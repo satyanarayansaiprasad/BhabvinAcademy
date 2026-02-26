@@ -360,17 +360,17 @@ function StudentViewCourseProgressPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Premium Certificate Dialog */}
-      <Dialog open={showCertificate} onOpenChange={setShowCertificate}>
-        <DialogContent className="max-w-5xl p-0 border-none bg-transparent shadow-none">
-          <Certificate
-            userName={auth?.user?.userFullName || auth?.user?.userName}
-            courseTitle={studentCurrentCourseProgress?.courseDetails?.title}
-            completionDate={new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}
-            instructorName={studentCurrentCourseProgress?.courseDetails?.instructorName}
-          />
-        </DialogContent>
-      </Dialog>
+      {/* Premium Certificate Download Trigger */}
+      {showCertificate && (
+        <Certificate
+          userName={auth?.user?.userFullName || auth?.user?.userName}
+          courseTitle={studentCurrentCourseProgress?.courseDetails?.title}
+          completionDate={new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}
+          instructorName={studentCurrentCourseProgress?.courseDetails?.instructorName}
+          silentDownload={true}
+          onDownloadComplete={() => setShowCertificate(false)}
+        />
+      )}
     </div>
   );
 }
