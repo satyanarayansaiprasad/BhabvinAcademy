@@ -1,3 +1,4 @@
+const Cart = require("../../models/Cart");
 const razorpay = require("../../helpers/razorpay");
 const crypto = require("crypto");
 const Order = require("../../models/Order");
@@ -114,7 +115,11 @@ const capturePaymentAndFinalizeOrder = async (req, res) => {
     }));
 
     if (studentCourses) {
-      studentCourses.courses.push(...coursesToAdd);
+      for (const courseToAdd of coursesToAdd) {
+        if (!studentCourses.courses.some(c => c.courseId === courseToAdd.courseId)) {
+          studentCourses.courses.push(courseToAdd);
+        }
+      }
       await studentCourses.save();
     } else {
       studentCourses = new StudentCourses({
@@ -137,6 +142,9 @@ const capturePaymentAndFinalizeOrder = async (req, res) => {
         },
       });
     }
+
+    // Clear the cart for this user after successful purchase
+    await Cart.findOneAndDelete({ userId: order.userId });
 
     res.status(200).json({
       success: true,

@@ -112,7 +112,7 @@ function StudentHomePage() {
         <p className="text-zinc-500 text-sm font-medium mb-6">By <span className="text-zinc-900">{course.instructorName}</span></p>
         <div className="flex items-center justify-between">
           <span className="text-xl font-black text-zinc-900">₹{course.pricing}</span>
-          <span className="text-blue-600 font-bold group-hover:translate-x-1 transition-transform text-sm">Enroll Now →</span>
+          <span className="text-blue-600 font-bold group-hover:translate-x-1 transition-transform text-sm">Buy Now →</span>
         </div>
       </div>
     </motion.div>
