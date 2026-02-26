@@ -136,22 +136,21 @@ function StudentProfilePage() {
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] pt-32 pb-24 selection:bg-blue-100">
-            <div className="container mx-auto px-4 lg:px-8 max-w-6xl">
-                <div className="grid lg:grid-cols-12 gap-12">
-
-                    {/* Left Column: Main Identity Card */}
+            <div className="container mx-auto px-4 lg:px-8 max-w-4xl">
+                <div className="flex justify-center">
+                    {/* Main Identity Card */}
                     <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="lg:col-span-8 space-y-8"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="w-full space-y-8"
                     >
                         {/* Premium Header Section */}
                         <div className="relative bg-white rounded-[48px] p-10 shadow-xl shadow-blue-900/5 border border-white overflow-hidden group">
                             <div className="absolute top-0 right-0 w-80 h-80 bg-blue-600/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
-                            <div className="relative z-10 flex flex-col md:flex-row items-start gap-10">
+                            <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-10">
                                 {/* Avatar Section */}
-                                <div className="relative shrink-0 mx-auto md:mx-0">
+                                <div className="relative shrink-0">
                                     <motion.div
                                         whileHover={{ scale: 1.02 }}
                                         className="w-44 h-44 rounded-[40px] overflow-hidden border-4 border-white shadow-2xl relative bg-zinc-100"
@@ -202,13 +201,13 @@ function StudentProfilePage() {
                                                 <Input
                                                     value={formData.userFullName}
                                                     onChange={(e) => setFormData(prev => ({ ...prev, userFullName: e.target.value }))}
-                                                    className="text-3xl font-black tracking-tighter h-14 rounded-2xl border-zinc-200 focus:ring-4 focus:ring-blue-100 transition-all"
+                                                    className="text-3xl font-black tracking-tighter h-14 rounded-2xl border-zinc-200 focus:ring-4 focus:ring-blue-100 transition-all text-center md:text-left"
                                                     placeholder="Your Full Name"
                                                 />
                                                 <Input
                                                     value={formData.userHeadline}
                                                     onChange={(e) => setFormData(prev => ({ ...prev, userHeadline: e.target.value }))}
-                                                    className="text-lg font-bold text-blue-600 h-12 rounded-xl border-zinc-200 focus:ring-4 focus:ring-blue-100 transition-all"
+                                                    className="text-lg font-bold text-blue-600 h-12 rounded-xl border-zinc-200 focus:ring-4 focus:ring-blue-100 transition-all text-center md:text-left"
                                                     placeholder="e.g. Master Student | UI Designer"
                                                 />
                                             </div>
@@ -228,7 +227,7 @@ function StudentProfilePage() {
                                             </p>
                                             <span className="w-1 h-1 rounded-full bg-zinc-300 hidden md:block" />
                                             <p className="text-zinc-400 text-sm font-medium flex items-center gap-2 capitalize">
-                                                <Briefcase className="w-4 h-4" /> {auth.user.role} Member
+                                                {auth.user.role === 'instructor' ? <CheckCircle2 className="w-4 h-4 text-blue-600" /> : <User className="w-4 h-4" />} {auth.user.role} Member
                                             </p>
                                         </div>
                                     </div>
@@ -272,129 +271,7 @@ function StudentProfilePage() {
                                 </div>
                             </div>
                         </div>
-
-                        {/* Bio Section Card */}
-                        <Card className="rounded-[40px] border-zinc-200/60 shadow-xl shadow-blue-900/5 overflow-hidden">
-                            <CardContent className="p-10">
-                                <div className="flex items-center justify-between mb-8">
-                                    <h3 className="text-xl font-black tracking-tighter flex items-center gap-3">
-                                        <div className="w-2 h-8 bg-blue-600 rounded-full" />
-                                        About Me.
-                                    </h3>
-                                    <FileText className="text-zinc-200 w-8 h-8" />
-                                </div>
-
-                                {isEditing ? (
-                                    <div className="space-y-6">
-                                        <Textarea
-                                            value={formData.userBio}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, userBio: e.target.value }))}
-                                            className="min-h-[160px] rounded-[24px] border-zinc-200 p-6 font-medium leading-relaxed focus:ring-4 focus:ring-blue-100 transition-all"
-                                            placeholder="Tell your story. What are your goals? What are you learning? Most students write about their passion for tech or business."
-                                        />
-                                        <div className="flex justify-end">
-                                            <Button
-                                                onClick={handleUpdateProfile}
-                                                disabled={updating || uploading}
-                                                className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6 font-bold"
-                                            >
-                                                Save Profile
-                                            </Button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="bg-zinc-50/50 rounded-[32px] p-8 border border-zinc-100">
-                                        <p className="text-zinc-600 font-medium leading-[1.8] italic">
-                                            {auth.user.userBio || "This student hasn't shared their story yet. Click 'Edit Profile' to add a bio and let others know what motivates you!"}
-                                        </p>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
                     </motion.div>
-
-                    {/* Right Column: Stats & Meta Information */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="lg:col-span-4 space-y-8"
-                    >
-                        {/* Achievement Card */}
-                        <div className="bg-zinc-900 rounded-[40px] p-8 text-white relative overflow-hidden group">
-                            <div className="relative z-10">
-                                <div className="flex items-center justify-between mb-6">
-                                    <Trophy className="h-10 w-10 text-amber-400 group-hover:rotate-12 transition-transform duration-500" />
-                                    <span className="text-[10px] font-black uppercase text-white tracking-[0.2em] bg-white/10 px-3 py-1 rounded-full">Pro Student</span>
-                                </div>
-                                <h4 className="text-xl font-black tracking-tighter mb-2">Expert Path.</h4>
-                                <p className="text-zinc-400 text-sm font-medium leading-relaxed mb-8">
-                                    You are in the top 5% of active students this month. Complete one more lesson to reach Level 12.
-                                </p>
-
-                                <div className="space-y-4">
-                                    <div className="h-2.5 w-full bg-white/10 rounded-full overflow-hidden">
-                                        <motion.div
-                                            initial={{ width: 0 }}
-                                            animate={{ width: "85%" }}
-                                            transition={{ duration: 1.5, ease: "easeOut" }}
-                                            className="h-full bg-gradient-to-r from-amber-400 to-amber-200"
-                                        />
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-[11px] font-extrabold uppercase text-white/40 tracking-widest">Level 11</span>
-                                        <span className="text-[11px] font-extrabold uppercase text-amber-400 tracking-widest">85% XP</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-400/10 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/2" />
-                        </div>
-
-                        {/* Quick Stats Grid */}
-                        <div className="grid grid-cols-2 gap-4">
-                            {stats.map((stat, index) => (
-                                <motion.div
-                                    key={index}
-                                    whileHover={{ y: -5 }}
-                                    className="bg-white rounded-[32px] p-6 border border-zinc-100 shadow-sm hover:shadow-lg transition-all"
-                                >
-                                    <div className={`w-10 h-10 rounded-xl ${stat.bg} ${stat.color} flex items-center justify-center mb-4`}>
-                                        <stat.icon size={20} />
-                                    </div>
-                                    <p className="text-2xl font-black tracking-tighter text-zinc-900">{stat.value}</p>
-                                    <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.1em]">{stat.label}</p>
-                                </motion.div>
-                            ))}
-                        </div>
-
-                        {/* Account Metadata Card */}
-                        <Card className="rounded-[40px] border-zinc-200/60 shadow-xl shadow-blue-900/5 bg-white">
-                            <CardContent className="p-8">
-                                <h4 className="text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-6">Social Discovery</h4>
-                                <div className="space-y-6">
-                                    <div className="flex items-center justify-between group cursor-pointer">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-500 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                                                <User size={16} />
-                                            </div>
-                                            <span className="text-sm font-bold text-zinc-900 group-hover:text-blue-600 transition-colors">Public Profile</span>
-                                        </div>
-                                        <ExternalLink size={14} className="text-zinc-300 group-hover:text-blue-600" />
-                                    </div>
-                                    <div className="flex items-center justify-between group cursor-pointer">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-500 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                                                <CheckCircle2 size={16} />
-                                            </div>
-                                            <span className="text-sm font-bold text-zinc-900 group-hover:text-emerald-600 transition-colors">Certificates (4)</span>
-                                        </div>
-                                        <ExternalLink size={14} className="text-zinc-300 group-hover:text-emerald-600" />
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </motion.div>
-
                 </div>
             </div>
         </div>
