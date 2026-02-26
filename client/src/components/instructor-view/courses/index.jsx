@@ -98,7 +98,9 @@ function InstructorCourses({ listOfCourses, fetchAllCourses }) {
                         <span className="text-zinc-400 text-[10px] uppercase font-bold tracking-tighter mb-1 flex items-center gap-1">
                           <DollarSign className="h-3 w-3" /> Revenue
                         </span>
-                        <span className="font-bold text-zinc-900">${(course?.students?.length || 0) * course?.pricing}</span>
+                        <span className="font-bold text-zinc-900">
+                          ₹{course?.students?.reduce((acc, student) => acc + parseFloat(student.paidAmount || 0), 0)?.toFixed(2) || "0.00"}
+                        </span>
                       </div>
                     </div>
                   </TableCell>

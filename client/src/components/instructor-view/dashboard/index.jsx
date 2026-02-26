@@ -23,15 +23,19 @@ function InstructorDashboard({ listOfCourses }) {
 
     const { totalStudents, totalProfit, studentList } = listOfCourses.reduce(
       (acc, course) => {
-        const studentCount = course.students.length;
+        const studentCount = course.students?.length || 0;
         acc.totalStudents += studentCount;
-        acc.totalProfit += course.pricing * studentCount;
 
-        course.students.forEach((student) => {
+        course.students?.forEach((student) => {
+          // Use stored paidAmount if available, otherwise fallback to course pricing
+          const amountPaid = student.paidAmount ? parseFloat(student.paidAmount) : course.pricing;
+          acc.totalProfit += amountPaid;
+
           acc.studentList.push({
             courseTitle: course.title,
             studentName: student.studentName,
             studentEmail: student.studentEmail,
+            purchasedDate: student.purchasedDate || null,
           });
         });
 
@@ -44,10 +48,16 @@ function InstructorDashboard({ listOfCourses }) {
       }
     );
 
+    // Sort students by purchasedDate descending (most recent first)
+    const sortedStudentList = [...studentList].sort((a, b) => {
+      if (!a.purchasedDate || !b.purchasedDate) return 0;
+      return new Date(b.purchasedDate) - new Date(a.purchasedDate);
+    });
+
     return {
-      totalProfit,
+      totalProfit: totalProfit.toFixed(2),
       totalStudents,
-      studentList,
+      studentList: sortedStudentList,
     };
   }
 
@@ -63,7 +73,7 @@ function InstructorDashboard({ listOfCourses }) {
     {
       icon: DollarSign,
       label: "Total Revenue",
-      value: `$${stats.totalProfit}`,
+      value: `₹${stats.totalProfit}`,
       color: "bg-emerald-50 text-emerald-600",
     },
   ];
