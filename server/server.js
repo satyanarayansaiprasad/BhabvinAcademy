@@ -26,13 +26,25 @@ app.use(
 app.use(express.json());
 
 //database connection
-mongoose
-    .connect(MONGO_URI)
-    .then(() => console.log("mongodb is connected"))
-    .catch((e) => console.log(e));
+const connectDB = async () => {
+    try {
+        if (mongoose.connection.readyState >= 1) return;
+
+        await mongoose.connect(MONGO_URI, {
+            autoIndex: true,
+        });
+        console.log("mongodb is connected");
+    } catch (e) {
+        console.log("MongoDB connection error:", e);
+    }
+};
+
+// Initial connection attempt
+connectDB();
 
 //routes configuration
-app.get("/health", (req, res) => {
+app.get("/health", async (req, res) => {
+    await connectDB();
     res.status(200).json({
         success: true,
         message: "Server is healthy",
