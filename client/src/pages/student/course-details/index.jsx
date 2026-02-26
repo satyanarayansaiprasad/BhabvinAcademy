@@ -39,11 +39,12 @@ function StudentViewCourseDetailsPage() {
   const [displayCurrentVideoFreePreview, setDisplayCurrentVideoFreePreview] =
     useState(null);
   const [showFreePreviewDialog, setShowFreePreviewDialog] = useState(false);
-  const [approvalUrl, setApprovalUrl] = useState("");
   const navigate = useNavigate();
   const { id } = useParams();
   const location = useLocation();
   const { toast } = useToast();
+
+  const isCourseInCart = cartItems.some(item => item.courseId === studentViewCourseDetails?._id);
 
   async function fetchStudentViewCourseDetails() {
     const response = await fetchStudentViewCourseDetailsService(
@@ -63,38 +64,12 @@ function StudentViewCourseDetailsPage() {
     setDisplayCurrentVideoFreePreview(getCurrentVideoInfo?.videoUrl);
   }
 
-  async function handleCreatePayment() {
+  async function handleBuyNow() {
     if (!auth?.authenticate) {
       navigate("/auth");
       return;
     }
-    const paymentPayload = {
-      userId: auth?.user?._id,
-      userName: auth?.user?.userName,
-      userEmail: auth?.user?.userEmail,
-      orderStatus: "pending",
-      paymentMethod: "paypal",
-      paymentStatus: "initiated",
-      orderDate: new Date(),
-      paymentId: "",
-      payerId: "",
-      instructorId: studentViewCourseDetails?.instructorId,
-      instructorName: studentViewCourseDetails?.instructorName,
-      courseImage: studentViewCourseDetails?.image,
-      courseTitle: studentViewCourseDetails?.title,
-      courseId: studentViewCourseDetails?._id,
-      coursePricing: studentViewCourseDetails?.pricing,
-    };
-
-    const response = await createPaymentService(paymentPayload);
-
-    if (response.success) {
-      sessionStorage.setItem(
-        "currentOrderId",
-        JSON.stringify(response?.data?.orderId)
-      );
-      setApprovalUrl(response?.data?.approveUrl);
-    }
+    navigate("/checkout", { state: { course: studentViewCourseDetails } });
   }
 
   async function handleAddToCartLocal() {
@@ -108,17 +83,16 @@ function StudentViewCourseDetailsPage() {
       return;
     }
 
+    if (cartItems.some(item => item.courseId === studentViewCourseDetails?._id)) {
+      navigate("/cart");
+      return;
+    }
+
     const response = await handleAddToCart(studentViewCourseDetails?._id, auth?.user?._id);
     if (response?.success) {
       toast({
         title: "Added to Cart",
         description: "The course has been added to your cart successfully.",
-      });
-    } else {
-      toast({
-        title: "Error",
-        description: response?.message || "Failed to add to cart.",
-        variant: "destructive",
       });
     }
   }
@@ -154,10 +128,6 @@ function StudentViewCourseDetailsPage() {
       </div>
     </div>
   );
-
-  if (approvalUrl !== "") {
-    window.location.href = approvalUrl;
-  }
 
   const getIndexOfFreePreviewUrl =
     studentViewCourseDetails !== null
@@ -364,17 +334,17 @@ function StudentViewCourseDetailsPage() {
 
                     <div className="space-y-4">
                       <Button
-                        onClick={handleCreatePayment}
+                        onClick={handleBuyNow}
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-[24px] h-16 text-xl font-bold shadow-xl shadow-blue-100 transition-all hover:scale-105 active:scale-95"
                       >
-                        Enroll Now
+                        Buy Now
                       </Button>
                       <Button
                         variant="outline"
                         onClick={handleAddToCartLocal}
                         className="w-full rounded-[24px] h-16 text-lg font-bold border-zinc-200 text-zinc-700 hover:bg-zinc-50"
                       >
-                        Add to Cart
+                        {isCourseInCart ? "Go to Cart" : "Add to Cart"}
                       </Button>
                     </div>
 

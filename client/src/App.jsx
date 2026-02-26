@@ -10,11 +10,11 @@ import NotFoundPage from "./pages/not-found";
 import AddNewCoursePage from "./pages/instructor/add-new-course";
 import StudentViewCoursesPage from "./pages/student/courses";
 import StudentViewCourseDetailsPage from "./pages/student/course-details";
-import PaypalPaymentReturnPage from "./pages/student/payment-return";
 import StudentCoursesPage from "./pages/student/student-courses";
 import StudentViewCourseProgressPage from "./pages/student/course-progress";
 import AboutUsPage from "./pages/student/about";
 import CartPage from "./pages/student/cart";
+import CheckoutPage from "./pages/student/checkout";
 import ScrollToTop from "./components/scroll-to-top";
 
 function App() {
@@ -79,10 +79,10 @@ function App() {
             element={<StudentViewCourseDetailsPage />}
           />
           <Route
-            path="payment-return"
+            path="checkout"
             element={
               <RouteGuard
-                element={<PaypalPaymentReturnPage />}
+                element={<CheckoutPage />}
                 authenticated={auth?.authenticate}
                 user={auth?.user}
               />

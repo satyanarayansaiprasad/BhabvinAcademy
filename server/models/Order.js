@@ -10,12 +10,19 @@ const OrderSchema = new mongoose.Schema({
   orderDate: Date,
   paymentId: String,
   payerId: String,
-  instructorId: String,
-  instructorName: String,
-  courseImage: String,
-  courseTitle: String,
-  courseId: String,
-  coursePricing: String,
+  razorpayOrderId: String,
+  razorpayPaymentId: String,
+  razorpaySignature: String,
+  courses: [
+    {
+      courseId: String,
+      title: String,
+      instructorId: String,
+      instructorName: String,
+      courseImage: String,
+      coursePricing: String,
+    },
+  ],
 });
 
 module.exports = mongoose.model("Order", OrderSchema);

@@ -1,14 +1,22 @@
 import { GraduationCap, TvMinimalPlay, Menu, X, ShoppingCart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/context/auth-context";
+import { StudentContext } from "@/context/student-context";
 import { motion, AnimatePresence } from "framer-motion";
 
 function StudentViewCommonHeader() {
   const navigate = useNavigate();
   const { auth, resetCredentials } = useContext(AuthContext);
+  const { cartItems, fetchCartItems } = useContext(StudentContext);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (auth?.authenticate && auth?.user?._id) {
+      fetchCartItems(auth?.user?._id);
+    }
+  }, [auth]);
 
   function handleLogout() {
     resetCredentials();
@@ -77,6 +85,11 @@ function StudentViewCommonHeader() {
                     className="flex cursor-pointer items-center gap-2 text-zinc-600 hover:text-zinc-900 transition-colors relative"
                   >
                     <ShoppingCart className="w-5 h-5" />
+                    {cartItems?.length > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold h-4 w-4 flex items-center justify-center rounded-full">
+                        {cartItems.length}
+                      </span>
+                    )}
                   </motion.div>
                 </>
               )}

@@ -43,6 +43,7 @@ function StudentViewCoursesPage() {
     setStudentViewCoursesList,
     loadingState,
     setLoadingState,
+    cartItems,
     handleAddToCart,
   } = useContext(StudentContext);
   const { toast } = useToast();
@@ -116,17 +117,16 @@ function StudentViewCoursesPage() {
       return;
     }
 
+    if (cartItems.some(item => item.courseId === courseId)) {
+      navigate("/cart");
+      return;
+    }
+
     const response = await handleAddToCart(courseId, auth?.user?._id);
     if (response?.success) {
       toast({
         title: "Added to Cart",
         description: "The course has been added to your cart successfully.",
-      });
-    } else {
-      toast({
-        title: "Error",
-        description: response?.message || "Failed to add to cart.",
-        variant: "destructive",
       });
     }
   }
@@ -347,7 +347,7 @@ function StudentViewCoursesPage() {
                             className="bg-zinc-900 text-white hover:bg-zinc-800 rounded-2xl h-12 px-6 flex items-center gap-2 font-bold shadow-lg shadow-zinc-900/10 active:scale-95 transition-all"
                           >
                             <ShoppingCart className="w-4 h-4" />
-                            Add to Cart
+                            {cartItems.some(item => item.courseId === courseItem?._id) ? "Go to Cart" : "Add to Cart"}
                           </Button>
                         </div>
                       </div>
