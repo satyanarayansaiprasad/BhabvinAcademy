@@ -4,6 +4,7 @@ const {
   loginUser,
   forgotPassword,
   resetPassword,
+  updateUserProfile,
 } = require("../../controllers/auth-controller/index");
 const authenticateMiddleware = require("../../middleware/auth-middleware");
 const router = express.Router();
@@ -12,6 +13,7 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
+router.put("/update-profile", authenticateMiddleware, updateUserProfile);
 router.get("/check-auth", authenticateMiddleware, (req, res) => {
   const user = req.user;
 

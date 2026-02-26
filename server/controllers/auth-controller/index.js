@@ -52,6 +52,7 @@ const loginUser = async (req, res) => {
       userFullName: checkUser.userFullName,
       userEmail: checkUser.userEmail,
       role: checkUser.role,
+      profileImage: checkUser.profileImage,
     },
     process.env.JWT_SECRET || "JWT_SECRET",
     { expiresIn: process.env.JWT_EXPIRES_IN || "120m" }
@@ -68,6 +69,7 @@ const loginUser = async (req, res) => {
         userFullName: checkUser.userFullName,
         userEmail: checkUser.userEmail,
         role: checkUser.role,
+        profileImage: checkUser.profileImage,
       },
     },
   });
@@ -112,4 +114,49 @@ const resetPassword = async (req, res) => {
   });
 };
 
-module.exports = { registerUser, loginUser, forgotPassword, resetPassword };
+const updateUserProfile = async (req, res) => {
+  try {
+    const { userId, userFullName, profileImage } = req.body;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found!",
+      });
+    }
+
+    if (userFullName) user.userFullName = userFullName;
+    if (profileImage !== undefined) user.profileImage = profileImage;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully!",
+      data: {
+        _id: user._id,
+        userName: user.userName,
+        userFullName: user.userFullName,
+        userEmail: user.userEmail,
+        role: user.role,
+        profileImage: user.profileImage,
+      },
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({
+      success: false,
+      message: "Some error occured!",
+    });
+  }
+};
+
+module.exports = {
+  registerUser,
+  loginUser,
+  forgotPassword,
+  resetPassword,
+  updateUserProfile,
+};

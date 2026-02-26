@@ -112,6 +112,7 @@ export default function AuthProvider({ children }) {
         handleForgotPassword,
         handleResetPassword,
         auth,
+        setAuth,
         resetCredentials,
       }}
     >

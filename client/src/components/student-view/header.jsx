@@ -76,7 +76,13 @@ function StudentViewCommonHeader() {
                     className="flex cursor-pointer items-center gap-2 text-zinc-600 hover:text-zinc-900 transition-colors"
                   >
                     <span className="font-bold text-[14px]">Profile</span>
-                    <User className="w-5 h-5" />
+                    {auth?.user?.profileImage ? (
+                      <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-zinc-100">
+                        <img src={auth.user.profileImage} alt="Profile" className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <User className="w-5 h-5" />
+                    )}
                   </motion.div>
                   <motion.div
                     whileHover={{ scale: 1.05 }}

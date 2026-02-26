@@ -211,3 +211,8 @@ export async function resetPasswordService(formData) {
   const { data } = await axiosInstance.post("/auth/reset-password", formData);
   return data;
 }
+
+export async function updateUserProfileService(formData) {
+  const { data } = await axiosInstance.put("/auth/update-profile", formData);
+  return data;
+}
