@@ -98,26 +98,13 @@ function StudentViewCourseDetailsPage() {
     }
   }
 
-  async function handleShare() {
-    const shareData = {
-      title: studentViewCourseDetails?.title,
-      text: studentViewCourseDetails?.subtitle,
-      url: window.location.href,
-    };
-
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        await navigator.clipboard.writeText(window.location.href);
-        toast({
-          title: "URL Copied!",
-          description: "Course link has been copied to your clipboard.",
-        });
-      }
-    } catch (err) {
-      console.error("Error sharing:", err);
-    }
+  function handleShare() {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url);
+    toast({
+      title: "Link Copied!",
+      description: "Course link has been copied to your clipboard.",
+    });
   }
 
   useEffect(() => {
@@ -352,7 +339,9 @@ function StudentViewCourseDetailsPage() {
                       </div>
                       <Button
                         onClick={handleShare}
-                        variant="ghost" className="rounded-full w-12 h-12 p-0 text-zinc-400 border border-zinc-100 hover:bg-zinc-50">
+                        variant="ghost"
+                        className="rounded-full w-12 h-12 p-0 text-zinc-400 border border-zinc-100 hover:bg-zinc-50"
+                      >
                         <Share2 className="h-5 w-5" />
                       </Button>
                     </div>
