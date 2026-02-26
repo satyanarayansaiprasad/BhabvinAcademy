@@ -15,6 +15,7 @@ import StudentViewCourseProgressPage from "./pages/student/course-progress";
 import AboutUsPage from "./pages/student/about";
 import CartPage from "./pages/student/cart";
 import CheckoutPage from "./pages/student/checkout";
+import StudentProfilePage from "./pages/student/profile";
 import ScrollToTop from "./components/scroll-to-top";
 
 function App() {
@@ -113,6 +114,16 @@ function App() {
             element={
               <RouteGuard
                 element={<CartPage />}
+                authenticated={auth?.authenticate}
+                user={auth?.user}
+              />
+            }
+          />
+          <Route
+            path="profile"
+            element={
+              <RouteGuard
+                element={<StudentProfilePage />}
                 authenticated={auth?.authenticate}
                 user={auth?.user}
               />

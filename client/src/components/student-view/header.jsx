@@ -1,4 +1,4 @@
-import { GraduationCap, TvMinimalPlay, Menu, X, ShoppingCart } from "lucide-react";
+import { GraduationCap, TvMinimalPlay, Menu, X, ShoppingCart, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { useContext, useEffect, useState } from "react";
@@ -69,6 +69,15 @@ function StudentViewCommonHeader() {
             <div className="hidden md:flex gap-4 items-center">
               {auth?.authenticate && (
                 <>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => navigate("/profile")}
+                    className="flex cursor-pointer items-center gap-2 text-zinc-600 hover:text-zinc-900 transition-colors"
+                  >
+                    <span className="font-bold text-[14px]">Profile</span>
+                    <User className="w-5 h-5" />
+                  </motion.div>
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -172,15 +181,26 @@ function StudentViewCommonHeader() {
                   About Us
                 </button>
                 {auth?.authenticate && (
-                  <button
-                    onClick={() => {
-                      navigate("/student-courses");
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="text-left text-2xl font-black text-zinc-900 tracking-tight hover:text-emerald-600 transition-colors"
-                  >
-                    My Courses
-                  </button>
+                  <>
+                    <button
+                      onClick={() => {
+                        navigate("/profile");
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="text-left text-2xl font-black text-zinc-900 tracking-tight hover:text-emerald-600 transition-colors"
+                    >
+                      Profile
+                    </button>
+                    <button
+                      onClick={() => {
+                        navigate("/student-courses");
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="text-left text-2xl font-black text-zinc-900 tracking-tight hover:text-emerald-600 transition-colors"
+                    >
+                      My Courses
+                    </button>
+                  </>
                 )}
               </nav>
 
