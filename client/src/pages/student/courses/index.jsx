@@ -1,0 +1,324 @@
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
+import { filterOptions, sortOptions } from "@/config";
+import { AuthContext } from "@/context/auth-context";
+import { StudentContext } from "@/context/student-context";
+import {
+  checkCoursePurchaseInfoService,
+  fetchStudentViewCourseListService,
+} from "@/services";
+import { ArrowUpDownIcon, Filter, Layers } from "lucide-react";
+import { useContext, useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+
+function createSearchParamsHelper(filterParams) {
+  const queryParams = [];
+  for (const [key, value] of Object.entries(filterParams)) {
+    if (Array.isArray(value) && value.length > 0) {
+      const paramValue = value.join(",");
+      queryParams.push(`${key}=${encodeURIComponent(paramValue)}`);
+    }
+  }
+  return queryParams.join("&");
+}
+
+function StudentViewCoursesPage() {
+  const [sort, setSort] = useState("price-lowtohigh");
+  const [filters, setFilters] = useState({});
+  const [searchParams, setSearchParams] = useSearchParams();
+  const {
+    studentViewCoursesList,
+    setStudentViewCoursesList,
+    loadingState,
+    setLoadingState,
+  } = useContext(StudentContext);
+  const navigate = useNavigate();
+  const { auth } = useContext(AuthContext);
+
+  function handleFilterOnChange(getSectionId, getCurrentOption) {
+    let cpyFilters = { ...filters };
+    const indexOfCurrentSeection = Object.keys(cpyFilters).indexOf(getSectionId);
+
+    if (indexOfCurrentSeection === -1) {
+      cpyFilters = {
+        ...cpyFilters,
+        [getSectionId]: [getCurrentOption.id],
+      };
+    } else {
+      const indexOfCurrentOption = cpyFilters[getSectionId].indexOf(
+        getCurrentOption.id
+      );
+
+      if (indexOfCurrentOption === -1)
+        cpyFilters[getSectionId].push(getCurrentOption.id);
+      else cpyFilters[getSectionId].splice(indexOfCurrentOption, 1);
+    }
+
+    setFilters(cpyFilters);
+    sessionStorage.setItem("filters", JSON.stringify(cpyFilters));
+  }
+
+  async function fetchAllStudentViewCourses(filters, sort) {
+    const query = new URLSearchParams({
+      ...filters,
+      sortBy: sort,
+    });
+    const response = await fetchStudentViewCourseListService(query);
+    if (response?.success) {
+      setStudentViewCoursesList(response?.data);
+      setLoadingState(false);
+    }
+  }
+
+  async function handleCourseNavigate(getCurrentCourseId) {
+    if (!auth?.authenticate) {
+      navigate(`/course/details/${getCurrentCourseId}`);
+      return;
+    }
+
+    const response = await checkCoursePurchaseInfoService(
+      getCurrentCourseId,
+      auth?.user?._id
+    );
+
+    if (response?.success) {
+      if (response?.data) {
+        navigate(`/course-progress/${getCurrentCourseId}`);
+      } else {
+        navigate(`/course/details/${getCurrentCourseId}`);
+      }
+    }
+  }
+
+  useEffect(() => {
+    const buildQueryStringForFilters = createSearchParamsHelper(filters);
+    setSearchParams(new URLSearchParams(buildQueryStringForFilters));
+  }, [filters]);
+
+  useEffect(() => {
+    setSort("price-lowtohigh");
+    setFilters(JSON.parse(sessionStorage.getItem("filters")) || {});
+  }, []);
+
+  useEffect(() => {
+    if (filters !== null && sort !== null)
+      fetchAllStudentViewCourses(filters, sort);
+  }, [filters, sort]);
+
+  useEffect(() => {
+    return () => {
+      sessionStorage.removeItem("filters");
+    };
+  }, []);
+
+  return (
+    <div className="bg-slate-50 min-h-screen">
+      <div className="container mx-auto px-4 lg:px-8 py-12">
+
+        {/* Header Section */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6"
+        >
+          <div>
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-zinc-900 mb-2">Explore Courses</h1>
+            <p className="text-zinc-500 font-medium">Discover your next passion from our curated catalog.</p>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <span className="text-sm font-bold text-zinc-400 bg-zinc-100 px-3 py-1 rounded-full">
+              {studentViewCoursesList.length} Results
+            </span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-2 h-11 px-5 rounded-full border-zinc-200 bg-white shadow-sm hover:shadow-md transition-all font-bold text-zinc-700"
+                >
+                  <ArrowUpDownIcon className="h-4 w-4" />
+                  <span>Sort By</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[200px] rounded-2xl p-2 shadow-2xl border-zinc-100">
+                <DropdownMenuRadioGroup
+                  value={sort}
+                  onValueChange={(value) => setSort(value)}
+                >
+                  {sortOptions.map((sortItem) => (
+                    <DropdownMenuRadioItem
+                      value={sortItem.id}
+                      key={sortItem.id}
+                      className="rounded-xl cursor-pointer py-2.5 font-medium"
+                    >
+                      {sortItem.label}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </motion.div>
+
+        <div className="flex flex-col lg:flex-row gap-12">
+          {/* Sidebar Filters */}
+          <aside className="w-full lg:w-72 shrink-0">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="bg-white rounded-[32px] border border-zinc-200/60 p-8 shadow-sm sticky top-28"
+            >
+              <div className="flex items-center gap-2 mb-8 text-zinc-900">
+                <Filter className="h-5 w-5" />
+                <h2 className="font-bold text-lg">Filters</h2>
+              </div>
+
+              <div className="space-y-10">
+                {Object.keys(filterOptions).map((keyItem) => (
+                  <div key={keyItem}>
+                    <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-4">
+                      {keyItem}
+                    </h3>
+                    <div className="grid gap-3">
+                      {filterOptions[keyItem].map((option) => (
+                        <Label
+                          key={option.id}
+                          className="flex items-center gap-3 cursor-pointer group"
+                        >
+                          <div className="relative flex items-center">
+                            <Checkbox
+                              id={option.id}
+                              checked={
+                                filters[keyItem]?.indexOf(option.id) > -1
+                              }
+                              onCheckedChange={() =>
+                                handleFilterOnChange(keyItem, option)
+                              }
+                              className="rounded-md border-zinc-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 shadow-none h-5 w-5 transition-all"
+                            />
+                          </div>
+                          <span className={`text-[15px] font-medium transition-colors ${filters[keyItem]?.indexOf(option.id) > -1
+                              ? "text-zinc-900 font-bold"
+                              : "text-zinc-500 group-hover:text-zinc-800"
+                            }`}>
+                            {option.label}
+                          </span>
+                        </Label>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <Button
+                variant="ghost"
+                className="w-full mt-10 text-zinc-400 border border-zinc-100 rounded-2xl h-12 hover:bg-zinc-50 font-bold"
+                onClick={() => {
+                  setFilters({});
+                  sessionStorage.removeItem("filters");
+                }}
+              >
+                Clear all filters
+              </Button>
+            </motion.div>
+          </aside>
+
+          {/* Main Course List */}
+          <main className="flex-1">
+            <AnimatePresence mode="popLayout">
+              {loadingState ? (
+                <div className="grid gap-6">
+                  {[...Array(4)].map((_, i) => (
+                    <Skeleton key={i} className="h-[200px] w-full rounded-[32px]" />
+                  ))}
+                </div>
+              ) : studentViewCoursesList && studentViewCoursesList.length > 0 ? (
+                <motion.div
+                  layout
+                  className="grid gap-6"
+                >
+                  {studentViewCoursesList.map((courseItem) => (
+                    <motion.div
+                      layout
+                      key={courseItem?._id}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      whileHover={{ y: -5 }}
+                      onClick={() => handleCourseNavigate(courseItem?._id)}
+                      className="group cursor-pointer bg-white rounded-[32px] border border-zinc-200/60 p-6 flex flex-col md:flex-row gap-8 shadow-sm hover:shadow-xl hover:border-zinc-300 transition-all duration-300 overflow-hidden"
+                    >
+                      <div className="w-full md:w-72 h-44 rounded-2xl overflow-hidden relative shrink-0">
+                        <img
+                          src={courseItem?.image}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors" />
+                      </div>
+
+                      <div className="flex-1 flex flex-col py-1">
+                        <div className="flex items-start justify-between gap-4 mb-2">
+                          <h3 className="text-2xl font-bold text-zinc-900 group-hover:text-blue-600 transition-colors leading-tight line-clamp-2">
+                            {courseItem?.title}
+                          </h3>
+                        </div>
+
+                        <p className="text-[15px] font-medium text-zinc-500 mb-4">
+                          By <span className="text-zinc-800 font-bold">{courseItem?.instructorName}</span>
+                        </p>
+
+                        <div className="flex flex-wrap items-center gap-3 mt-auto mb-4">
+                          <span className="flex items-center gap-1.5 px-3 py-1 bg-zinc-100 rounded-full text-xs font-bold text-zinc-600">
+                            <Layers className="h-3 w-3" />
+                            {courseItem?.curriculum?.length} Lectures
+                          </span>
+                          <span className="px-3 py-1 bg-blue-50 rounded-full text-xs font-bold text-blue-600 uppercase tracking-wider">
+                            {courseItem?.level}
+                          </span>
+                        </div>
+
+                        <div className="pt-4 border-t border-zinc-100 flex items-center justify-between">
+                          <div className="flex items-center gap-1">
+                            <span className="text-zinc-900 font-bold">4.8</span>
+                            <div className="flex text-yellow-500 text-sm">★★★★★</div>
+                          </div>
+                          <p className="text-3xl font-extrabold text-zinc-900 tracking-tighter">
+                            ${courseItem?.pricing}
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex flex-col items-center justify-center py-32 text-center"
+                >
+                  <div className="w-20 h-20 bg-zinc-100 rounded-full flex items-center justify-center mb-6">
+                    <Filter className="h-10 w-10 text-zinc-300" />
+                  </div>
+                  <h2 className="text-3xl font-bold text-zinc-900 mb-2">No Courses Found</h2>
+                  <p className="text-zinc-500 font-medium">Try adjusting your filters to find what you're looking for.</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </main>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default StudentViewCoursesPage;
