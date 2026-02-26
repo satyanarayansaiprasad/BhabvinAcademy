@@ -363,9 +363,14 @@ function StudentViewCourseProgressPage() {
       {/* Premium Certificate Download Trigger */}
       {showCertificate && (
         <Certificate
+          key={studentCurrentCourseProgress?.courseDetails?._id}
           userName={auth?.user?.userFullName || auth?.user?.userName}
           courseTitle={studentCurrentCourseProgress?.courseDetails?.title}
-          completionDate={new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}
+          completionDate={new Date().toLocaleDateString('en-IN', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })}
           instructorName={studentCurrentCourseProgress?.courseDetails?.instructorName}
           silentDownload={true}
           onDownloadComplete={() => setShowCertificate(false)}
