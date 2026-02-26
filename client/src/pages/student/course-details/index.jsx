@@ -32,6 +32,7 @@ function StudentViewCourseDetailsPage() {
     loadingState,
     setLoadingState,
     handleAddToCart,
+    cartItems,
   } = useContext(StudentContext);
 
   const { auth } = useContext(AuthContext);

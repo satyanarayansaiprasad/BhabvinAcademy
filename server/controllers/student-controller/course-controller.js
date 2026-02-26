@@ -1,5 +1,6 @@
 const Course = require("../../models/Course");
 const StudentCourses = require("../../models/StudentCourses");
+const mongoose = require("mongoose");
 
 const getAllStudentViewCourses = async (req, res) => {
   try {
@@ -14,43 +15,35 @@ const getAllStudentViewCourses = async (req, res) => {
 
     let filters = {};
     if (category && category.length) {
-      filters.category = {
-        $in: typeof category === "string" ? category.split(",") : category,
-      };
+      const categoryArray = typeof category === "string" ? category.split(",").filter(c => c.trim() !== "") : category;
+      if (categoryArray.length > 0) filters.category = { $in: categoryArray };
     }
     if (level && level.length) {
-      filters.level = {
-        $in: typeof level === "string" ? level.split(",") : level,
-      };
+      const levelArray = typeof level === "string" ? level.split(",").filter(l => l.trim() !== "") : level;
+      if (levelArray.length > 0) filters.level = { $in: levelArray };
     }
     if (primaryLanguage && primaryLanguage.length) {
-      filters.primaryLanguage = {
-        $in:
-          typeof primaryLanguage === "string"
-            ? primaryLanguage.split(",")
-            : primaryLanguage,
-      };
+      const langArray = typeof primaryLanguage === "string" ? primaryLanguage.split(",").filter(p => p.trim() !== "") : primaryLanguage;
+      if (langArray.length > 0) filters.primaryLanguage = { $in: langArray };
     }
+
+    // Only show published courses
+    filters.isPublished = true;
 
     let sortParam = {};
     switch (sortBy) {
       case "price-lowtohigh":
         sortParam.pricing = 1;
-
         break;
       case "price-hightolow":
         sortParam.pricing = -1;
-
         break;
       case "title-atoz":
         sortParam.title = 1;
-
         break;
       case "title-ztoa":
         sortParam.title = -1;
-
         break;
-
       default:
         sortParam.pricing = 1;
         break;
@@ -74,6 +67,14 @@ const getAllStudentViewCourses = async (req, res) => {
 const getStudentViewCourseDetails = async (req, res) => {
   try {
     const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Course ID format",
+      });
+    }
+
     const courseDetails = await Course.findById(id);
 
     if (!courseDetails) {
@@ -100,6 +101,14 @@ const getStudentViewCourseDetails = async (req, res) => {
 const checkCoursePurchaseInfo = async (req, res) => {
   try {
     const { id, studentId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Course ID provided",
+      });
+    }
+
     const studentCourses = await StudentCourses.findOne({
       userId: studentId,
     });
