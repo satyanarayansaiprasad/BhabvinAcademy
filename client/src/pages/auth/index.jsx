@@ -64,12 +64,12 @@ function AuthPage() {
               <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center mb-8">
                 <Sparkles className="h-6 w-6 text-white" />
               </div>
-              <h2 className="text-4xl font-black tracking-tighter leading-tight mb-6">
+              <h2 className="text-[28px] font-black tracking-tighter leading-tight mb-6">
                 Start your <br />
                 learning <br />
                 revolution.
               </h2>
-              <p className="text-zinc-400 font-medium text-lg leading-relaxed max-w-xs">
+              <p className="text-zinc-400 font-medium text-base leading-relaxed max-w-xs">
                 Join the most immersive community of high-achievers. Master any skill with cinematic precision.
               </p>
             </div>
@@ -118,7 +118,7 @@ function AuthPage() {
                 {activeTab === "signin" ? (
                   <div className="space-y-6">
                     <div>
-                      <h3 className="text-3xl font-black tracking-tighter text-zinc-900 mb-2">Welcome Back.</h3>
+                      <h3 className="text-[22px] font-black tracking-tighter text-zinc-900 mb-2">Welcome Back.</h3>
                       <p className="text-zinc-500 font-medium">Continue your journey to excellence.</p>
                     </div>
                     <div className="space-y-4 pt-4 auth-form-container">
@@ -135,7 +135,7 @@ function AuthPage() {
                 ) : (
                   <div className="space-y-6">
                     <div>
-                      <h3 className="text-3xl font-black tracking-tighter text-zinc-900 mb-2">Join the Academy.</h3>
+                      <h3 className="text-[22px] font-black tracking-tighter text-zinc-900 mb-2">Join the Academy.</h3>
                       <p className="text-zinc-500 font-medium">Setup your profile and start learning.</p>
                     </div>
                     <div className="space-y-4 pt-4 auth-form-container">

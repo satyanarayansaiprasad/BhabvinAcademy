@@ -97,11 +97,11 @@ function StudentHomePage() {
         </div>
       </div>
       <div className="p-8">
-        <h3 className="text-xl font-bold text-zinc-900 mb-2 line-clamp-1">{course.title}</h3>
+        <h3 className="text-lg font-bold text-zinc-900 mb-2 line-clamp-1">{course.title}</h3>
         <p className="text-zinc-500 text-sm font-medium mb-6">By <span className="text-zinc-900">{course.instructorName}</span></p>
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-black text-zinc-900">${course.pricing}</span>
-          <span className="text-blue-600 font-bold group-hover:translate-x-1 transition-transform">Enroll Now →</span>
+          <span className="text-xl font-black text-zinc-900">${course.pricing}</span>
+          <span className="text-blue-600 font-bold group-hover:translate-x-1 transition-transform text-sm">Enroll Now →</span>
         </div>
       </div>
     </motion.div>
@@ -136,7 +136,7 @@ function StudentHomePage() {
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
-                className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white mb-8 leading-[0.9]"
+                className="text-3xl md:text-[35px] font-black tracking-tighter text-white mb-8 leading-[1.1]"
               >
                 Learn <br />
                 <span className="bg-gradient-to-r from-blue-400 via-emerald-400 to-indigo-400 bg-clip-text text-transparent italic">
@@ -148,7 +148,7 @@ function StudentHomePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
-                className="text-lg md:text-xl text-zinc-400 max-w-xl mb-12 font-medium leading-relaxed"
+                className="text-base text-zinc-400 max-w-xl mb-12 font-medium leading-relaxed"
               >
                 Experience the most immersive learning platform ever built.
                 Industry-leading courses, beautifully rendered on every screen.
@@ -320,7 +320,7 @@ function StudentHomePage() {
           <div className="flex items-center justify-between mb-12">
             <div>
               <span className="text-blue-600 font-black text-[10px] uppercase tracking-widest block mb-2">Popular Now</span>
-              <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-zinc-900">Trending Courses.</h2>
+              <h2 className="text-[28px] font-black tracking-tighter text-zinc-900">Trending Courses.</h2>
             </div>
             <Button
               onClick={() => navigate("/courses")}
@@ -342,7 +342,7 @@ function StudentHomePage() {
           <div className="flex items-center justify-between mb-12">
             <div>
               <span className="text-emerald-600 font-black text-[10px] uppercase tracking-widest block mb-2">High Enrollment</span>
-              <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-zinc-900">Most Demanded.</h2>
+              <h2 className="text-[28px] font-black tracking-tighter text-zinc-900">Most Demanded.</h2>
             </div>
             <Button
               onClick={() => navigate("/courses")}
@@ -367,7 +367,7 @@ function StudentHomePage() {
           <div className="flex items-center justify-between mb-12">
             <div>
               <span className="text-purple-600 font-black text-[10px] uppercase tracking-widest block mb-2">Fresh Content</span>
-              <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-zinc-900">Recent Additions.</h2>
+              <h2 className="text-[28px] font-black tracking-tighter text-zinc-900">Recent Additions.</h2>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
@@ -399,10 +399,10 @@ function StudentHomePage() {
             </div>
 
             <div className="relative z-10 max-w-2xl mx-auto">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tighter mb-6 leading-tight">
+              <h2 className="text-[28px] font-black tracking-tighter mb-6 leading-tight text-white">
                 The future belongs <br className="hidden md:block" /> to the curious.
               </h2>
-              <p className="text-lg text-zinc-400 mb-10 font-medium">
+              <p className="text-base text-zinc-400 mb-10 font-medium">
                 Join 20,000+ students mastering skills from the world's most innovative instructors.
               </p>
               <Button

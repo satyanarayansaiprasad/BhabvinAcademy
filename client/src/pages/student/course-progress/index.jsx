@@ -175,7 +175,7 @@ function StudentViewCourseProgressPage() {
             className="p-8 lg:p-12 bg-zinc-950 border-t border-white/5"
           >
             <span className="text-blue-500 font-bold text-xs uppercase tracking-widest mb-2 block">Now playing</span>
-            <h2 className="text-3xl md:text-4xl font-black tracking-tighter text-white mb-4">{currentLecture?.title}</h2>
+            <h2 className="text-2xl md:text-[28px] font-black tracking-tighter text-white mb-4">{currentLecture?.title}</h2>
             <p className="text-zinc-500 font-medium max-w-3xl leading-relaxed">
               {studentCurrentCourseProgress?.courseDetails?.subtitle}
             </p>
@@ -224,8 +224,8 @@ function StudentViewCourseProgressPage() {
                               whileHover={{ x: 4 }}
                               onClick={() => setCurrentLecture(item)}
                               className={`flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all border ${isCurrent
-                                  ? "bg-blue-600 border-blue-500 shadow-lg shadow-blue-600/20"
-                                  : "bg-white/0 border-transparent hover:bg-white/5 hover:border-white/5"
+                                ? "bg-blue-600 border-blue-500 shadow-lg shadow-blue-600/20"
+                                : "bg-white/0 border-transparent hover:bg-white/5 hover:border-white/5"
                                 }`}
                             >
                               <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${isCurrent ? "bg-white/20" : isViewed ? "bg-emerald-500/10 text-emerald-500" : "bg-white/5 text-zinc-500"
@@ -256,7 +256,7 @@ function StudentViewCourseProgressPage() {
                       <div className="p-8">
                         <div className="flex items-center gap-3 mb-6 text-zinc-100">
                           <Info className="h-5 w-5 text-blue-500" />
-                          <h2 className="text-xl font-black tracking-tighter">About Course.</h2>
+                          <h2 className="text-lg font-black tracking-tighter">About Course.</h2>
                         </div>
                         <p className="text-zinc-400 font-medium leading-relaxed mb-10">
                           {studentCurrentCourseProgress?.courseDetails?.description}
@@ -291,14 +291,14 @@ function StudentViewCourseProgressPage() {
             <GraduationCap className="h-10 w-10 text-red-500" />
           </div>
           <DialogHeader className="mb-8">
-            <DialogTitle className="text-3xl font-black tracking-tighter text-white">Access Denied.</DialogTitle>
-            <DialogDescription className="text-zinc-500 font-medium text-lg">
+            <DialogTitle className="text-2xl font-black tracking-tighter text-white">Access Denied.</DialogTitle>
+            <DialogDescription className="text-zinc-500 font-medium text-base">
               You haven't enrolled in this course yet. Please visit the course page to get full access.
             </DialogDescription>
           </DialogHeader>
           <Button
             onClick={() => navigate("/courses")}
-            className="w-full bg-white text-black hover:bg-zinc-200 rounded-[20px] h-14 text-lg font-black"
+            className="w-full bg-white text-black hover:bg-zinc-200 rounded-[20px] h-14 text-base font-black"
           >
             Go to Explore
           </Button>
@@ -318,8 +318,8 @@ function StudentViewCourseProgressPage() {
           </motion.div>
 
           <DialogHeader className="mb-10">
-            <DialogTitle className="text-4xl md:text-5xl font-black tracking-tighter text-white mb-4">Mastery Achieved.</DialogTitle>
-            <DialogDescription className="text-zinc-400 font-medium text-xl leading-relaxed">
+            <DialogTitle className="text-3xl md:text-[35px] font-black tracking-tighter text-white mb-4">Mastery Achieved.</DialogTitle>
+            <DialogDescription className="text-zinc-400 font-medium text-base leading-relaxed">
               Congratulations! You've successfully completed <br />
               <span className="text-white font-bold">"{studentCurrentCourseProgress?.courseDetails?.title}"</span>.
               You're now ready for the next challenge.
@@ -329,14 +329,14 @@ function StudentViewCourseProgressPage() {
           <div className="grid grid-cols-2 gap-4">
             <Button
               onClick={() => navigate("/student-courses")}
-              className="bg-white text-black hover:bg-zinc-200 rounded-[24px] h-16 text-lg font-black flex items-center justify-center gap-2"
+              className="bg-white text-black hover:bg-zinc-200 rounded-[24px] h-16 text-base font-black flex items-center justify-center gap-2"
             >
               My Courses
             </Button>
             <Button
               variant="outline"
               onClick={handleRewatchCourse}
-              className="bg-white/5 border-white/10 hover:bg-white/10 text-white rounded-[24px] h-16 text-lg font-black flex items-center justify-center gap-2"
+              className="bg-white/5 border-white/10 hover:bg-white/10 text-white rounded-[24px] h-16 text-base font-black flex items-center justify-center gap-2"
             >
               <RotateCcw className="h-5 w-5" />
               Rewatch

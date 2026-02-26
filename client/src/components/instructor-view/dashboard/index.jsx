@@ -89,7 +89,7 @@ function InstructorDashboard({ listOfCourses }) {
             </div>
             <div>
               <p className="text-zinc-500 font-bold text-sm mb-1">{item.label}</p>
-              <h3 className="text-4xl font-black tracking-tighter text-zinc-900">
+              <h3 className="text-[28px] font-black tracking-tighter text-zinc-900">
                 {item.value}
               </h3>
             </div>
@@ -105,7 +105,7 @@ function InstructorDashboard({ listOfCourses }) {
         className="bg-white rounded-[40px] border border-zinc-200/60 shadow-sm overflow-hidden"
       >
         <div className="p-8 border-b border-zinc-100 flex items-center justify-between">
-          <h2 className="text-2xl font-bold tracking-tight text-zinc-900">Recent Students.</h2>
+          <h2 className="text-xl font-bold tracking-tight text-zinc-900">Recent Students.</h2>
           <Button variant="ghost" className="text-zinc-400 font-bold text-sm">View All</Button>
         </div>
         <div className="overflow-x-auto">

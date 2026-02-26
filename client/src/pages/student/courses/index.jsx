@@ -132,7 +132,7 @@ function StudentViewCoursesPage() {
           className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6"
         >
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-zinc-900 mb-2">Explore Courses</h1>
+            <h1 className="text-[28px] font-bold tracking-tight text-zinc-900 mb-2">Explore Courses</h1>
             <p className="text-zinc-500 font-medium">Discover your next passion from our curated catalog.</p>
           </div>
 
@@ -180,7 +180,7 @@ function StudentViewCoursesPage() {
             >
               <div className="flex items-center gap-2 mb-8 text-zinc-900">
                 <Filter className="h-5 w-5" />
-                <h2 className="font-bold text-lg">Filters</h2>
+                <h2 className="font-bold text-base">Filters</h2>
               </div>
 
               <div className="space-y-10">
@@ -208,8 +208,8 @@ function StudentViewCoursesPage() {
                             />
                           </div>
                           <span className={`text-[15px] font-medium transition-colors ${filters[keyItem]?.indexOf(option.id) > -1
-                              ? "text-zinc-900 font-bold"
-                              : "text-zinc-500 group-hover:text-zinc-800"
+                            ? "text-zinc-900 font-bold"
+                            : "text-zinc-500 group-hover:text-zinc-800"
                             }`}>
                             {option.label}
                           </span>
@@ -268,7 +268,7 @@ function StudentViewCoursesPage() {
 
                       <div className="flex-1 flex flex-col py-1">
                         <div className="flex items-start justify-between gap-4 mb-2">
-                          <h3 className="text-2xl font-bold text-zinc-900 group-hover:text-blue-600 transition-colors leading-tight line-clamp-2">
+                          <h3 className="text-xl font-bold text-zinc-900 group-hover:text-blue-600 transition-colors leading-tight line-clamp-2">
                             {courseItem?.title}
                           </h3>
                         </div>
@@ -292,7 +292,7 @@ function StudentViewCoursesPage() {
                             <span className="text-zinc-900 font-bold">4.8</span>
                             <div className="flex text-yellow-500 text-sm">★★★★★</div>
                           </div>
-                          <p className="text-3xl font-extrabold text-zinc-900 tracking-tighter">
+                          <p className="text-2xl font-extrabold text-zinc-900 tracking-tighter">
                             ${courseItem?.pricing}
                           </p>
                         </div>
@@ -309,7 +309,7 @@ function StudentViewCoursesPage() {
                   <div className="w-20 h-20 bg-zinc-100 rounded-full flex items-center justify-center mb-6">
                     <Filter className="h-10 w-10 text-zinc-300" />
                   </div>
-                  <h2 className="text-3xl font-bold text-zinc-900 mb-2">No Courses Found</h2>
+                  <h2 className="text-2xl font-bold text-zinc-900 mb-2">No Courses Found</h2>
                   <p className="text-zinc-500 font-medium">Try adjusting your filters to find what you're looking for.</p>
                 </motion.div>
               )}

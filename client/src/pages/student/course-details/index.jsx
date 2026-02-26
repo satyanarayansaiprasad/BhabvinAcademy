@@ -165,7 +165,7 @@ function StudentViewCourseDetailsPage() {
             <motion.h1
               {...fadeUp}
               transition={{ delay: 0.1 }}
-              className="text-5xl md:text-7xl font-black tracking-tighter leading-[1.1] mb-8"
+              className="text-3xl md:text-[35px] font-black tracking-tighter leading-tight mb-8"
             >
               {studentViewCourseDetails?.title}
             </motion.h1>
@@ -173,7 +173,7 @@ function StudentViewCourseDetailsPage() {
             <motion.p
               {...fadeUp}
               transition={{ delay: 0.2 }}
-              className="text-xl md:text-2xl text-zinc-400 font-medium mb-12 leading-relaxed"
+              className="text-base text-zinc-400 font-medium mb-12 leading-relaxed"
             >
               {studentViewCourseDetails?.subtitle}
             </motion.p>
@@ -218,7 +218,7 @@ function StudentViewCourseDetailsPage() {
               viewport={{ once: true }}
               className="bg-white rounded-[40px] border border-zinc-200/60 p-10 shadow-sm"
             >
-              <h2 className="text-3xl font-black tracking-tighter mb-8 text-zinc-900 flex items-center gap-3">
+              <h2 className="text-[22px] font-black tracking-tighter mb-8 text-zinc-900 flex items-center gap-3">
                 <Info className="h-8 w-8 text-blue-600" />
                 What you'll learn.
               </h2>
@@ -238,7 +238,7 @@ function StudentViewCourseDetailsPage() {
 
             {/* Curriculum */}
             <section>
-              <h2 className="text-3xl font-black tracking-tighter mb-8 text-zinc-900">Curriculum.</h2>
+              <h2 className="text-[22px] font-black tracking-tighter mb-8 text-zinc-900">Curriculum.</h2>
               <div className="bg-white rounded-[40px] border border-zinc-200/60 shadow-sm divide-y divide-zinc-100 overflow-hidden">
                 {studentViewCourseDetails?.curriculum?.map(
                   (curriculumItem, index) => (
@@ -264,8 +264,8 @@ function StudentViewCourseDetailsPage() {
                           )}
                         </div>
                         <div>
-                          <p className="font-bold text-zinc-900 text-lg group-hover:text-blue-600 transition-colors">{curriculumItem?.title}</p>
-                          <p className="text-zinc-400 text-sm font-medium">{curriculumItem?.freePreview ? "Free Preview" : "Paid Content"}</p>
+                          <p className="font-bold text-zinc-900 text-base group-hover:text-blue-600 transition-colors">{curriculumItem?.title}</p>
+                          <p className="text-zinc-400 text-xs font-medium">{curriculumItem?.freePreview ? "Free Preview" : "Paid Content"}</p>
                         </div>
                       </div>
 
@@ -282,9 +282,9 @@ function StudentViewCourseDetailsPage() {
 
             {/* Description */}
             <section>
-              <h2 className="text-3xl font-black tracking-tighter mb-8 text-zinc-900">Description.</h2>
+              <h2 className="text-[22px] font-black tracking-tighter mb-8 text-zinc-900">Description.</h2>
               <div className="bg-white rounded-[40px] border border-zinc-200/60 p-10 shadow-sm">
-                <p className="text-xl text-zinc-600 leading-relaxed font-medium whitespace-pre-line">
+                <p className="text-base text-zinc-600 leading-relaxed font-medium whitespace-pre-line">
                   {studentViewCourseDetails?.description}
                 </p>
               </div>
@@ -326,7 +326,7 @@ function StudentViewCourseDetailsPage() {
                     <div className="flex items-center justify-between mb-8">
                       <div>
                         <p className="text-zinc-400 font-bold uppercase tracking-widest text-[10px] mb-1">Lifetime Access</p>
-                        <h3 className="text-5xl font-black tracking-tighter text-zinc-900">${studentViewCourseDetails?.pricing}</h3>
+                        <h3 className="text-[28px] font-black tracking-tighter text-zinc-900">${studentViewCourseDetails?.pricing}</h3>
                       </div>
                       <Button variant="ghost" className="rounded-full w-12 h-12 p-0 text-zinc-400 border border-zinc-100 hover:bg-zinc-50">
                         <Share2 className="h-5 w-5" />
