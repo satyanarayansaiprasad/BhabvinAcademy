@@ -88,34 +88,46 @@ function StudentHomePage() {
     transition: { duration: 0.8, ease: "easeOut" }
   };
 
-  const CourseCard = ({ course, handleCourseNavigate, index }) => (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.1, duration: 0.6 }}
-      whileHover={{ y: -10 }}
-      onClick={() => handleCourseNavigate(course._id)}
-      className="group cursor-pointer bg-white rounded-[32px] overflow-hidden border border-zinc-200/60 shadow-sm hover:shadow-2xl transition-all duration-500"
-    >
-      <div className="aspect-[16/10] overflow-hidden relative">
-        <img src={course.image} alt={course.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-        <div className="absolute top-4 left-4">
-          <span className="px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-[10px] font-black uppercase tracking-widest text-zinc-900 border border-zinc-200">
-            {course.category}
-          </span>
+  const CourseCard = ({ course, handleCourseNavigate, index }) => {
+    const { studentBoughtCoursesList } = useContext(StudentContext);
+    const isOwned = studentBoughtCoursesList.some(item => item.courseId === course._id);
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ delay: index * 0.1, duration: 0.6 }}
+        whileHover={{ y: -10 }}
+        onClick={() => handleCourseNavigate(course._id)}
+        className="group cursor-pointer bg-white rounded-[32px] overflow-hidden border border-zinc-200/60 shadow-sm hover:shadow-2xl transition-all duration-500"
+      >
+        <div className="aspect-[16/10] overflow-hidden relative">
+          <img src={course.image} alt={course.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+          <div className="absolute top-4 left-4 flex gap-2">
+            <span className="px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-[10px] font-black uppercase tracking-widest text-zinc-900 border border-zinc-200">
+              {course.category}
+            </span>
+            {isOwned && (
+              <span className="px-3 py-1 rounded-full bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest border-none">
+                Owned
+              </span>
+            )}
+          </div>
         </div>
-      </div>
-      <div className="p-8">
-        <h3 className="text-lg font-bold text-zinc-900 mb-2 line-clamp-1">{course.title}</h3>
-        <p className="text-zinc-500 text-sm font-medium mb-6">By <span className="text-zinc-900">{course.instructorName}</span></p>
-        <div className="flex items-center justify-between">
-          <span className="text-xl font-black text-zinc-900">₹{course.pricing}</span>
-          <span className="text-blue-600 font-bold group-hover:translate-x-1 transition-transform text-sm">Buy Now →</span>
+        <div className="p-8">
+          <h3 className="text-lg font-bold text-zinc-900 mb-2 line-clamp-1">{course.title}</h3>
+          <p className="text-zinc-500 text-sm font-medium mb-6">By <span className="text-zinc-900">{course.instructorName}</span></p>
+          <div className="flex items-center justify-between">
+            <span className="text-xl font-black text-zinc-900">₹{course.pricing}</span>
+            <span className={`text-sm font-bold group-hover:translate-x-1 transition-transform ${isOwned ? "text-emerald-600" : "text-blue-600"}`}>
+              {isOwned ? "Continue Learning →" : "Buy Now →"}
+            </span>
+          </div>
         </div>
-      </div>
-    </motion.div>
-  );
+      </motion.div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 overflow-x-hidden">

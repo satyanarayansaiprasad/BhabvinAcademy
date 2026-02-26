@@ -1,5 +1,5 @@
-import { addToCartService, fetchCartItemsService } from "@/services";
-import { createContext, useState } from "react";
+import { addToCartService, fetchCartItemsService, fetchStudentBoughtCoursesService } from "@/services";
+import { createContext, useEffect, useState } from "react";
 
 export const StudentContext = createContext(null);
 
@@ -32,6 +32,13 @@ export default function StudentProvider({ children }) {
     }
   }
 
+  async function fetchBoughtCourses(userId) {
+    const response = await fetchStudentBoughtCoursesService(userId);
+    if (response?.success) {
+      setStudentBoughtCoursesList(response?.data);
+    }
+  }
+
   return (
     <StudentContext.Provider
       value={{
@@ -51,6 +58,7 @@ export default function StudentProvider({ children }) {
         setCartItems,
         handleAddToCart,
         fetchCartItems,
+        fetchBoughtCourses,
       }}
     >
       {children}

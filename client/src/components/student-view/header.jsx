@@ -9,12 +9,13 @@ import { motion, AnimatePresence } from "framer-motion";
 function StudentViewCommonHeader() {
   const navigate = useNavigate();
   const { auth, resetCredentials } = useContext(AuthContext);
-  const { cartItems, fetchCartItems } = useContext(StudentContext);
+  const { cartItems, fetchCartItems, fetchBoughtCourses } = useContext(StudentContext);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (auth?.authenticate && auth?.user?._id) {
       fetchCartItems(auth?.user?._id);
+      fetchBoughtCourses(auth?.user?._id);
     }
   }, [auth]);
 

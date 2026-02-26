@@ -45,6 +45,7 @@ function StudentViewCoursesPage() {
     setLoadingState,
     cartItems,
     handleAddToCart,
+    studentBoughtCoursesList,
   } = useContext(StudentContext);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -366,16 +367,29 @@ function StudentViewCoursesPage() {
                               ₹{courseItem?.pricing}
                             </p>
                           </div>
-                          <Button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleAddToCartLocal(courseItem?._id);
-                            }}
-                            className="bg-zinc-900 text-white hover:bg-zinc-800 rounded-2xl h-12 px-6 flex items-center gap-2 font-bold shadow-lg shadow-zinc-900/10 active:scale-95 transition-all"
-                          >
-                            <ShoppingCart className="w-4 h-4" />
-                            {cartItems.some(item => item.courseId === courseItem?._id) ? "Go to Cart" : "Add to Cart"}
-                          </Button>
+                          {studentBoughtCoursesList.some(item => item.courseId === courseItem?._id) ? (
+                            <Button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/course-progress/${courseItem?._id}`);
+                              }}
+                              className="bg-emerald-600 text-white hover:bg-emerald-700 rounded-2xl h-12 px-6 flex items-center gap-2 font-bold shadow-lg shadow-emerald-900/10 active:scale-95 transition-all"
+                            >
+                              <TvMinimalPlay className="w-4 h-4" />
+                              Continue
+                            </Button>
+                          ) : (
+                            <Button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleAddToCartLocal(courseItem?._id);
+                              }}
+                              className="bg-zinc-900 text-white hover:bg-zinc-800 rounded-2xl h-12 px-6 flex items-center gap-2 font-bold shadow-lg shadow-zinc-900/10 active:scale-95 transition-all"
+                            >
+                              <ShoppingCart className="w-4 h-4" />
+                              {cartItems.some(item => item.courseId === courseItem?._id) ? "Go to Cart" : "Add to Cart"}
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </motion.div>

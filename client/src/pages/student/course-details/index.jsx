@@ -33,6 +33,7 @@ function StudentViewCourseDetailsPage() {
     setLoadingState,
     handleAddToCart,
     cartItems,
+    studentBoughtCoursesList,
   } = useContext(StudentContext);
 
   const { auth } = useContext(AuthContext);
@@ -46,6 +47,7 @@ function StudentViewCourseDetailsPage() {
   const { toast } = useToast();
 
   const isCourseInCart = cartItems.some(item => item.courseId === studentViewCourseDetails?._id);
+  const isCoursePurchased = studentBoughtCoursesList.some(item => item.courseId === studentViewCourseDetails?._id);
 
   async function fetchStudentViewCourseDetails() {
     const response = await fetchStudentViewCourseDetailsService(
@@ -347,19 +349,31 @@ function StudentViewCourseDetailsPage() {
                     </div>
 
                     <div className="space-y-4">
-                      <Button
-                        onClick={handleBuyNow}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-[24px] h-16 text-xl font-bold shadow-xl shadow-blue-100 transition-all hover:scale-105 active:scale-95"
-                      >
-                        Buy Now
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={handleAddToCartLocal}
-                        className="w-full rounded-[24px] h-16 text-lg font-bold border-zinc-200 text-zinc-700 hover:bg-zinc-50"
-                      >
-                        {isCourseInCart ? "Go to Cart" : "Add to Cart"}
-                      </Button>
+                      {isCoursePurchased ? (
+                        <Button
+                          onClick={() => navigate(`/course-progress/${studentViewCourseDetails?._id}`)}
+                          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-[24px] h-16 text-xl font-bold shadow-xl shadow-emerald-100 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+                        >
+                          <PlayCircle className="w-6 h-6" />
+                          Continue Learning
+                        </Button>
+                      ) : (
+                        <>
+                          <Button
+                            onClick={handleBuyNow}
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-[24px] h-16 text-xl font-bold shadow-xl shadow-blue-100 transition-all hover:scale-105 active:scale-95"
+                          >
+                            Buy Now
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={handleAddToCartLocal}
+                            className="w-full rounded-[24px] h-16 text-lg font-bold border-zinc-200 text-zinc-700 hover:bg-zinc-50"
+                          >
+                            {isCourseInCart ? "Go to Cart" : "Add to Cart"}
+                          </Button>
+                        </>
+                      )}
                     </div>
 
                     <div className="mt-8 pt-8 border-t border-zinc-100 flex items-center justify-center gap-2 text-zinc-400 font-medium text-xs">
