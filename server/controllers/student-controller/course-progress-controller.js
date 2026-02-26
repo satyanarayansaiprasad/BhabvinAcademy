@@ -180,8 +180,52 @@ const resetCurrentCourseProgress = async (req, res) => {
   }
 };
 
+const getCompletedCourses = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const completedProgress = await CourseProgress.find({
+      userId,
+      completed: true,
+    });
+
+    if (!completedProgress || completedProgress.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+      });
+    }
+
+    const completedCourses = [];
+
+    for (const progress of completedProgress) {
+      const course = await Course.findById(progress.courseId);
+      if (course) {
+        completedCourses.push({
+          courseId: course._id,
+          title: course.title,
+          instructorName: course.instructorName,
+          completionDate: progress.completionDate,
+        });
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      data: completedCourses,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Some error occured!",
+    });
+  }
+};
+
 module.exports = {
   markCurrentLectureAsViewed,
   getCurrentCourseProgress,
   resetCurrentCourseProgress,
+  getCompletedCourses,
 };

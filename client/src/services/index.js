@@ -111,6 +111,15 @@ export async function createPaymentService(formData) {
   return data;
 }
 
+export async function createFreeMockPaymentService(formData) {
+  const { data } = await axiosInstance.post(
+    `/student/order/create-free`,
+    formData
+  );
+
+  return data;
+}
+
 export async function captureAndFinalizePaymentService(
   razorpay_order_id,
   razorpay_payment_id,
@@ -138,6 +147,14 @@ export async function fetchStudentBoughtCoursesService(studentId) {
 export async function getCurrentCourseProgressService(userId, courseId) {
   const { data } = await axiosInstance.get(
     `/student/course-progress/get/${userId}/${courseId}`
+  );
+
+  return data;
+}
+
+export async function fetchStudentCompletedCoursesService(userId) {
+  const { data } = await axiosInstance.get(
+    `/student/course-progress/completed-courses/${userId}`
   );
 
   return data;

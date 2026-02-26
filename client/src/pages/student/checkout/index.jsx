@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AuthContext } from "@/context/auth-context";
 import { StudentContext } from "@/context/student-context";
-import { captureAndFinalizePaymentService, createPaymentService } from "@/services";
+import { createFreeMockPaymentService } from "@/services";
 import { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -25,36 +25,13 @@ function CheckoutPage() {
         0
     );
 
-    const loadRazorpayScript = () => {
-        return new Promise((resolve) => {
-            const script = document.createElement("script");
-            script.src = "https://checkout.razorpay.com/v1/checkout.js";
-            script.onload = () => resolve(true);
-            script.onerror = () => resolve(false);
-            document.body.appendChild(script);
-        });
-    };
 
     async function handlePayment() {
-        const res = await loadRazorpayScript();
-
-        if (!res) {
-            toast({
-                title: "Error",
-                description: "Razorpay SDK failed to load. Are you online?",
-                variant: "destructive",
-            });
-            return;
-        }
-
+        // Mocking the payment flow for now as requested
         const orderPayload = {
             userId: auth?.user?._id,
             userName: auth?.user?.userName,
             userEmail: auth?.user?.userEmail,
-            orderStatus: "pending",
-            paymentMethod: "razorpay",
-            paymentStatus: "initiated",
-            orderDate: new Date(),
             courses: itemsToBuy.map((item) => ({
                 courseId: item.courseId || item._id,
                 title: item.title,
@@ -65,52 +42,27 @@ function CheckoutPage() {
             })),
         };
 
-        const response = await createPaymentService(orderPayload);
+        const response = await createFreeMockPaymentService(orderPayload);
 
         if (response.success) {
-            const options = {
-                key: "rzp_test_placeholder", // This should come from backend or env in real world
-                amount: response.data.amount,
-                currency: response.data.currency,
-                name: "Bhavin Academy",
-                description: "Course Purchase",
-                order_id: response.data.razorpayOrderId,
-                handler: async function (razorpayResponse) {
-                    const captureResponse = await captureAndFinalizePaymentService(
-                        razorpayResponse.razorpay_order_id,
-                        razorpayResponse.razorpay_payment_id,
-                        razorpayResponse.razorpay_signature,
-                        response.data.orderId
-                    );
+            toast({
+                title: "Purchase Successful",
+                description: "You have purchased the course, now it will show in My Learnings page.",
+            });
 
-                    if (captureResponse.success) {
-                        toast({
-                            title: "Payment Successful",
-                            description: "You have successfully enrolled in the course(s)!",
-                        });
-                        // Clear cart if it was a cart purchase
-                        if (!singleCourse) {
-                            // In a real app, you'd call a service to clear the cart in DB too
-                            setCartItems([]);
-                        }
-                        navigate("/student-courses");
-                    }
-                },
-                prefill: {
-                    name: auth?.user?.userName,
-                    email: auth?.user?.userEmail,
-                },
-                theme: {
-                    color: "#000000",
-                },
-            };
+            // Clear cart globally
+            if (!singleCourse) {
+                setCartItems([]);
+            }
 
-            const rzp = new window.Razorpay(options);
-            rzp.open();
+            // Small delay to let user see the toast
+            setTimeout(() => {
+                navigate("/student-courses");
+            }, 1500);
         } else {
             toast({
                 title: "Error",
-                description: "Failed to create order. Please try again.",
+                description: "Failed to process enrollment. Please try again.",
                 variant: "destructive",
             });
         }

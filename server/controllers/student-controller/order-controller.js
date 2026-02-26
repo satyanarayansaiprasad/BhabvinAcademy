@@ -161,4 +161,87 @@ const capturePaymentAndFinalizeOrder = async (req, res) => {
   }
 };
 
-module.exports = { createOrder, capturePaymentAndFinalizeOrder };
+const createFreeOrder = async (req, res) => {
+  try {
+    const {
+      userId,
+      userName,
+      userEmail,
+      courses,
+    } = req.body;
+
+    const newlyCreatedCourseOrder = new Order({
+      userId,
+      userName,
+      userEmail,
+      orderStatus: "confirmed",
+      paymentMethod: "free_mock",
+      paymentStatus: "paid",
+      orderDate: new Date(),
+      courses,
+    });
+
+    await newlyCreatedCourseOrder.save();
+
+    //update out student course model
+    let studentCourses = await StudentCourses.findOne({
+      userId: userId,
+    });
+
+    const coursesToAdd = courses.map(course => ({
+      courseId: course.courseId,
+      title: course.title,
+      instructorId: course.instructorId,
+      instructorName: course.instructorName,
+      dateOfPurchase: new Date(),
+      courseImage: course.courseImage,
+    }));
+
+    if (studentCourses) {
+      for (const courseToAdd of coursesToAdd) {
+        if (!studentCourses.courses.some(c => c.courseId === courseToAdd.courseId)) {
+          studentCourses.courses.push(courseToAdd);
+        }
+      }
+      await studentCourses.save();
+    } else {
+      studentCourses = new StudentCourses({
+        userId: userId,
+        courses: coursesToAdd,
+      });
+      await studentCourses.save();
+    }
+
+    //update the course schema students for each course
+    for (const course of courses) {
+      await Course.findByIdAndUpdate(course.courseId, {
+        $addToSet: {
+          students: {
+            studentId: userId,
+            studentName: userName,
+            studentEmail: userEmail,
+            paidAmount: course.coursePricing,
+            purchasedDate: new Date(),
+          },
+        },
+      });
+    }
+
+    // Clear the cart for this user
+    await Cart.findOneAndDelete({ userId: userId });
+
+    res.status(201).json({
+      success: true,
+      message: "Order confirmed",
+      data: newlyCreatedCourseOrder,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      success: false,
+      message: "Some error occured!",
+    });
+  }
+};
+
+module.exports = { createOrder, capturePaymentAndFinalizeOrder, createFreeOrder };

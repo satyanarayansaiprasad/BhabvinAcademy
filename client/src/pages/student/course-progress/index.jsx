@@ -22,6 +22,8 @@ import { useContext, useEffect, useState } from "react";
 import Confetti from "react-confetti";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import Certificate from "@/components/certificate";
+import { Award } from "lucide-react";
 
 function StudentViewCourseProgressPage() {
   const navigate = useNavigate();
@@ -34,6 +36,7 @@ function StudentViewCourseProgressPage() {
     useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [isSideBarOpen, setIsSideBarOpen] = useState(true);
+  const [showCertificate, setShowCertificate] = useState(false);
   const { id } = useParams();
 
   async function fetchCurrentCourseProgress() {
@@ -326,22 +329,43 @@ function StudentViewCourseProgressPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-4 mt-8">
+            <div className="grid grid-cols-2 gap-4">
+              <Button
+                onClick={() => navigate("/student-courses")}
+                className="bg-white text-black hover:bg-zinc-200 rounded-[24px] h-16 text-base font-black flex items-center justify-center gap-2"
+              >
+                My Courses
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleRewatchCourse}
+                className="bg-white/5 border-white/10 hover:bg-white/10 text-white rounded-[24px] h-16 text-base font-black flex items-center justify-center gap-2"
+              >
+                <RotateCcw className="h-5 w-5" />
+                Rewatch
+              </Button>
+            </div>
             <Button
-              onClick={() => navigate("/student-courses")}
-              className="bg-white text-black hover:bg-zinc-200 rounded-[24px] h-16 text-base font-black flex items-center justify-center gap-2"
+              onClick={() => setShowCertificate(true)}
+              className="bg-amber-500 hover:bg-amber-600 text-white rounded-[24px] h-16 text-base font-black flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
             >
-              My Courses
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleRewatchCourse}
-              className="bg-white/5 border-white/10 hover:bg-white/10 text-white rounded-[24px] h-16 text-base font-black flex items-center justify-center gap-2"
-            >
-              <RotateCcw className="h-5 w-5" />
-              Rewatch
+              <Award className="h-6 w-6" />
+              Claim Certificate
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Premium Certificate Dialog */}
+      <Dialog open={showCertificate} onOpenChange={setShowCertificate}>
+        <DialogContent className="max-w-5xl p-0 border-none bg-transparent shadow-none">
+          <Certificate
+            userName={auth?.user?.userFullName || auth?.user?.userName}
+            courseTitle={studentCurrentCourseProgress?.courseDetails?.title}
+            completionDate={new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}
+            instructorName={studentCurrentCourseProgress?.courseDetails?.instructorName}
+          />
         </DialogContent>
       </Dialog>
     </div>

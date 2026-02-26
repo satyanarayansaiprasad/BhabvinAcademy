@@ -20,9 +20,11 @@ import {
     Briefcase,
     ExternalLink
 } from "lucide-react";
-import { mediaUploadService, updateUserProfileService } from "@/services";
+import { mediaUploadService, updateUserProfileService, fetchStudentCompletedCoursesService } from "@/services";
 import { useToast } from "@/hooks/use-toast";
 import MediaProgressbar from "@/components/media-progress-bar";
+import Certificate from "@/components/certificate";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 function StudentProfilePage() {
     const { auth, setAuth } = useContext(AuthContext);
@@ -38,6 +40,9 @@ function StudentProfilePage() {
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [updating, setUpdating] = useState(false);
+    const [completedCourses, setCompletedCourses] = useState([]);
+    const [selectedCertificate, setSelectedCertificate] = useState(null);
+    const [loadingCompletedCourses, setLoadingCompletedCourses] = useState(false);
 
     useEffect(() => {
         if (auth?.user) {
@@ -47,8 +52,23 @@ function StudentProfilePage() {
                 userHeadline: auth.user.userHeadline || "",
                 userBio: auth.user.userBio || "",
             });
+            fetchCompletedCourses();
         }
     }, [auth]);
+
+    async function fetchCompletedCourses() {
+        try {
+            setLoadingCompletedCourses(true);
+            const response = await fetchStudentCompletedCoursesService(auth.user._id);
+            if (response.success) {
+                setCompletedCourses(response.data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch completed courses:", error);
+        } finally {
+            setLoadingCompletedCourses(false);
+        }
+    }
 
     if (!auth?.user) {
         return (
@@ -273,6 +293,82 @@ function StudentProfilePage() {
                         </div>
                     </motion.div>
                 </div>
+
+                {/* Certificates Section */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="mt-12 space-y-6"
+                >
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <Award className="w-6 h-6 text-amber-500" />
+                            <h2 className="text-2xl font-black tracking-tighter text-zinc-900">My Certificates.</h2>
+                        </div>
+                        <span className="bg-zinc-100 text-zinc-500 font-bold text-xs px-3 py-1 rounded-full">
+                            {completedCourses.length} Achievement{completedCourses.length !== 1 ? 's' : ''}
+                        </span>
+                    </div>
+
+                    {completedCourses.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {completedCourses.map((course) => (
+                                <motion.div
+                                    key={course.courseId}
+                                    whileHover={{ y: -4 }}
+                                    className="bg-white rounded-[32px] p-6 border border-zinc-100 shadow-sm hover:shadow-xl transition-all group flex items-center justify-between"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-amber-500 transition-colors">
+                                            <Award className="w-7 h-7 text-amber-500 group-hover:text-white transition-colors" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-zinc-900 text-base leading-tight">
+                                                {course.title}
+                                            </h3>
+                                            <p className="text-xs font-medium text-zinc-400 mt-1">
+                                                Completed on {new Date(course.completionDate).toLocaleDateString()}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <Button
+                                        onClick={() => setSelectedCertificate(course)}
+                                        variant="ghost"
+                                        size="icon"
+                                        className="rounded-xl hover:bg-zinc-50 text-zinc-400 hover:text-blue-600"
+                                    >
+                                        <ExternalLink className="w-5 h-5" />
+                                    </Button>
+                                </motion.div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="bg-white rounded-[40px] p-12 text-center border-2 border-dashed border-zinc-100">
+                            <div className="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <FileText className="w-8 h-8 text-zinc-300" />
+                            </div>
+                            <h3 className="font-bold text-zinc-900">No certificates yet</h3>
+                            <p className="text-sm text-zinc-500 font-medium max-w-[240px] mx-auto mt-2">
+                                Complete your enrolled courses to unlock premium designed certificates.
+                            </p>
+                        </div>
+                    )}
+                </motion.div>
+
+                {/* Certificate Viewer Dialog */}
+                <Dialog open={!!selectedCertificate} onOpenChange={() => setSelectedCertificate(null)}>
+                    <DialogContent className="max-w-5xl p-0 border-none bg-transparent shadow-none">
+                        {selectedCertificate && (
+                            <Certificate
+                                userName={auth?.user?.userFullName || auth?.user?.userName}
+                                courseTitle={selectedCertificate.title}
+                                completionDate={new Date(selectedCertificate.completionDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                instructorName={selectedCertificate.instructorName}
+                            />
+                        )}
+                    </DialogContent>
+                </Dialog>
             </div>
         </div>
     );
