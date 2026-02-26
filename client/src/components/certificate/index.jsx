@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Award, CheckCircle2, Download, Share2, ShieldCheck, User, Loader2 } from 'lucide-react';
+import { Award, Download, Share2, ShieldCheck, Loader2, GraduationCap } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { toPng } from 'html-to-image';
@@ -18,14 +18,12 @@ const Certificate = ({ userName, courseTitle, completionDate, instructorName, ce
         try {
             setIsGenerating(true);
 
-            // Generate Image
             const dataUrl = await toPng(certificateRef.current, {
                 cacheBust: true,
                 quality: 1,
-                pixelRatio: 2 // High quality
+                pixelRatio: 3
             });
 
-            // Create PDF
             const pdf = new jsPDF({
                 orientation: 'landscape',
                 unit: 'px',
@@ -33,17 +31,17 @@ const Certificate = ({ userName, courseTitle, completionDate, instructorName, ce
             });
 
             pdf.addImage(dataUrl, 'PNG', 0, 0, certificateRef.current.offsetWidth * 2, certificateRef.current.offsetHeight * 2);
-            pdf.save(`Certificate-${courseTitle.replace(/\s+/g, '-')}.pdf`);
+            pdf.save(`Certificate_${courseTitle.replace(/\s+/g, '_')}.pdf`);
 
             toast({
-                title: "Certificate Downloaded",
-                description: "Your official certificate has been generated and downloaded.",
+                title: "Success",
+                description: "Your official premium certificate has been generated.",
             });
         } catch (error) {
-            console.error('Error generating certificate:', error);
+            console.error('Download error:', error);
             toast({
-                title: "Download Failed",
-                description: "Something went wrong while generating your certificate.",
+                title: "Error",
+                description: "Failed to generate PDF.",
                 variant: "destructive"
             });
         } finally {
@@ -52,95 +50,130 @@ const Certificate = ({ userName, courseTitle, completionDate, instructorName, ce
     };
 
     const handleShareLinkedIn = () => {
-        const text = encodeURIComponent(`I am proud to share that I have successfully completed the course "${courseTitle}" on Bhavin Academy! 🎓✨`);
+        const text = encodeURIComponent(`Excited to announce that I've completed "${courseTitle}" on Bhavin Academy! 🎓🚀`);
         const url = encodeURIComponent(window.location.origin);
         window.open(`https://www.linkedin.com/feed/?shareActive=true&text=${text}%20${url}`, '_blank');
     };
 
     return (
         <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-4xl mx-auto"
+            className="w-full max-w-5xl mx-auto"
         >
-            <div ref={certificateRef}>
-                <Card className="relative overflow-hidden border-none shadow-2xl rounded-[40px] bg-white p-1">
-                    {/* ... (rest of the card content remains the same) */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-amber-400 via-amber-200 to-amber-500 rounded-[40px] p-1">
-                        <div className="w-full h-full bg-white rounded-[38px] relative overflow-hidden">
-                            {/* Decorative Background Elements */}
-                            <div className="absolute top-0 right-0 w-96 h-96 bg-amber-50 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-                            <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-50 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
-                            {/* Certificate Content */}
-                            <CardContent className="relative z-10 p-12 md:p-20 text-center flex flex-col items-center">
-                                {/* Header */}
-                                <div className="mb-12">
-                                    <Award className="w-20 h-20 text-amber-500 mx-auto mb-6" />
-                                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-zinc-900 uppercase">
-                                        Certificate of Achievement
-                                    </h1>
-                                    <div className="h-1 w-32 bg-amber-400 mx-auto mt-4 rounded-full" />
-                                </div>
-                                <p className="text-zinc-500 font-medium text-lg mb-8 italic">
-                                    This is to certify that
-                                </p>
-                                <h2 className="text-4xl md:text-6xl font-black text-zinc-900 mb-8 tracking-tight decoration-amber-400 underline underline-offset-8">
-                                    {userName}
-                                </h2>
-                                <p className="text-zinc-500 font-medium text-lg max-w-2xl leading-relaxed mb-12">
-                                    has successfully completed the professional development course
-                                    <br />
-                                    <span className="text-zinc-900 font-extrabold text-2xl not-italic mt-4 block">
-                                        "{courseTitle}"
-                                    </span>
-                                </p>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-20 w-full max-w-2xl border-t border-zinc-100 pt-12">
-                                    <div className="text-center">
-                                        <p className="text-2xl font-black text-zinc-900 mb-1">{instructorName}</p>
-                                        <div className="h-0.5 w-24 bg-zinc-200 mx-auto mb-2" />
-                                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Master Instructor</p>
-                                    </div>
-                                    <div className="text-center">
-                                        <p className="text-2xl font-black text-zinc-900 mb-1">{completionDate}</p>
-                                        <div className="h-0.5 w-24 bg-zinc-200 mx-auto mb-2" />
-                                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Date of Completion</p>
-                                    </div>
-                                </div>
-                                {/* Footer / Verification */}
-                                <div className="mt-16 flex flex-col items-center">
-                                    <div className="flex items-center gap-2 text-zinc-400 font-bold text-[10px] uppercase tracking-widest mb-4">
-                                        <ShieldCheck className="w-4 h-4 text-amber-500" />
-                                        Verified Certificate ID: {certificateId || "BA-" + Math.random().toString(36).substr(2, 9).toUpperCase()}
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <div className="bg-zinc-900 p-2 rounded-lg">
-                                            <Award className="w-6 h-6 text-white" />
-                                        </div>
-                                        <span className="font-extrabold text-xl tracking-tighter text-zinc-900">Bhavin Academy</span>
-                                    </div>
-                                </div>
-                            </CardContent>
+            <div ref={certificateRef} className="bg-white p-6 md:p-12 rounded-[50px]">
+                <Card className="relative overflow-hidden border-[20px] border-zinc-900 shadow-3xl rounded-[40px] bg-white">
+                    {/* Double Golden Frame */}
+                    <div className="absolute inset-0 border-[2px] border-amber-400/40 m-3 pointer-events-none" />
+                    <div className="absolute inset-0 border-[1px] border-amber-500 m-6 pointer-events-none" />
+
+                    <CardContent className="relative z-10 p-16 md:p-24 text-center flex flex-col items-center min-h-[750px] justify-between">
+                        {/* Elegant Watermark */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.02] pointer-events-none">
+                            <GraduationCap className="w-[800px] h-[800px] text-zinc-900" />
                         </div>
-                    </div>
+
+                        {/* Top Branding Section */}
+                        <div className="w-full flex flex-col items-center">
+                            <div className="flex items-center gap-4 mb-10 translate-y-[-20px]">
+                                <div className="bg-zinc-900 p-4 rounded-[24px] rotate-6 shadow-2xl">
+                                    <GraduationCap className="w-12 h-12 text-amber-400" />
+                                </div>
+                                <div className="text-left">
+                                    <h3 className="font-black text-4xl tracking-tighter text-zinc-900 leading-none">Bhavin Academy.</h3>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-600 mt-2">Center of Excellence</p>
+                                </div>
+                            </div>
+
+                            <h1 className="text-sm font-black tracking-[0.8em] text-zinc-400 uppercase mb-4 pl-[0.8em]">
+                                Digital Credential of Achievement
+                            </h1>
+                            <div className="h-[1px] w-96 bg-gradient-to-r from-transparent via-zinc-200 to-transparent" />
+                        </div>
+
+                        {/* Middle Text Section */}
+                        <div className="flex flex-col items-center max-w-4xl">
+                            <p className="text-zinc-400 font-serif text-2xl mb-12 italic">
+                                This is to officially certify that
+                            </p>
+
+                            <h2 className="text-5xl md:text-8xl font-black text-zinc-900 mb-12 tracking-tighter uppercase leading-tight">
+                                {userName}
+                            </h2>
+
+                            <div className="space-y-6">
+                                <p className="text-zinc-500 font-medium text-xl leading-relaxed">
+                                    has demonstrated exceptional mastery and successfully completed the professional curriculum of
+                                </p>
+                                <div className="inline-block relative">
+                                    <span className="text-zinc-900 font-black text-3xl md:text-5xl tracking-tight relative z-10 px-4">
+                                        {courseTitle}
+                                    </span>
+                                    <div className="absolute bottom-1 left-0 w-full h-4 bg-amber-100 -z-10" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Bottom Signatures & Seal Section */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 items-end gap-16 w-full mt-16 pt-12 border-t border-zinc-50">
+                            <div className="flex flex-col items-center">
+                                <p className="text-2xl font-black text-zinc-900 mb-4 font-serif italic border-b-2 border-zinc-100 px-6 pb-2">
+                                    {instructorName}
+                                </p>
+                                <p className="text-[11px] font-black text-zinc-400 uppercase tracking-widest text-center leading-relaxed">
+                                    Head of Academic Affairs<br />& Lead Instructor
+                                </p>
+                            </div>
+
+                            <div className="relative">
+                                {/* Intricate Golden Seal */}
+                                <div className="w-44 h-44 bg-gradient-to-b from-amber-300 via-amber-200 to-amber-600 rounded-full flex items-center justify-center p-1 shadow-[0_20px_40px_rgba(0,0,0,0.1)]">
+                                    <div className="w-full h-full border-[3px] border-white/60 border-dashed rounded-full flex items-center justify-center bg-white/20 backdrop-blur-sm">
+                                        <Award className="w-16 h-16 text-zinc-900" />
+                                    </div>
+                                </div>
+                                <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-zinc-900 text-amber-400 text-[10px] font-black py-2 px-6 rounded-2xl uppercase tracking-[0.2em] whitespace-nowrap shadow-2xl border border-white/10">
+                                    Verified Achievement
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col items-center">
+                                <p className="text-2xl font-black text-zinc-900 mb-4 font-serif border-b-2 border-zinc-100 px-6 pb-2">
+                                    {completionDate}
+                                </p>
+                                <p className="text-[11px] font-black text-zinc-400 uppercase tracking-widest">Date Issued</p>
+                            </div>
+                        </div>
+
+                        {/* Credential ID Footer */}
+                        <div className="mt-24 pt-8 w-full">
+                            <div className="flex items-center justify-center gap-3 text-zinc-300 font-bold text-[10px] uppercase tracking-[0.4em]">
+                                <ShieldCheck className="w-4 h-4 text-amber-500" />
+                                Credential ID: {certificateId || "BA" + Math.random().toString(36).substr(2, 9).toUpperCase()}
+                            </div>
+                        </div>
+                    </CardContent>
                 </Card>
             </div>
 
             {/* Actions */}
-            <div className="mt-10 flex justify-center gap-4">
+            <div className="mt-12 flex flex-col sm:flex-row justify-center gap-6 px-4 pb-12 no-print">
                 <Button
                     onClick={handleDownload}
                     disabled={isGenerating}
-                    className="bg-zinc-900 hover:bg-black text-white rounded-2xl h-14 px-8 font-bold flex items-center gap-2 shadow-xl transition-all hover:scale-105"
+                    className="bg-zinc-900 hover:bg-black text-white rounded-[40px] h-20 px-14 text-xl font-black flex items-center gap-4 shadow-3xl transition-all hover:scale-105 group"
                 >
-                    {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
-                    {isGenerating ? "Generating..." : "Download PDF"}
+                    {isGenerating ? <Loader2 className="w-7 h-7 animate-spin" /> : <Download className="w-7 h-7 group-hover:translate-y-1 transition-transform" />}
+                    {isGenerating ? "Preparing High-Def PDF..." : "Download Certificate (PDF)"}
                 </Button>
+
                 <Button
                     variant="outline"
                     onClick={handleShareLinkedIn}
-                    className="border-2 border-zinc-200 hover:bg-zinc-50 rounded-2xl h-14 px-8 font-bold flex items-center gap-2 transition-all hover:border-zinc-900"
+                    className="border-2 border-zinc-200 hover:bg-zinc-50 rounded-[40px] h-20 px-14 text-lg font-black flex items-center gap-4 transition-all hover:border-zinc-900 group shadow-xl"
                 >
-                    <Share2 className="w-5 h-5" /> Share on LinkedIn
+                    <Share2 className="w-7 h-7 group-hover:scale-110 transition-transform" />
+                    Share Achievement
                 </Button>
             </div>
         </motion.div>
