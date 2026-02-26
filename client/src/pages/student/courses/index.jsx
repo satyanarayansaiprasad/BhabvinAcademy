@@ -56,18 +56,19 @@ function StudentViewCoursesPage() {
     const indexOfCurrentSeection = Object.keys(cpyFilters).indexOf(getSectionId);
 
     if (indexOfCurrentSeection === -1) {
-      cpyFilters = {
-        ...cpyFilters,
-        [getSectionId]: [getCurrentOption.id],
-      };
+      cpyFilters[getSectionId] = [getCurrentOption.id];
     } else {
       const indexOfCurrentOption = cpyFilters[getSectionId].indexOf(
         getCurrentOption.id
       );
 
       if (indexOfCurrentOption === -1)
-        cpyFilters[getSectionId].push(getCurrentOption.id);
-      else cpyFilters[getSectionId].splice(indexOfCurrentOption, 1);
+        cpyFilters[getSectionId] = [...cpyFilters[getSectionId], getCurrentOption.id];
+      else {
+        const updatedSection = [...cpyFilters[getSectionId]];
+        updatedSection.splice(indexOfCurrentOption, 1);
+        cpyFilters[getSectionId] = updatedSection;
+      }
     }
 
     setFilters(cpyFilters);
@@ -75,11 +76,11 @@ function StudentViewCoursesPage() {
   }
 
   async function fetchAllStudentViewCourses(filters, sort) {
-    const query = new URLSearchParams({
-      ...filters,
-      sortBy: sort,
-    });
-    const response = await fetchStudentViewCourseListService(query);
+    const buildQueryStringForFilters = createSearchParamsHelper(filters);
+    const query = new URLSearchParams(buildQueryStringForFilters);
+    if (sort) query.set("sortBy", sort);
+
+    const response = await fetchStudentViewCourseListService(query.toString());
     if (response?.success) {
       setStudentViewCoursesList(response?.data);
       setLoadingState(false);
@@ -133,12 +134,27 @@ function StudentViewCoursesPage() {
 
   useEffect(() => {
     const buildQueryStringForFilters = createSearchParamsHelper(filters);
-    setSearchParams(new URLSearchParams(buildQueryStringForFilters));
-  }, [filters]);
+    const query = new URLSearchParams(buildQueryStringForFilters);
+    if (sort) query.set("sortBy", sort);
+    setSearchParams(query);
+  }, [filters, sort]);
 
   useEffect(() => {
-    setSort("price-lowtohigh");
-    setFilters(JSON.parse(sessionStorage.getItem("filters")) || {});
+    const initialFilters = {};
+    const queryParams = new URLSearchParams(window.location.search);
+
+    for (const [key, value] of queryParams.entries()) {
+      if (key !== "sortBy") {
+        initialFilters[key] = value.split(",");
+      }
+    }
+
+    setFilters(
+      Object.keys(initialFilters).length > 0
+        ? initialFilters
+        : JSON.parse(sessionStorage.getItem("filters") || "{}")
+    );
+    setSort(queryParams.get("sortBy") || "price-lowtohigh");
   }, []);
 
   async function fetchHomeConfig() {
