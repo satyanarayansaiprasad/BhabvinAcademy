@@ -40,7 +40,7 @@ function StudentHomePage() {
   }
 
   async function fetchAllStudentViewCourses() {
-    const response = await fetchStudentViewCourseListService();
+    const response = await fetchStudentViewCourseListService("");
     if (response?.success) setStudentViewCoursesList(response?.data);
   }
 

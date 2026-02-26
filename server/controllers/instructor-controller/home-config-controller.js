@@ -1,4 +1,5 @@
 const HomeConfig = require("../../models/HomeConfig");
+const Course = require("../../models/Course");
 
 const getHomeConfig = async (req, res) => {
     try {
