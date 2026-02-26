@@ -36,7 +36,7 @@ function StudentCoursesPage() {
 
         {/* Header */}
         <motion.div {...fadeUp} className="mb-12">
-          <h1 className="text-[28px] font-black tracking-tighter text-zinc-900 mb-2">My Learning.</h1>
+          <h1 className="text-4xl md:text-[50px] font-black tracking-tighter text-zinc-900 mb-2">My Learning.</h1>
           <p className="text-zinc-500 font-medium">Continue where you left off and master your skills.</p>
         </motion.div>
 
@@ -72,7 +72,7 @@ function StudentCoursesPage() {
                       {course?.instructorName}
                     </span>
                   </div>
-                  <h3 className="text-lg font-bold text-zinc-900 leading-tight mb-6 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                  <h3 className="text-[28px] font-bold text-zinc-900 leading-tight mb-6 line-clamp-2 group-hover:text-blue-600 transition-colors">
                     {course?.title}
                   </h3>
 
@@ -96,7 +96,7 @@ function StudentCoursesPage() {
               <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-8 shadow-sm">
                 <GraduationCap className="h-10 w-10 text-zinc-300" />
               </div>
-              <h2 className="text-2xl font-bold text-zinc-900 mb-4">You haven't enrolled in any courses yet.</h2>
+              <h2 className="text-[35px] font-bold text-zinc-900 mb-4">You haven't enrolled in any courses yet.</h2>
               <p className="text-base text-zinc-500 font-medium mb-10 max-w-sm">Ready to start your learning journey? Explore our catalog and find your perfect course.</p>
               <Button
                 onClick={() => navigate("/courses")}

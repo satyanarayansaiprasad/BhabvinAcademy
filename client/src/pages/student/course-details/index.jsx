@@ -165,7 +165,7 @@ function StudentViewCourseDetailsPage() {
             <motion.h1
               {...fadeUp}
               transition={{ delay: 0.1 }}
-              className="text-3xl md:text-[35px] font-black tracking-tighter leading-tight mb-8"
+              className="text-4xl md:text-[50px] font-black tracking-tighter leading-tight mb-8"
             >
               {studentViewCourseDetails?.title}
             </motion.h1>
@@ -218,7 +218,7 @@ function StudentViewCourseDetailsPage() {
               viewport={{ once: true }}
               className="bg-white rounded-[40px] border border-zinc-200/60 p-10 shadow-sm"
             >
-              <h2 className="text-[22px] font-black tracking-tighter mb-8 text-zinc-900 flex items-center gap-3">
+              <h2 className="text-[35px] font-black tracking-tighter mb-8 text-zinc-900 flex items-center gap-3">
                 <Info className="h-8 w-8 text-blue-600" />
                 What you'll learn.
               </h2>
@@ -238,7 +238,7 @@ function StudentViewCourseDetailsPage() {
 
             {/* Curriculum */}
             <section>
-              <h2 className="text-[22px] font-black tracking-tighter mb-8 text-zinc-900">Curriculum.</h2>
+              <h2 className="text-[35px] font-black tracking-tighter mb-8 text-zinc-900">Curriculum.</h2>
               <div className="bg-white rounded-[40px] border border-zinc-200/60 shadow-sm divide-y divide-zinc-100 overflow-hidden">
                 {studentViewCourseDetails?.curriculum?.map(
                   (curriculumItem, index) => (
@@ -264,7 +264,7 @@ function StudentViewCourseDetailsPage() {
                           )}
                         </div>
                         <div>
-                          <p className="font-bold text-zinc-900 text-base group-hover:text-blue-600 transition-colors">{curriculumItem?.title}</p>
+                          <p className="font-bold text-zinc-900 text-lg group-hover:text-blue-600 transition-colors">{curriculumItem?.title}</p>
                           <p className="text-zinc-400 text-xs font-medium">{curriculumItem?.freePreview ? "Free Preview" : "Paid Content"}</p>
                         </div>
                       </div>
@@ -282,7 +282,7 @@ function StudentViewCourseDetailsPage() {
 
             {/* Description */}
             <section>
-              <h2 className="text-[22px] font-black tracking-tighter mb-8 text-zinc-900">Description.</h2>
+              <h2 className="text-[35px] font-black tracking-tighter mb-8 text-zinc-900">Description.</h2>
               <div className="bg-white rounded-[40px] border border-zinc-200/60 p-10 shadow-sm">
                 <p className="text-base text-zinc-600 leading-relaxed font-medium whitespace-pre-line">
                   {studentViewCourseDetails?.description}
@@ -384,7 +384,7 @@ function StudentViewCourseDetailsPage() {
 
             <div className="w-full lg:w-[350px] p-8 bg-zinc-900 border-l border-white/5 flex flex-col">
               <DialogHeader className="mb-8">
-                <DialogTitle className="text-2xl font-black tracking-tighter text-white">Course Preview.</DialogTitle>
+                <DialogTitle className="text-[28px] font-black tracking-tighter text-white">Course Preview.</DialogTitle>
                 <p className="text-zinc-500 font-medium">Watch free samples from the curriculum.</p>
               </DialogHeader>
 

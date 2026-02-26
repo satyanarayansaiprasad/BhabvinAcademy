@@ -103,7 +103,7 @@ function InstructorDashboardpage() {
               transition={{ duration: 0.6 }}
             >
               <span className="text-zinc-400 font-bold uppercase tracking-widest text-[10px] mb-2 block">Instructor Portal</span>
-              <h1 className="text-[28px] font-extrabold tracking-tighter text-zinc-900 lowercase">
+              <h1 className="text-4xl md:text-[50px] font-extrabold tracking-tighter text-zinc-900 lowercase">
                 {activeTab}.
               </h1>
             </motion.div>
