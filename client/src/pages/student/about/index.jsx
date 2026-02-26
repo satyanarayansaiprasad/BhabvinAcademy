@@ -33,13 +33,9 @@ function AboutUsPage() {
                                 <span className="text-blue-600 font-black text-xs uppercase tracking-[0.2em] block mb-4">
                                     About Bhavin Academy
                                 </span>
-                                <motion.h1
-                                    {...fadeUp}
-                                    transition={{ delay: 0.1 }}
-                                    className="text-4xl md:text-[50px] font-black tracking-tighter text-zinc-900 mb-8 leading-tight"
-                                >
+                                <h1 className="text-3xl md:text-[50px] font-black tracking-tighter text-zinc-900 mb-8 leading-tight">
                                     Empowering the next <br /> generation of masters.
-                                </motion.h1>
+                                </h1>
                                 <p className="text-base text-zinc-600 font-medium mb-12 leading-relaxed">
                                     Bhavin Academy is a premium learning ecosystem designed for professionals who refuse to settle for average. We combine world-class instruction with high-fidelity digital experiences to help you master the skills that matter in the modern economy.
                                 </p>
@@ -48,9 +44,7 @@ function AboutUsPage() {
                                     {stats.map((stat, index) => (
                                         <div key={index} className="flex flex-col gap-1">
                                             <div className="text-blue-600 mb-2">{stat.icon}</div>
-                                            <span className="text-[28px] font-black text-zinc-900 leading-none">
-                                                {stat.value}
-                                            </span>
+                                            <span className="text-xl font-black text-zinc-900 leading-none">{stat.value}</span>
                                             <span className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">{stat.label}</span>
                                         </div>
                                     ))}

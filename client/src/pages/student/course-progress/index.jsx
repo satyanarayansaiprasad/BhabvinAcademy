@@ -175,7 +175,7 @@ function StudentViewCourseProgressPage() {
             className="p-8 lg:p-12 bg-zinc-950 border-t border-white/5"
           >
             <span className="text-blue-500 font-bold text-xs uppercase tracking-widest mb-2 block">Now playing</span>
-            <h2 className="text-[35px] font-black tracking-tighter text-white mb-4">{currentLecture?.title}</h2>
+            <h2 className="text-2xl md:text-[28px] font-black tracking-tighter text-white mb-4">{currentLecture?.title}</h2>
             <p className="text-zinc-500 font-medium max-w-3xl leading-relaxed">
               {studentCurrentCourseProgress?.courseDetails?.subtitle}
             </p>
@@ -256,7 +256,7 @@ function StudentViewCourseProgressPage() {
                       <div className="p-8">
                         <div className="flex items-center gap-3 mb-6 text-zinc-100">
                           <Info className="h-5 w-5 text-blue-500" />
-                          <h2 className="text-[28px] font-black tracking-tighter">About Course.</h2>
+                          <h2 className="text-lg font-black tracking-tighter">About Course.</h2>
                         </div>
                         <p className="text-zinc-400 font-medium leading-relaxed mb-10">
                           {studentCurrentCourseProgress?.courseDetails?.description}
@@ -291,7 +291,7 @@ function StudentViewCourseProgressPage() {
             <GraduationCap className="h-10 w-10 text-red-500" />
           </div>
           <DialogHeader className="mb-8">
-            <DialogTitle className="text-[35px] font-black tracking-tighter text-white">Access Denied.</DialogTitle>
+            <DialogTitle className="text-2xl font-black tracking-tighter text-white">Access Denied.</DialogTitle>
             <DialogDescription className="text-zinc-500 font-medium text-base">
               You haven't enrolled in this course yet. Please visit the course page to get full access.
             </DialogDescription>
@@ -318,7 +318,7 @@ function StudentViewCourseProgressPage() {
           </motion.div>
 
           <DialogHeader className="mb-10">
-            <DialogTitle className="text-4xl md:text-[50px] font-black tracking-tighter text-white mb-4">Mastery Achieved.</DialogTitle>
+            <DialogTitle className="text-3xl md:text-[50px] font-black tracking-tighter text-white mb-4">Mastery Achieved.</DialogTitle>
             <DialogDescription className="text-zinc-400 font-medium text-base leading-relaxed">
               Congratulations! You've successfully completed <br />
               <span className="text-white font-bold">"{studentCurrentCourseProgress?.courseDetails?.title}"</span>.
