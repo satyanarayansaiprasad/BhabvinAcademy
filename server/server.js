@@ -26,6 +26,7 @@ app.use(
 app.use(express.json());
 
 //database connection
+let connectionError = null;
 const connectDB = async () => {
     try {
         if (mongoose.connection.readyState >= 1) return;
@@ -34,8 +35,10 @@ const connectDB = async () => {
             autoIndex: true,
         });
         console.log("mongodb is connected");
+        connectionError = null;
     } catch (e) {
         console.log("MongoDB connection error:", e);
+        connectionError = e.message;
     }
 };
 
@@ -55,7 +58,8 @@ app.get("/health", async (req, res) => {
             clientUrl: process.env.CLIENT_URL
         },
         dbStatus: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
-        dbReadyState: mongoose.connection.readyState
+        dbReadyState: mongoose.connection.readyState,
+        connectionError: connectionError
     });
 });
 
