@@ -309,7 +309,7 @@ function StudentViewCourseProgressPage() {
       </Dialog>
 
       {/* Course Completion Modal */}
-      <Dialog open={showCourseCompleteDialog}>
+      <Dialog open={showCourseCompleteDialog} onOpenChange={setShowCourseCompleteDialog}>
         <DialogContent className="max-w-lg border-none bg-zinc-950 p-12 rounded-[50px] text-center text-white shadow-3xl">
           <motion.div
             initial={{ scale: 0 }}
@@ -347,7 +347,10 @@ function StudentViewCourseProgressPage() {
               </Button>
             </div>
             <Button
-              onClick={() => setShowCertificate(true)}
+              onClick={() => {
+                setShowCertificate(true);
+                setShowCourseCompleteDialog(false);
+              }}
               className="bg-amber-500 hover:bg-amber-600 text-white rounded-[24px] h-16 text-base font-black flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
             >
               <Award className="h-6 w-6" />
