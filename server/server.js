@@ -15,11 +15,22 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
+const allowedOrigins = process.env.CLIENT_URL
+    ? [process.env.CLIENT_URL, process.env.CLIENT_URL.endsWith('/') ? process.env.CLIENT_URL.slice(0, -1) : `${process.env.CLIENT_URL}/`]
+    : ["http://localhost:5173", "http://localhost:3000"];
+
 app.use(
     cors({
-        origin: process.env.CLIENT_URL,
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+                callback(null, true);
+            } else {
+                callback(new Error("Not allowed by CORS"));
+            }
+        },
         methods: ["GET", "POST", "DELETE", "PUT"],
         allowedHeaders: ["Content-Type", "Authorization"],
+        credentials: true
     })
 );
 
