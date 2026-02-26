@@ -20,7 +20,7 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpDownIcon, Filter, ShoppingCart } from "lucide-react";
+import { ArrowUpDown, Filter, ShoppingCart, Layers } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 function createSearchParamsHelper(filterParams) {
@@ -39,6 +39,8 @@ function StudentViewCoursesPage() {
   const [filters, setFilters] = useState({});
   const [searchParams, setSearchParams] = useSearchParams();
   const {
+    studentViewCoursesList,
+    setStudentViewCoursesList,
     loadingState,
     setLoadingState,
     handleAddToCart,
@@ -186,7 +188,7 @@ function StudentViewCoursesPage() {
                   variant="outline"
                   className="flex items-center gap-2 h-11 px-5 rounded-full border-zinc-200 bg-white shadow-sm hover:shadow-md transition-all font-bold text-zinc-700"
                 >
-                  <ArrowUpDownIcon className="h-4 w-4" />
+                  <ArrowUpDown className="h-4 w-4" />
                   <span>Sort By</span>
                 </Button>
               </DropdownMenuTrigger>
