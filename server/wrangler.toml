@@ -1,0 +1,12 @@
+name = "bhavin-academy-api"
+main = "server.js"
+compatibility_date = "2025-02-26"
+compatibility_flags = [ "nodejs_compat" ]
+
+[vars]
+# Non-sensitive variables (Public)
+PORT = 5000
+CLIENT_URL = "https://bhavin-academy.vercel.app" # Replace with your actual frontend URL later
+
+# Note: Sensitive secrets (MONGODB_URI, JWT_SECRET, etc.) 
+# should be set via `npx wrangler secret put`
