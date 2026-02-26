@@ -11,7 +11,7 @@ import {
   mediaDeleteService,
   mediaUploadService,
 } from "@/services";
-import { Upload, Plus, Trash2, Video, GripVertical, Check, Eye, EyeOff, FileVideo } from "lucide-react";
+import { Upload, Plus, Trash2, Video, Check, Eye, EyeOff, FileVideo, Youtube, Link as LinkIcon, RefreshCw, Lock } from "lucide-react";
 import { useContext, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -56,6 +56,26 @@ function CourseCurriculum() {
     setCourseCurriculumFormData(cpyCourseCurriculumFormData);
   }
 
+  function handleVideoSourceChange(source, currentIndex) {
+    let cpyCourseCurriculumFormData = [...courseCurriculumFormData];
+    cpyCourseCurriculumFormData[currentIndex] = {
+      ...cpyCourseCurriculumFormData[currentIndex],
+      videoSource: source,
+      videoUrl: "",
+      public_id: "", // clear previous upload info
+    };
+    setCourseCurriculumFormData(cpyCourseCurriculumFormData);
+  }
+
+  function handleExternalUrlChange(event, currentIndex) {
+    let cpyCourseCurriculumFormData = [...courseCurriculumFormData];
+    cpyCourseCurriculumFormData[currentIndex] = {
+      ...cpyCourseCurriculumFormData[currentIndex],
+      videoUrl: event.target.value,
+    };
+    setCourseCurriculumFormData(cpyCourseCurriculumFormData);
+  }
+
   async function handleSingleLectureUpload(event, currentIndex) {
     const selectedFile = event.target.files[0];
 
@@ -75,6 +95,7 @@ function CourseCurriculum() {
             ...cpyCourseCurriculumFormData[currentIndex],
             videoUrl: response?.data?.url,
             public_id: response?.data?.public_id,
+            videoSource: "upload",
           };
           setCourseCurriculumFormData(cpyCourseCurriculumFormData);
           setMediaUploadProgress(false);
@@ -157,6 +178,7 @@ function CourseCurriculum() {
             title: `Lecture ${cpyCourseCurriculumFormdata.length + (index + 1)
               }`,
             freePreview: false,
+            videoSource: "upload",
           })),
         ];
         setCourseCurriculumFormData(cpyCourseCurriculumFormdata);
@@ -252,101 +274,171 @@ function CourseCurriculum() {
                 className="bg-zinc-50/50 rounded-[32px] border border-zinc-200 p-8 shadow-sm group hover:bg-white hover:shadow-xl transition-all hover:border-zinc-300"
               >
                 <div className="flex flex-col lg:flex-row gap-8">
-                  {/* Left: Video Preview / Upload */}
-                  <div className="w-full lg:w-[400px] shrink-0">
+                  {/* Left: Video Preview / Upload Source selection */}
+                  <div className="w-full lg:w-[450px] shrink-0 space-y-4">
+                    <div className="flex gap-2 p-1 bg-zinc-100 rounded-2xl">
+                      <Button
+                        variant={curriculumItem?.videoSource === "upload" ? "secondary" : "ghost"}
+                        onClick={() => handleVideoSourceChange("upload", index)}
+                        className={`flex-1 rounded-xl h-10 font-bold transition-all ${curriculumItem?.videoSource === "upload" ? "bg-white shadow-sm" : "hover:bg-white/50"}`}
+                      >
+                        <FileVideo className="h-4 w-4 mr-2" />
+                        Local Upload
+                      </Button>
+                      <Button
+                        variant={curriculumItem?.videoSource === "external" ? "secondary" : "ghost"}
+                        onClick={() => handleVideoSourceChange("external", index)}
+                        className={`flex-1 rounded-xl h-10 font-bold transition-all ${curriculumItem?.videoSource === "external" ? "bg-white shadow-sm" : "hover:bg-white/50"}`}
+                      >
+                        <Youtube className="h-4 w-4 mr-2" />
+                        External URL
+                      </Button>
+                    </div>
+
                     {curriculumItem?.videoUrl ? (
                       <div className="space-y-4">
-                        <div className="aspect-video rounded-2xl overflow-hidden border-2 border-white shadow-xl bg-black">
+                        <div className="aspect-video rounded-3xl overflow-hidden border-4 border-white shadow-2xl bg-black group/player relative">
                           <VideoPlayer
                             url={curriculumItem?.videoUrl}
                             width="100%"
                             height="100%"
                           />
+                          <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover/player:opacity-100 transition-opacity">
+                            <Button
+                              variant="secondary"
+                              size="icon"
+                              className="rounded-full bg-white/90 backdrop-blur-md hover:bg-white shadow-xl"
+                              onClick={() => handleReplaceVideo(index)}
+                            >
+                              <RefreshCw className="h-4 w-4 text-zinc-900" />
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex items-center justify-between px-2">
+                          <div className="flex items-center gap-2 text-zinc-400">
+                            {curriculumItem?.videoSource === "external" ? (
+                              <>
+                                <LinkIcon className="h-3 w-3" />
+                                <span className="text-[10px] font-bold truncate max-w-[200px]">{curriculumItem?.videoUrl}</span>
+                              </>
+                            ) : (
+                              <>
+                                <Check className="h-3.5 w-3.5 text-emerald-500" />
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600">Securely Uploaded</span>
+                              </>
+                            )}
+                          </div>
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
-                            className="flex-1 rounded-xl h-10 font-bold border-zinc-200 hover:bg-zinc-100"
-                            onClick={() => handleReplaceVideo(index)}
-                          >
-                            <RefreshCw className="h-3.5 w-3.5 mr-2" />
-                            Replace
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 rounded-xl h-10 font-bold text-red-500 border-red-100 hover:bg-red-50 hover:border-red-200"
+                            className="text-red-500 hover:text-red-600 hover:bg-red-50 font-bold rounded-xl h-8"
                             onClick={() => handleDeleteLecture(index)}
                           >
                             <Trash2 className="h-3.5 w-3.5 mr-2" />
-                            Delete
+                            Delete Lecture
                           </Button>
                         </div>
                       </div>
                     ) : (
-                      <label className="flex flex-col items-center justify-center w-full aspect-video border-2 border-dashed border-zinc-200 rounded-2xl cursor-pointer hover:bg-white hover:border-blue-400 transition-all group/upload">
-                        <div className="flex flex-col items-center justify-center p-6 text-center">
-                          <div className="w-12 h-12 rounded-full bg-zinc-100 flex items-center justify-center mb-4 group-hover/upload:bg-blue-600 group-hover/upload:text-white transition-colors">
-                            <FileVideo className="h-6 w-6" />
+                      <div className="space-y-4">
+                        {curriculumItem?.videoSource === "upload" ? (
+                          <label className="flex flex-col items-center justify-center w-full aspect-video border-2 border-dashed border-zinc-200 rounded-[32px] cursor-pointer hover:bg-white hover:border-blue-400 transition-all group/upload relative overflow-hidden bg-zinc-50/50">
+                            <div className="flex flex-col items-center justify-center p-8 text-center relative z-10">
+                              <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-4 group-hover/upload:bg-blue-600 group-hover/upload:text-white transition-all shadow-sm group-hover/upload:shadow-xl group-hover/upload:-translate-y-1">
+                                <Upload className="h-6 w-6" />
+                              </div>
+                              <p className="text-lg font-black tracking-tighter text-zinc-900 mb-1">Drop lecture video here</p>
+                              <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-[0.2em]">High quality MP4 preferred</p>
+                            </div>
+                            <input
+                              type="file"
+                              accept="video/*"
+                              onChange={(event) => handleSingleLectureUpload(event, index)}
+                              className="hidden"
+                            />
+                          </label>
+                        ) : (
+                          <div className="w-full aspect-video border-2 border-dashed border-zinc-200 rounded-[32px] bg-zinc-50/50 p-8 flex flex-col justify-center">
+                            <div className="space-y-4">
+                              <div className="flex flex-col items-center text-center">
+                                <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-4 shadow-sm">
+                                  <Youtube className="h-6 w-6 text-red-500" />
+                                </div>
+                                <p className="text-lg font-black tracking-tighter text-zinc-900">External Video URL</p>
+                                <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-[0.2em] mb-6">YouTube, Vimeo, etc.</p>
+                              </div>
+                              <div className="relative">
+                                <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                                <Input
+                                  value={curriculumItem?.videoUrl}
+                                  onChange={(e) => handleExternalUrlChange(e, index)}
+                                  placeholder="Paste video link here..."
+                                  className="rounded-2xl h-14 pl-12 pr-4 bg-white border-zinc-200 font-medium focus:ring-4 focus:ring-blue-500/5 shadow-sm"
+                                />
+                              </div>
+                            </div>
                           </div>
-                          <p className="text-sm font-black tracking-tighter text-zinc-900 mb-1">Upload Lecture Video</p>
-                          <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">MP4 preferred</p>
-                        </div>
-                        <input
-                          type="file"
-                          accept="video/*"
-                          onChange={(event) => handleSingleLectureUpload(event, index)}
-                          className="hidden"
-                        />
-                      </label>
+                        )}
+                      </div>
                     )}
                   </div>
 
                   {/* Right: metadata content */}
-                  <div className="flex-1 space-y-6">
-                    <div className="flex items-center gap-3">
-                      <span className="w-8 h-8 rounded-lg bg-zinc-900 text-white flex items-center justify-center font-black text-xs">
-                        {index + 1}
-                      </span>
-                      <h4 className="text-xl font-black tracking-tighter text-zinc-900">Lecture Configuration.</h4>
+                  <div className="flex-1 space-y-8 pt-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="relative">
+                          <div className="w-12 h-12 rounded-2xl bg-zinc-900 flex items-center justify-center">
+                            <span className="text-white font-black text-lg leading-none">{index + 1}</span>
+                          </div>
+                          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-blue-600 border-2 border-zinc-50 flex items-center justify-center">
+                            <Check className="h-2.5 w-2.5 text-white" />
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="text-2xl font-black tracking-tighter text-zinc-900 leading-none">Lecture Configuration.</h4>
+                          <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">Set basic metadata and visibility</p>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Lecture Title</Label>
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Lecture Title</Label>
                         <Input
-                          placeholder="e.g. Introduction to Neural Networks"
-                          className="rounded-xl h-12 px-4 bg-white border-zinc-200 font-bold focus:ring-blue-500/10 focus:border-blue-500"
+                          placeholder="e.g. 01. Introduction to the course"
+                          className="rounded-2xl h-14 px-6 bg-white border-zinc-200 font-bold text-lg focus:ring-4 focus:ring-blue-500/5 transition-all shadow-sm"
                           onChange={(event) => handleCourseTitleChange(event, index)}
                           value={curriculumItem?.title}
                         />
                       </div>
 
-                      <div className="flex items-center justify-between p-4 bg-white rounded-2xl border border-zinc-100 shadow-sm">
-                        <div className="flex items-center gap-4">
-                          <div className={`p-2 rounded-xl ${curriculumItem?.freePreview ? 'bg-emerald-50 text-emerald-600' : 'bg-zinc-50 text-zinc-400'}`}>
-                            {curriculumItem?.freePreview ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                      <div className="grid grid-cols-1 gap-4">
+                        <div className={`flex items-center justify-between p-6 rounded-3xl border transition-all ${curriculumItem?.freePreview ? 'bg-emerald-50/50 border-emerald-100' : 'bg-white border-zinc-100 shadow-sm'}`}>
+                          <div className="flex items-center gap-5">
+                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${curriculumItem?.freePreview ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-zinc-50 text-zinc-400'}`}>
+                              {curriculumItem?.freePreview ? <Eye className="h-6 w-6" /> : <EyeOff className="h-6 w-6" />}
+                            </div>
+                            <div>
+                              <p className="text-base font-bold text-zinc-900 leading-none mb-1">Free Preview</p>
+                              <p className="text-xs text-zinc-500 font-medium tracking-tight">Allow students to watch this for free.</p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="text-sm font-bold text-zinc-900 leading-none mb-1">Free Preview</p>
-                            <p className="text-xs text-zinc-400 font-medium">Allow students to watch this for free.</p>
-                          </div>
+                          <Switch
+                            checked={curriculumItem?.freePreview}
+                            onCheckedChange={(value) => handleFreePreviewChange(value, index)}
+                            className="data-[state=checked]:bg-emerald-500"
+                          />
                         </div>
-                        <Switch
-                          checked={curriculumItem?.freePreview}
-                          onCheckedChange={(value) => handleFreePreviewChange(value, index)}
-                          className="data-[state=checked]:bg-emerald-500"
-                        />
                       </div>
                     </div>
 
-                    {curriculumItem?.videoUrl && (
-                      <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-4 py-2 rounded-xl self-start">
-                        <Check className="h-4 w-4" />
-                        <span className="text-xs font-black tracking-tight uppercase">Video Optimized</span>
+                    <div className="pt-4 border-t border-zinc-100 flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-zinc-400 font-medium text-xs">
+                        <Lock className="w-3.5 h-3.5" />
+                        SSL Secured Content
                       </div>
-                    )}
+                    </div>
                   </div>
                 </div>
               </motion.div>
