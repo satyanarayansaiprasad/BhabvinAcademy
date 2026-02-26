@@ -51,13 +51,20 @@ function AboutUsPage() {
                                 </div>
                             </div>
 
-                            <div className="relative">
-                                <div className="aspect-square rounded-[32px] bg-zinc-900/5 border border-zinc-200 overflow-hidden relative group">
-                                    <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/10 via-transparent to-purple-600/10" />
-                                    <div className="absolute inset-10 flex flex-col items-center justify-center text-center">
-                                        <GraduationCap className="w-24 h-24 text-zinc-900 mb-6" />
-                                        <h3 className="text-2xl font-bold text-zinc-900">Elite Education</h3>
-                                        <p className="text-zinc-500 font-medium mt-2">Curated by industry leaders for maximum impact.</p>
+                            <div className="relative h-full">
+                                <div className="aspect-square lg:aspect-auto lg:h-[600px] rounded-[32px] overflow-hidden relative group border border-zinc-200 shadow-2xl">
+                                    <img
+                                        src="/about_us_hero.png"
+                                        alt="Students Learning"
+                                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/60 via-transparent to-transparent opacity-60" />
+
+                                    <div className="absolute inset-6 md:inset-10 flex flex-col justify-end">
+                                        <div className="bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20">
+                                            <h3 className="text-xl font-bold text-white mb-1">Global Academy</h3>
+                                            <p className="text-white/80 text-sm font-medium">Join 20,000+ students on your journey to mastery.</p>
+                                        </div>
                                     </div>
                                 </div>
 
