@@ -1,4 +1,4 @@
-import { GraduationCap, TvMinimalPlay, Menu, X } from "lucide-react";
+import { GraduationCap, TvMinimalPlay, Menu, X, ShoppingCart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { useContext, useState } from "react";
@@ -60,15 +60,25 @@ function StudentViewCommonHeader() {
           <div className="flex items-center space-x-4">
             <div className="hidden md:flex gap-4 items-center">
               {auth?.authenticate && (
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => navigate("/student-courses")}
-                  className="flex cursor-pointer items-center gap-2 text-zinc-600 hover:text-zinc-900 transition-colors"
-                >
-                  <span className="font-bold text-[14px]">My Courses</span>
-                  <TvMinimalPlay className="w-5 h-5" />
-                </motion.div>
+                <>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => navigate("/student-courses")}
+                    className="flex cursor-pointer items-center gap-2 text-zinc-600 hover:text-zinc-900 transition-colors"
+                  >
+                    <span className="font-bold text-[14px]">My Learning</span>
+                    <TvMinimalPlay className="w-5 h-5" />
+                  </motion.div>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => navigate("/cart")}
+                    className="flex cursor-pointer items-center gap-2 text-zinc-600 hover:text-zinc-900 transition-colors relative"
+                  >
+                    <ShoppingCart className="w-5 h-5" />
+                  </motion.div>
+                </>
               )}
               {auth?.authenticate ? (
                 <Button onClick={handleLogout} variant="outline" className="rounded-xl border-zinc-200 hover:bg-zinc-50 font-bold px-6">

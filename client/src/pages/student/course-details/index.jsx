@@ -17,10 +17,10 @@ import {
   createPaymentService,
   fetchStudentViewCourseDetailsService,
 } from "@/services";
-import { CheckCircle, Globe, Lock, PlayCircle, Clock, Users, Play, Star, Share2, Info } from "lucide-react";
-import { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { CheckCircle, Globe, Lock, PlayCircle, Clock, Users, Play, Star, Share2, Info, ShoppingCart } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 function StudentViewCourseDetailsPage() {
   const {
@@ -30,6 +30,7 @@ function StudentViewCourseDetailsPage() {
     setCurrentCourseDetailsId,
     loadingState,
     setLoadingState,
+    handleAddToCart,
   } = useContext(StudentContext);
 
   const { auth } = useContext(AuthContext);
@@ -41,6 +42,7 @@ function StudentViewCourseDetailsPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const location = useLocation();
+  const { toast } = useToast();
 
   async function fetchStudentViewCourseDetails() {
     const response = await fetchStudentViewCourseDetailsService(
@@ -91,6 +93,32 @@ function StudentViewCourseDetailsPage() {
         JSON.stringify(response?.data?.orderId)
       );
       setApprovalUrl(response?.data?.approveUrl);
+    }
+  }
+
+  async function handleAddToCartLocal() {
+    if (!auth?.authenticate) {
+      toast({
+        title: "Please Sign In",
+        description: "You need to be signed in to add courses to your cart.",
+        variant: "destructive",
+      });
+      navigate("/auth");
+      return;
+    }
+
+    const response = await handleAddToCart(studentViewCourseDetails?._id, auth?.user?._id);
+    if (response?.success) {
+      toast({
+        title: "Added to Cart",
+        description: "The course has been added to your cart successfully.",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: response?.message || "Failed to add to cart.",
+        variant: "destructive",
+      });
     }
   }
 
@@ -326,7 +354,7 @@ function StudentViewCourseDetailsPage() {
                     <div className="flex items-center justify-between mb-8">
                       <div>
                         <p className="text-zinc-400 font-bold uppercase tracking-widest text-[10px] mb-1">Lifetime Access</p>
-                        <h3 className="text-[28px] font-black tracking-tighter text-zinc-900">${studentViewCourseDetails?.pricing}</h3>
+                        <h3 className="text-[28px] font-black tracking-tighter text-zinc-900">₹{studentViewCourseDetails?.pricing}</h3>
                       </div>
                       <Button variant="ghost" className="rounded-full w-12 h-12 p-0 text-zinc-400 border border-zinc-100 hover:bg-zinc-50">
                         <Share2 className="h-5 w-5" />
@@ -342,6 +370,7 @@ function StudentViewCourseDetailsPage() {
                       </Button>
                       <Button
                         variant="outline"
+                        onClick={handleAddToCartLocal}
                         className="w-full rounded-[24px] h-16 text-lg font-bold border-zinc-200 text-zinc-700 hover:bg-zinc-50"
                       >
                         Add to Cart

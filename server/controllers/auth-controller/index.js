@@ -51,8 +51,8 @@ const loginUser = async (req, res) => {
       userEmail: checkUser.userEmail,
       role: checkUser.role,
     },
-    "JWT_SECRET",
-    { expiresIn: "120m" }
+    process.env.JWT_SECRET || "JWT_SECRET",
+    { expiresIn: process.env.JWT_EXPIRES_IN || "120m" }
   );
 
   res.status(200).json({
@@ -70,4 +70,43 @@ const loginUser = async (req, res) => {
   });
 };
 
-module.exports = { registerUser, loginUser };
+const forgotPassword = async (req, res) => {
+  const { userEmail } = req.body;
+  const user = await User.findOne({ userEmail });
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: "User not found!",
+    });
+  }
+
+  // In a real app, send reset link with token to email
+  return res.status(200).json({
+    success: true,
+    message: "User verified. You can now reset your password.",
+  });
+};
+
+const resetPassword = async (req, res) => {
+  const { userEmail, newPassword } = req.body;
+  const user = await User.findOne({ userEmail });
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: "User not found!",
+    });
+  }
+
+  const hashPassword = await bcrypt.hash(newPassword, 10);
+  user.password = hashPassword;
+  await user.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Password reset successfully!",
+  });
+};
+
+module.exports = { registerUser, loginUser, forgotPassword, resetPassword };

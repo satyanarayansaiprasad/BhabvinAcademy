@@ -3,7 +3,6 @@ import axiosInstance from "@/api/axiosInstance";
 export async function registerService(formData) {
   const { data } = await axiosInstance.post("/auth/register", {
     ...formData,
-    role: "user",
   });
 
   return data;
@@ -180,5 +179,31 @@ export async function getHomeConfigService() {
 export async function updateHomeConfigService(formData) {
   const { data } = await axiosInstance.put("/home-config/update", formData);
 
+  return data;
+}
+export async function addToCartService(formData) {
+  const { data } = await axiosInstance.post("/student/cart/add", formData);
+  return data;
+}
+
+export async function fetchCartItemsService(userId) {
+  const { data } = await axiosInstance.get(`/student/cart/get/${userId}`);
+  return data;
+}
+
+export async function deleteCartItemService(userId, courseId) {
+  const { data } = await axiosInstance.delete(
+    `/student/cart/delete/${userId}/${courseId}`
+  );
+  return data;
+}
+
+export async function forgotPasswordService(formData) {
+  const { data } = await axiosInstance.post("/auth/forgot-password", formData);
+  return data;
+}
+
+export async function resetPasswordService(formData) {
+  const { data } = await axiosInstance.post("/auth/reset-password", formData);
   return data;
 }

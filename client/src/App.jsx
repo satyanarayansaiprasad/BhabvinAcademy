@@ -14,6 +14,7 @@ import PaypalPaymentReturnPage from "./pages/student/payment-return";
 import StudentCoursesPage from "./pages/student/student-courses";
 import StudentViewCourseProgressPage from "./pages/student/course-progress";
 import AboutUsPage from "./pages/student/about";
+import CartPage from "./pages/student/cart";
 import ScrollToTop from "./components/scroll-to-top";
 
 function App() {
@@ -102,6 +103,16 @@ function App() {
             element={
               <RouteGuard
                 element={<StudentViewCourseProgressPage />}
+                authenticated={auth?.authenticate}
+                user={auth?.user}
+              />
+            }
+          />
+          <Route
+            path="cart"
+            element={
+              <RouteGuard
+                element={<CartPage />}
                 authenticated={auth?.authenticate}
                 user={auth?.user}
               />

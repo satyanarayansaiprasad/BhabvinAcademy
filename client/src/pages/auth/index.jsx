@@ -130,9 +130,17 @@ function AuthPage() {
                         isButtonDisabled={!checkIfSignInFormIsValid()}
                         handleSubmit={handleLoginUser}
                       />
+                      <div className="flex justify-end mt-2">
+                        <button
+                          onClick={() => setActiveTab("forgot")}
+                          className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors"
+                        >
+                          Forgot Password?
+                        </button>
+                      </div>
                     </div>
                   </div>
-                ) : (
+                ) : activeTab === "signup" ? (
                   <div className="space-y-6">
                     <div>
                       <h3 className="text-[22px] font-black tracking-tighter text-zinc-900 mb-2">Join the Academy.</h3>
@@ -149,6 +157,8 @@ function AuthPage() {
                       />
                     </div>
                   </div>
+                ) : (
+                  <ForgotPasswordSection setActiveTab={setActiveTab} />
                 )}
               </motion.div>
             </AnimatePresence>
@@ -159,6 +169,82 @@ function AuthPage() {
           </div>
         </div>
       </main>
+    </div>
+  );
+}
+
+function ForgotPasswordSection({ setActiveTab }) {
+  const [email, setEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [step, setStep] = useState(1); // 1: Email, 2: New Password
+  const { handleForgotPassword, handleResetPassword } = useContext(AuthContext);
+
+  async function onForgotSubmit(e) {
+    e.preventDefault();
+    const data = await handleForgotPassword(email);
+    if (data.success) {
+      setStep(2);
+    }
+  }
+
+  async function onResetSubmit(e) {
+    e.preventDefault();
+    const data = await handleResetPassword(email, newPassword);
+    if (data.success) {
+      setActiveTab("signin");
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-[22px] font-black tracking-tighter text-zinc-900 mb-2">
+          {step === 1 ? "Reset Password." : "New Password."}
+        </h3>
+        <p className="text-zinc-500 font-medium">
+          {step === 1 ? "Enter your email to verify your identity." : "Set a new secure password for your account."}
+        </p>
+      </div>
+
+      <form onSubmit={step === 1 ? onForgotSubmit : onResetSubmit} className="space-y-4 pt-4 auth-form-container">
+        {step === 1 ? (
+          <div>
+            <label className="text-sm font-bold text-zinc-900 mb-2 block">Email Address</label>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full h-12 px-5 rounded-xl border border-zinc-200 focus:border-zinc-900 focus:ring-0 transition-all font-medium"
+              required
+            />
+          </div>
+        ) : (
+          <div>
+            <label className="text-sm font-bold text-zinc-900 mb-2 block">New Password</label>
+            <input
+              type="password"
+              placeholder="Enter new password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="w-full h-12 px-5 rounded-xl border border-zinc-200 focus:border-zinc-900 focus:ring-0 transition-all font-medium"
+              required
+            />
+          </div>
+        )}
+
+        <Button type="submit" className="w-full h-14 bg-zinc-900 text-white rounded-2xl font-black text-sm shadow-lg shadow-zinc-900/10">
+          {step === 1 ? "Verify Email" : "Reset Password"}
+        </Button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("signin")}
+          className="w-full text-center text-xs font-bold text-zinc-400 hover:text-zinc-600 transition-colors py-2"
+        >
+          Back to Sign In
+        </button>
+      </form>
     </div>
   );
 }

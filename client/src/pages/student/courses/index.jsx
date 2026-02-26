@@ -15,11 +15,13 @@ import { StudentContext } from "@/context/student-context";
 import {
   checkCoursePurchaseInfoService,
   fetchStudentViewCourseListService,
+  getHomeConfigService,
 } from "@/services";
-import { ArrowUpDownIcon, Filter, Layers } from "lucide-react";
-import { useContext, useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { ShoppingCart } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 function createSearchParamsHelper(filterParams) {
   const queryParams = [];
@@ -37,13 +39,14 @@ function StudentViewCoursesPage() {
   const [filters, setFilters] = useState({});
   const [searchParams, setSearchParams] = useSearchParams();
   const {
-    studentViewCoursesList,
-    setStudentViewCoursesList,
     loadingState,
     setLoadingState,
+    handleAddToCart,
   } = useContext(StudentContext);
+  const { toast } = useToast();
   const navigate = useNavigate();
   const { auth } = useContext(AuthContext);
+  const [categories, setCategories] = useState([]);
 
   function handleFilterOnChange(getSectionId, getCurrentOption) {
     let cpyFilters = { ...filters };
@@ -100,6 +103,32 @@ function StudentViewCoursesPage() {
     }
   }
 
+  async function handleAddToCartLocal(courseId) {
+    if (!auth?.authenticate) {
+      toast({
+        title: "Please Sign In",
+        description: "You need to be signed in to add courses to your cart.",
+        variant: "destructive",
+      });
+      navigate("/auth");
+      return;
+    }
+
+    const response = await handleAddToCart(courseId, auth?.user?._id);
+    if (response?.success) {
+      toast({
+        title: "Added to Cart",
+        description: "The course has been added to your cart successfully.",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: response?.message || "Failed to add to cart.",
+        variant: "destructive",
+      });
+    }
+  }
+
   useEffect(() => {
     const buildQueryStringForFilters = createSearchParamsHelper(filters);
     setSearchParams(new URLSearchParams(buildQueryStringForFilters));
@@ -108,6 +137,17 @@ function StudentViewCoursesPage() {
   useEffect(() => {
     setSort("price-lowtohigh");
     setFilters(JSON.parse(sessionStorage.getItem("filters")) || {});
+  }, []);
+
+  async function fetchHomeConfig() {
+    const response = await getHomeConfigService();
+    if (response?.success) {
+      setCategories(response?.data?.categories || []);
+    }
+  }
+
+  useEffect(() => {
+    fetchHomeConfig();
   }, []);
 
   useEffect(() => {
@@ -190,7 +230,7 @@ function StudentViewCoursesPage() {
                       {keyItem}
                     </h3>
                     <div className="grid gap-3">
-                      {filterOptions[keyItem].map((option) => (
+                      {(keyItem === 'category' && categories.length > 0 ? categories : filterOptions[keyItem]).map((option) => (
                         <Label
                           key={option.id}
                           className="flex items-center gap-3 cursor-pointer group"
@@ -288,13 +328,25 @@ function StudentViewCoursesPage() {
                         </div>
 
                         <div className="pt-4 border-t border-zinc-100 flex items-center justify-between">
-                          <div className="flex items-center gap-1">
-                            <span className="text-zinc-900 font-bold">4.8</span>
-                            <div className="flex text-yellow-500 text-sm">★★★★★</div>
+                          <div className="flex flex-col">
+                            <div className="flex items-center gap-1 mb-1">
+                              <span className="text-zinc-900 font-bold">4.8</span>
+                              <div className="flex text-yellow-500 text-xs">★★★★★</div>
+                            </div>
+                            <p className="text-2xl font-extrabold text-zinc-900 tracking-tighter">
+                              ₹{courseItem?.pricing}
+                            </p>
                           </div>
-                          <p className="text-2xl font-extrabold text-zinc-900 tracking-tighter">
-                            ${courseItem?.pricing}
-                          </p>
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAddToCartLocal(courseItem?._id);
+                            }}
+                            className="bg-zinc-900 text-white hover:bg-zinc-800 rounded-2xl h-12 px-6 flex items-center gap-2 font-bold shadow-lg shadow-zinc-900/10 active:scale-95 transition-all"
+                          >
+                            <ShoppingCart className="w-4 h-4" />
+                            Add to Cart
+                          </Button>
                         </div>
                       </div>
                     </motion.div>

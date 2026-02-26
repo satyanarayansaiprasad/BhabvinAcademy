@@ -10,6 +10,14 @@ function InstructorHomeConfig() {
     const [newSkill, setNewSkill] = useState("");
     const [studentReviews, setStudentReviews] = useState([]);
     const [newReview, setNewReview] = useState({ studentName: "", reviewText: "" });
+    const [featuredSections, setFeaturedSections] = useState({
+        trending: [],
+        mostDemanded: [],
+        recent: [],
+    });
+    const [categories, setCategories] = useState([]);
+    const [newCategory, setNewCategory] = useState({ id: "", label: "" });
+    const [allCourses, setAllCourses] = useState([]);
     const [loading, setLoading] = useState(false);
 
     async function fetchConfig() {
@@ -17,12 +25,31 @@ function InstructorHomeConfig() {
         if (response?.success) {
             setSkillPillars(response?.data?.skillPillars || []);
             setStudentReviews(response?.data?.studentReviews || []);
+            setFeaturedSections(response?.data?.featuredCourseSections || {
+                trending: [],
+                mostDemanded: [],
+                recent: [],
+            });
+            setCategories(response?.data?.categories || []);
+        }
+    }
+
+    async function fetchAllCourses() {
+        // We reuse the instructor courses list or fetch a fresh one
+        const response = await fetchInstructorCourseListService();
+        if (response?.success) {
+            setAllCourses(response?.data);
         }
     }
 
     async function handleUpdateConfig() {
         setLoading(true);
-        const response = await updateHomeConfigService({ skillPillars, studentReviews });
+        const response = await updateHomeConfigService({
+            skillPillars,
+            studentReviews,
+            featuredCourseSections: featuredSections,
+            categories
+        });
         if (response?.success) {
             alert("Home configuration updated successfully!");
         }
@@ -56,9 +83,35 @@ function InstructorHomeConfig() {
         setStudentReviews(updatedReviews);
     }
 
+    function handleAddCategory() {
+        if (newCategory.id.trim() !== "" && newCategory.label.trim() !== "") {
+            setCategories([...categories, { ...newCategory }]);
+            setNewCategory({ id: "", label: "" });
+        }
+    }
+
+    function handleRemoveCategory(index) {
+        setCategories(categories.filter((_, i) => i !== index));
+    }
+
     useEffect(() => {
         fetchConfig();
+        fetchAllCourses();
     }, []);
+
+    function toggleCourseInSection(section, courseId) {
+        setFeaturedSections(prev => {
+            const currentSection = Array.isArray(prev[section]) ? prev[section] : [];
+            const updatedSection = currentSection.find(c => (c._id || c) === courseId)
+                ? currentSection.filter(c => (c._id || c) !== courseId)
+                : [...currentSection, courseId];
+
+            return {
+                ...prev,
+                [section]: updatedSection
+            };
+        });
+    }
 
     return (
         <motion.div
@@ -192,6 +245,108 @@ function InstructorHomeConfig() {
                                         className="absolute top-4 right-4 text-zinc-300 hover:text-red-500 hover:bg-red-50 rounded-full"
                                     >
                                         <Trash2 className="h-5 w-5" />
+                                    </Button>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                    </div>
+                </section>
+
+                <section className="pt-12 border-t border-zinc-100">
+                    <div className="flex flex-col gap-1 mb-8">
+                        <span className="text-purple-600 font-black text-[10px] uppercase tracking-widest flex items-center gap-2">
+                            <Sparkles className="h-3 w-3" /> Curation
+                        </span>
+                        <h3 className="text-2xl font-black tracking-tighter">Featured Course Sections.</h3>
+                        <p className="text-zinc-500 text-sm font-medium">Select which courses appear in the home page sections.</p>
+                    </div>
+
+                    <div className="space-y-12">
+                        {['trending', 'mostDemanded', 'recent'].map(section => (
+                            <div key={section} className="bg-zinc-50/50 p-8 rounded-[32px] border border-zinc-100">
+                                <h4 className="text-lg font-bold mb-6 capitalize text-zinc-900 flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full bg-purple-500" />
+                                    {section.replace(/([A-Z])/g, ' $1')}
+                                </h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-h-[400px] overflow-y-auto p-2 scrollbar-hide">
+                                    {allCourses.map(course => {
+                                        const isSelected = featuredSections[section]?.some(c => (c._id || c) === course._id);
+                                        return (
+                                            <div
+                                                key={course._id}
+                                                onClick={() => toggleCourseInSection(section, course._id)}
+                                                className={`cursor-pointer p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col gap-2 ${isSelected
+                                                    ? "border-purple-600 bg-purple-50/50 shadow-md"
+                                                    : "border-zinc-100 bg-white hover:border-zinc-300"
+                                                    }`}
+                                            >
+                                                <div className="aspect-video rounded-lg overflow-hidden shrink-0">
+                                                    <img src={course.image} className="w-full h-full object-cover" alt="" />
+                                                </div>
+                                                <span className={`text-[13px] font-bold line-clamp-2 leading-tight ${isSelected ? "text-purple-900" : "text-zinc-700"}`}>
+                                                    {course.title}
+                                                </span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+
+                <section className="pt-12 border-t border-zinc-100">
+                    <div className="flex flex-col gap-1 mb-8">
+                        <span className="text-orange-600 font-black text-[10px] uppercase tracking-widest flex items-center gap-2">
+                            <Sparkles className="h-3 w-3" /> Taxonomy
+                        </span>
+                        <h3 className="text-2xl font-black tracking-tighter">Category Management.</h3>
+                        <p className="text-zinc-500 text-sm font-medium">Add categories for the home page slider and course filters.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <Input
+                            value={newCategory.label}
+                            onChange={(e) => setNewCategory({ ...newCategory, label: e.target.value, id: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
+                            placeholder="Category Name (e.g. Web Design)"
+                            className="rounded-2xl h-14 border-zinc-200"
+                        />
+                        <Input
+                            value={newCategory.id}
+                            onChange={(e) => setNewCategory({ ...newCategory, id: e.target.value })}
+                            placeholder="Category ID (slug)"
+                            className="rounded-2xl h-14 border-zinc-200"
+                        />
+                    </div>
+                    <Button
+                        onClick={handleAddCategory}
+                        className="w-full bg-orange-600 hover:bg-orange-700 text-white rounded-2xl h-14 font-bold flex items-center gap-2 mb-10 transition-all hover:scale-[1.01] active:scale-[0.99]"
+                    >
+                        <Plus className="h-5 w-5" />
+                        <span>Add Category</span>
+                    </Button>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <AnimatePresence>
+                            {categories.map((cat, index) => (
+                                <motion.div
+                                    key={index}
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, scale: 0.9 }}
+                                    className="flex items-center justify-between p-4 px-6 rounded-2xl bg-zinc-50 border border-zinc-100 group hover:border-zinc-300 hover:bg-white transition-all shadow-sm"
+                                >
+                                    <div className="flex flex-col">
+                                        <span className="font-bold text-lg text-zinc-900 leading-none mb-1">{cat.label}</span>
+                                        <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">{cat.id}</span>
+                                    </div>
+                                    <Button
+                                        onClick={() => handleRemoveCategory(index)}
+                                        variant="ghost"
+                                        size="icon"
+                                        className="rounded-full h-10 w-10 text-zinc-300 hover:text-red-500 hover:bg-red-50 transition-all"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
                                     </Button>
                                 </motion.div>
                             ))}

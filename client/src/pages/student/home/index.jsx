@@ -17,6 +17,12 @@ function StudentHomePage() {
     useContext(StudentContext);
   const { auth } = useContext(AuthContext);
   const [skillPillars, setSkillPillars] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [featuredSections, setFeaturedSections] = useState({
+    trending: [],
+    mostDemanded: [],
+    recent: [],
+  });
 
   const navigate = useNavigate();
 
@@ -62,7 +68,12 @@ function StudentHomePage() {
     const response = await getHomeConfigService();
     if (response?.success) {
       setSkillPillars(response?.data?.skillPillars || []);
-
+      setFeaturedSections(response?.data?.featuredCourseSections || {
+        trending: [],
+        mostDemanded: [],
+        recent: [],
+      });
+      setCategories(response?.data?.categories || []);
     }
   }
 
@@ -100,7 +111,7 @@ function StudentHomePage() {
         <h3 className="text-lg font-bold text-zinc-900 mb-2 line-clamp-1">{course.title}</h3>
         <p className="text-zinc-500 text-sm font-medium mb-6">By <span className="text-zinc-900">{course.instructorName}</span></p>
         <div className="flex items-center justify-between">
-          <span className="text-xl font-black text-zinc-900">${course.pricing}</span>
+          <span className="text-xl font-black text-zinc-900">₹{course.pricing}</span>
           <span className="text-blue-600 font-bold group-hover:translate-x-1 transition-transform text-sm">Enroll Now →</span>
         </div>
       </div>
@@ -286,7 +297,7 @@ function StudentHomePage() {
       <section className="py-20 bg-white border-b border-zinc-100 overflow-hidden">
         <div className="relative flex overflow-x-hidden">
           <div className="animate-marquee-reverse whitespace-nowrap flex items-center gap-4 px-4">
-            {courseCategories.map((category) => (
+            {(categories.length > 0 ? categories : courseCategories).map((category) => (
               <motion.button
                 key={category.id}
                 whileHover={{ scale: 1.05, y: -2 }}
@@ -298,7 +309,7 @@ function StudentHomePage() {
               </motion.button>
             ))}
             {/* Duplicate for seamless scrolling */}
-            {courseCategories.map((category) => (
+            {(categories.length > 0 ? categories : courseCategories).map((category) => (
               <motion.button
                 key={`dup-${category.id}`}
                 whileHover={{ scale: 1.05, y: -2 }}
@@ -331,7 +342,7 @@ function StudentHomePage() {
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
-            {studentViewCoursesList && studentViewCoursesList.slice(0, 3).map((course, index) => (
+            {(featuredSections?.trending?.length > 0 ? featuredSections.trending : studentViewCoursesList.slice(0, 3)).map((course, index) => (
               <CourseCard key={course._id} course={course} handleCourseNavigate={handleCourseNavigate} index={index} />
             ))}
           </div>
@@ -353,12 +364,16 @@ function StudentHomePage() {
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
-            {studentViewCoursesList && [...studentViewCoursesList]
-              .sort((a, b) => (b.students?.length || 0) - (a.students?.length || 0))
-              .slice(0, 3)
-              .map((course, index) => (
+            {featuredSections?.mostDemanded?.length > 0
+              ? featuredSections.mostDemanded.map((course, index) => (
                 <CourseCard key={course._id} course={course} handleCourseNavigate={handleCourseNavigate} index={index} />
-              ))}
+              ))
+              : studentViewCoursesList && [...studentViewCoursesList]
+                .sort((a, b) => (b.students?.length || 0) - (a.students?.length || 0))
+                .slice(0, 3)
+                .map((course, index) => (
+                  <CourseCard key={course._id} course={course} handleCourseNavigate={handleCourseNavigate} index={index} />
+                ))}
           </div>
         </div>
 
@@ -371,12 +386,16 @@ function StudentHomePage() {
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
-            {studentViewCoursesList && [...studentViewCoursesList]
-              .sort((a, b) => new Date(b.date) - new Date(a.date))
-              .slice(0, 3)
-              .map((course, index) => (
+            {featuredSections?.recent?.length > 0
+              ? featuredSections.recent.map((course, index) => (
                 <CourseCard key={course._id} course={course} handleCourseNavigate={handleCourseNavigate} index={index} />
-              ))}
+              ))
+              : studentViewCoursesList && [...studentViewCoursesList]
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 3)
+                .map((course, index) => (
+                  <CourseCard key={course._id} course={course} handleCourseNavigate={handleCourseNavigate} index={index} />
+                ))}
           </div>
         </div>
       </section>

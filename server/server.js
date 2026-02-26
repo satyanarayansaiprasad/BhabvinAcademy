@@ -9,15 +9,19 @@ const studentViewCourseRoutes = require("./routes/student-routes/course-routes")
 const studentViewOrderRoutes = require("./routes/student-routes/order-routes");
 const studentCoursesRoutes = require("./routes/student-routes/student-courses-routes");
 const studentCourseProgressRoutes = require("./routes/student-routes/course-progress-routes");
+const studentCartRoutes = require("./routes/student-routes/cart-routes");
 const homeConfigRoutes = require("./routes/instructor-routes/home-config-routes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-const allowedOrigins = process.env.CLIENT_URL
-    ? [process.env.CLIENT_URL, process.env.CLIENT_URL.endsWith('/') ? process.env.CLIENT_URL.slice(0, -1) : `${process.env.CLIENT_URL}/`]
-    : ["http://localhost:5173", "http://localhost:3000"];
+const allowedOrigins = [
+    process.env.CLIENT_URL,
+    process.env.CLIENT_URL?.endsWith('/') ? process.env.CLIENT_URL.slice(0, -1) : `${process.env.CLIENT_URL}/`,
+    "http://localhost:5173",
+    "http://localhost:3000"
+].filter(Boolean);
 
 app.use(
     cors({
@@ -64,6 +68,7 @@ app.use("/student/course", studentViewCourseRoutes);
 app.use("/student/order", studentViewOrderRoutes);
 app.use("/student/courses-bought", studentCoursesRoutes);
 app.use("/student/course-progress", studentCourseProgressRoutes);
+app.use("/student/cart", studentCartRoutes);
 app.use("/home-config", homeConfigRoutes);
 
 app.use((err, req, res, next) => {

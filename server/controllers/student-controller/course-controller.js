@@ -13,14 +13,23 @@ const getAllStudentViewCourses = async (req, res) => {
     console.log(req.query, "req.query");
 
     let filters = {};
-    if (category.length) {
-      filters.category = { $in: category.split(",") };
+    if (category && category.length) {
+      filters.category = {
+        $in: typeof category === "string" ? category.split(",") : category,
+      };
     }
-    if (level.length) {
-      filters.level = { $in: level.split(",") };
+    if (level && level.length) {
+      filters.level = {
+        $in: typeof level === "string" ? level.split(",") : level,
+      };
     }
-    if (primaryLanguage.length) {
-      filters.primaryLanguage = { $in: primaryLanguage.split(",") };
+    if (primaryLanguage && primaryLanguage.length) {
+      filters.primaryLanguage = {
+        $in:
+          typeof primaryLanguage === "string"
+            ? primaryLanguage.split(",")
+            : primaryLanguage,
+      };
     }
 
     let sortParam = {};

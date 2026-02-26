@@ -1,6 +1,12 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { initialSignInFormData, initialSignUpFormData } from "@/config";
-import { checkAuthService, loginService, registerService } from "@/services";
+import {
+  checkAuthService,
+  forgotPasswordService,
+  loginService,
+  registerService,
+  resetPasswordService,
+} from "@/services";
 import { createContext, useEffect, useState } from "react";
 
 export const AuthContext = createContext(null);
@@ -39,6 +45,16 @@ export default function AuthProvider({ children }) {
         user: null,
       });
     }
+  }
+
+  async function handleForgotPassword(userEmail) {
+    const data = await forgotPasswordService({ userEmail });
+    return data;
+  }
+
+  async function handleResetPassword(userEmail, newPassword) {
+    const data = await resetPasswordService({ userEmail, newPassword });
+    return data;
   }
 
   //check auth user
@@ -93,6 +109,8 @@ export default function AuthProvider({ children }) {
         setSignUpFormData,
         handleRegisterUser,
         handleLoginUser,
+        handleForgotPassword,
+        handleResetPassword,
         auth,
         resetCredentials,
       }}
