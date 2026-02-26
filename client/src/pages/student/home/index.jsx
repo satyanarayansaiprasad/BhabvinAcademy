@@ -137,8 +137,10 @@ function StudentHomePage() {
                 transition={{ delay: 0.1 }}
                 className="text-4xl md:text-[50px] font-black tracking-tighter text-white mb-8 leading-[1.1]"
               >
-                Master the Craft <br />
-                <span className="text-blue-500">Without Limits.</span>
+                Learn <br />
+                <span className="bg-gradient-to-r from-blue-400 via-emerald-400 to-indigo-400 bg-clip-text text-transparent italic">
+                  Without Limits.
+                </span>
               </motion.h1>
 
               <motion.p

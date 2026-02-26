@@ -38,8 +38,7 @@ function AboutUsPage() {
                                     transition={{ delay: 0.1 }}
                                     className="text-4xl md:text-[50px] font-black tracking-tighter text-zinc-900 mb-8 leading-tight"
                                 >
-                                    Beyond Education. <br />
-                                    <span className="text-blue-600">Pure Innovation.</span>
+                                    Empowering the next <br /> generation of masters.
                                 </motion.h1>
                                 <p className="text-base text-zinc-600 font-medium mb-12 leading-relaxed">
                                     Bhavin Academy is a premium learning ecosystem designed for professionals who refuse to settle for average. We combine world-class instruction with high-fidelity digital experiences to help you master the skills that matter in the modern economy.
