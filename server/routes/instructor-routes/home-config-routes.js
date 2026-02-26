@@ -1,9 +1,8 @@
-import express from 'express';
-import { getHomeConfig, updateHomeConfig } from '../../controllers/instructor-controller/home-config-controller.js';
-
+const express = require("express");
+const { getHomeConfig, updateHomeConfig } = require("../../controllers/instructor-controller/home-config-controller");
 const router = express.Router();
 
 router.get("/get", getHomeConfig);
 router.put("/update", updateHomeConfig);
 
-export default router;
+module.exports = router;

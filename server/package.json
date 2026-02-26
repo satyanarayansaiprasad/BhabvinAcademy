@@ -1,18 +1,17 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "type": "module",
+  "description": "",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
+    "start": "server.js",
     "dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "esbuild": "^0.27.3",
     "nodemon": "^3.1.6",
     "wrangler": "^4.68.1"
   },

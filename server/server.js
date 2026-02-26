@@ -1,17 +1,18 @@
-import { httpServerHandler } from 'cloudflare:node';
-import express from 'express';
-import cors from 'cors';
-import mongoose from 'mongoose';
-import authRoutes from './routes/auth-routes/index.js';
-import mediaRoutes from './routes/instructor-routes/media-routes.js';
-import instructorCourseRoutes from './routes/instructor-routes/course-routes.js';
-import studentViewCourseRoutes from './routes/student-routes/course-routes.js';
-import studentViewOrderRoutes from './routes/student-routes/order-routes.js';
-import studentCoursesRoutes from './routes/student-routes/student-courses-routes.js';
-import studentCourseProgressRoutes from './routes/student-routes/course-progress-routes.js';
-import homeConfigRoutes from './routes/instructor-routes/home-config-routes.js';
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
+const authRoutes = require("./routes/auth-routes/index");
+const mediaRoutes = require("./routes/instructor-routes/media-routes");
+const instructorCourseRoutes = require("./routes/instructor-routes/course-routes");
+const studentViewCourseRoutes = require("./routes/student-routes/course-routes");
+const studentViewOrderRoutes = require("./routes/student-routes/order-routes");
+const studentCoursesRoutes = require("./routes/student-routes/student-courses-routes");
+const studentCourseProgressRoutes = require("./routes/student-routes/course-progress-routes");
+const homeConfigRoutes = require("./routes/instructor-routes/home-config-routes");
 
 const app = express();
+const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
 app.use(
@@ -25,12 +26,10 @@ app.use(
 app.use(express.json());
 
 //database connection
-if (MONGO_URI) {
-    mongoose
-        .connect(MONGO_URI)
-        .then(() => console.log("mongodb is connected"))
-        .catch((e) => console.log(e));
-}
+mongoose
+    .connect(MONGO_URI)
+    .then(() => console.log("mongodb is connected"))
+    .catch((e) => console.log(e));
 
 //routes configuration
 app.use("/auth", authRoutes);
@@ -50,6 +49,10 @@ app.use((err, req, res, next) => {
     });
 });
 
-export default {
-    fetch: httpServerHandler(app)
-};
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Server is now running on port ${PORT}`);
+    });
+}
+
+module.exports = app;

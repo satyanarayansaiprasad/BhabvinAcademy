@@ -1,9 +1,9 @@
-import paypal from "../../helpers/paypal.js";
-import Order from "../../models/Order.js";
-import Course from "../../models/Course.js";
-import StudentCourses from "../../models/StudentCourses.js";
+const paypal = require("../../helpers/paypal");
+const Order = require("../../models/Order");
+const Course = require("../../models/Course");
+const StudentCourses = require("../../models/StudentCourses");
 
-export const createOrder = async (req, res) => {
+const createOrder = async (req, res) => {
   try {
     const {
       userId,
@@ -104,7 +104,7 @@ export const createOrder = async (req, res) => {
   }
 };
 
-export const capturePaymentAndFinalizeOrder = async (req, res) => {
+const capturePaymentAndFinalizeOrder = async (req, res) => {
   try {
     const { paymentId, payerId, orderId } = req.body;
 
@@ -183,3 +183,5 @@ export const capturePaymentAndFinalizeOrder = async (req, res) => {
     });
   }
 };
+
+module.exports = { createOrder, capturePaymentAndFinalizeOrder };

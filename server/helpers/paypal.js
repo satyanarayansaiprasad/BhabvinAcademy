@@ -1,4 +1,4 @@
-import paypal from 'paypal-rest-sdk';
+const paypal = require("paypal-rest-sdk");
 
 paypal.configure({
   mode: "sandbox",
@@ -6,4 +6,4 @@ paypal.configure({
   client_secret: process.env.PAYPAL_SECRET_ID,
 });
 
-export default paypal;
+module.exports = paypal;

@@ -1,14 +1,13 @@
-import express from 'express';
-import {
+const express = require("express");
+const {
   getStudentViewCourseDetails,
   getAllStudentViewCourses,
   checkCoursePurchaseInfo,
-} from '../../controllers/student-controller/course-controller.js';
-
+} = require("../../controllers/student-controller/course-controller");
 const router = express.Router();
 
 router.get("/get", getAllStudentViewCourses);
 router.get("/get/details/:id", getStudentViewCourseDetails);
 router.get("/purchase-info/:id/:studentId", checkCoursePurchaseInfo);
 
-export default router;
+module.exports = router;

@@ -1,6 +1,6 @@
-import HomeConfig from "../../models/HomeConfig.js";
+const HomeConfig = require("../../models/HomeConfig");
 
-export const getHomeConfig = async (req, res) => {
+const getHomeConfig = async (req, res) => {
     try {
         const config = await HomeConfig.findOne({});
         if (!config) {
@@ -73,7 +73,7 @@ export const getHomeConfig = async (req, res) => {
     }
 };
 
-export const updateHomeConfig = async (req, res) => {
+const updateHomeConfig = async (req, res) => {
     try {
         const { skillPillars, studentReviews } = req.body;
         let config = await HomeConfig.findOne({});
@@ -100,3 +100,5 @@ export const updateHomeConfig = async (req, res) => {
         });
     }
 };
+
+module.exports = { getHomeConfig, updateHomeConfig };

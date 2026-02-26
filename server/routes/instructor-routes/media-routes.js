@@ -1,16 +1,23 @@
-import express from 'express';
-import multer from 'multer';
-import {
-  uploadMediaToCloudinary,
+const express = require("express");
+const multer = require("multer");
+const {
+  uploadMediaToCloudinaryFromBuffer,
   deleteMediaFromCloudinary,
-} from '../../helpers/cloudinary.js';
+} = require("../../helpers/cloudinary");
 
 const router = express.Router();
-const upload = multer({ storage: multer.memoryStorage() });
+
+// Use memory storage for serverless environments (Vercel)
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 router.post("/upload", upload.single("file"), async (req, res) => {
   try {
-    const result = await uploadMediaToCloudinary(req.file.buffer);
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "No file uploaded" });
+    }
+
+    const result = await uploadMediaToCloudinaryFromBuffer(req.file.buffer);
     res.status(200).json({
       success: true,
       data: result,
@@ -46,8 +53,12 @@ router.delete("/delete/:id", async (req, res) => {
 
 router.post("/bulk-upload", upload.array("files", 10), async (req, res) => {
   try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ success: false, message: "No files uploaded" });
+    }
+
     const uploadPromises = req.files.map((fileItem) =>
-      uploadMediaToCloudinary(fileItem.buffer)
+      uploadMediaToCloudinaryFromBuffer(fileItem.buffer)
     );
 
     const results = await Promise.all(uploadPromises);
@@ -64,4 +75,4 @@ router.post("/bulk-upload", upload.array("files", 10), async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;

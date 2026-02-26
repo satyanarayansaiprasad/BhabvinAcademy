@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require("mongoose");
 
 const OrderSchema = new mongoose.Schema({
   userId: String,
@@ -18,5 +18,4 @@ const OrderSchema = new mongoose.Schema({
   coursePricing: String,
 });
 
-const Order = mongoose.model("Order", OrderSchema);
-export default Order;
+module.exports = mongoose.model("Order", OrderSchema);

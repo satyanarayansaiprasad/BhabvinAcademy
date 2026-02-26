@@ -1,6 +1,6 @@
-import StudentCourses from "../../models/StudentCourses.js";
+const StudentCourses = require("../../models/StudentCourses");
 
-export const getCoursesByStudentId = async (req, res) => {
+const getCoursesByStudentId = async (req, res) => {
   try {
     const { studentId } = req.params;
     const studentBoughtCourses = await StudentCourses.findOne({
@@ -9,7 +9,7 @@ export const getCoursesByStudentId = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: studentBoughtCourses ? studentBoughtCourses.courses : [],
+      data: studentBoughtCourses.courses,
     });
   } catch (error) {
     console.log(error);
@@ -19,3 +19,5 @@ export const getCoursesByStudentId = async (req, res) => {
     });
   }
 };
+
+module.exports = { getCoursesByStudentId };

@@ -1,8 +1,8 @@
-import User from "../../models/User.js";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+const User = require("../../models/User");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
-export const registerUser = async (req, res) => {
+const registerUser = async (req, res) => {
   const { userName, userEmail, password, role } = req.body;
 
   const existingUser = await User.findOne({
@@ -32,7 +32,7 @@ export const registerUser = async (req, res) => {
   });
 };
 
-export const loginUser = async (req, res) => {
+const loginUser = async (req, res) => {
   const { userEmail, password } = req.body;
 
   const checkUser = await User.findOne({ userEmail });
@@ -51,7 +51,7 @@ export const loginUser = async (req, res) => {
       userEmail: checkUser.userEmail,
       role: checkUser.role,
     },
-    process.env.JWT_SECRET || "JWT_SECRET",
+    "JWT_SECRET",
     { expiresIn: "120m" }
   );
 
@@ -69,3 +69,5 @@ export const loginUser = async (req, res) => {
     },
   });
 };
+
+module.exports = { registerUser, loginUser };
