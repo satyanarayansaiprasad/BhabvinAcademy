@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from 'mongoose';
 
 const HomeConfigSchema = new mongoose.Schema({
     skillPillars: [
@@ -15,4 +15,5 @@ const HomeConfigSchema = new mongoose.Schema({
     ],
 });
 
-module.exports = mongoose.model("HomeConfig", HomeConfigSchema);
+const HomeConfig = mongoose.model("HomeConfig", HomeConfigSchema);
+export default HomeConfig;

@@ -1,7 +1,10 @@
 name = "bhavin-academy-api"
-main = "server.mjs"
-compatibility_date = "2025-02-26"
-compatibility_flags = [ "nodejs_compat" ]
+main = "index.js"
+compatibility_date = "2026-02-26"
+compatibility_flags = [ "nodejs_compat", "enable_nodejs_http_server_modules" ]
+
+[build]
+command = "npx esbuild entry.mjs --bundle --outfile=index.js --format=esm --platform=node --target=node20 --external:cloudflare:node"
 
 [vars]
 # Non-sensitive variables (Public)

@@ -1,4 +1,4 @@
-const cloudinary = require("cloudinary").v2;
+import { v2 as cloudinary } from 'cloudinary';
 
 //configure with env data
 cloudinary.config({
@@ -7,9 +7,9 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadMediaToCloudinary = async (fileInput) => {
+export const uploadMediaToCloudinary = async (fileInput) => {
   try {
-    // If it's a buffer (from memory storage), we need to upload it as base64 or stream
+    // If it's a buffer (from memory storage), we need to upload it as base64
     let uploadData = fileInput;
     if (Buffer.isBuffer(fileInput)) {
       uploadData = `data:image/png;base64,${fileInput.toString("base64")}`;
@@ -26,7 +26,7 @@ const uploadMediaToCloudinary = async (fileInput) => {
   }
 };
 
-const deleteMediaFromCloudinary = async (publicId) => {
+export const deleteMediaFromCloudinary = async (publicId) => {
   try {
     await cloudinary.uploader.destroy(publicId);
   } catch (error) {
@@ -34,5 +34,3 @@ const deleteMediaFromCloudinary = async (publicId) => {
     throw new Error("failed to delete assest from cloudinary");
   }
 };
-
-module.exports = { uploadMediaToCloudinary, deleteMediaFromCloudinary };

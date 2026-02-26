@@ -1,6 +1,6 @@
-const Course = require("../../models/Course");
+import Course from "../../models/Course.js";
 
-const addNewCourse = async (req, res) => {
+export const addNewCourse = async (req, res) => {
   try {
     const courseData = req.body;
     const newlyCreatedCourse = new Course(courseData);
@@ -22,7 +22,7 @@ const addNewCourse = async (req, res) => {
   }
 };
 
-const getAllCourses = async (req, res) => {
+export const getAllCourses = async (req, res) => {
   try {
     const coursesList = await Course.find({});
 
@@ -39,7 +39,7 @@ const getAllCourses = async (req, res) => {
   }
 };
 
-const getCourseDetailsByID = async (req, res) => {
+export const getCourseDetailsByID = async (req, res) => {
   try {
     const { id } = req.params;
     const courseDetails = await Course.findById(id);
@@ -64,7 +64,7 @@ const getCourseDetailsByID = async (req, res) => {
   }
 };
 
-const updateCourseByID = async (req, res) => {
+export const updateCourseByID = async (req, res) => {
   try {
     const { id } = req.params;
     const updatedCourseData = req.body;
@@ -96,7 +96,7 @@ const updateCourseByID = async (req, res) => {
   }
 };
 
-const deleteCourseByID = async (req, res) => {
+export const deleteCourseByID = async (req, res) => {
   try {
     const { id } = req.params;
     const deletedCourse = await Course.findByIdAndDelete(id);
@@ -119,12 +119,4 @@ const deleteCourseByID = async (req, res) => {
       message: "Some error occured!",
     });
   }
-};
-
-module.exports = {
-  addNewCourse,
-  getAllCourses,
-  updateCourseByID,
-  getCourseDetailsByID,
-  deleteCourseByID,
 };
