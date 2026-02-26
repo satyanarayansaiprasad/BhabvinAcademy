@@ -53,6 +53,8 @@ const loginUser = async (req, res) => {
       userEmail: checkUser.userEmail,
       role: checkUser.role,
       profileImage: checkUser.profileImage,
+      userHeadline: checkUser.userHeadline,
+      userBio: checkUser.userBio,
     },
     process.env.JWT_SECRET || "JWT_SECRET",
     { expiresIn: process.env.JWT_EXPIRES_IN || "120m" }
@@ -70,6 +72,8 @@ const loginUser = async (req, res) => {
         userEmail: checkUser.userEmail,
         role: checkUser.role,
         profileImage: checkUser.profileImage,
+        userHeadline: checkUser.userHeadline,
+        userBio: checkUser.userBio,
       },
     },
   });
@@ -116,7 +120,7 @@ const resetPassword = async (req, res) => {
 
 const updateUserProfile = async (req, res) => {
   try {
-    const { userId, userFullName, profileImage } = req.body;
+    const { userId, userFullName, profileImage, userHeadline, userBio } = req.body;
 
     const user = await User.findById(userId);
 
@@ -127,8 +131,10 @@ const updateUserProfile = async (req, res) => {
       });
     }
 
-    if (userFullName) user.userFullName = userFullName;
+    if (userFullName !== undefined) user.userFullName = userFullName;
     if (profileImage !== undefined) user.profileImage = profileImage;
+    if (userHeadline !== undefined) user.userHeadline = userHeadline;
+    if (userBio !== undefined) user.userBio = userBio;
 
     await user.save();
 
@@ -142,6 +148,8 @@ const updateUserProfile = async (req, res) => {
         userEmail: user.userEmail,
         role: user.role,
         profileImage: user.profileImage,
+        userHeadline: user.userHeadline,
+        userBio: user.userBio,
       },
     });
   } catch (e) {
