@@ -46,23 +46,6 @@ const connectDB = async () => {
 connectDB();
 
 //routes configuration
-app.get("/health", async (req, res) => {
-    await connectDB();
-    res.status(200).json({
-        success: true,
-        message: "Server is healthy",
-        env: {
-            mongoUriSet: !!process.env.MONGO_URI,
-            mongoUriLength: process.env.MONGO_URI?.length || 0,
-            nodeEnv: process.env.NODE_ENV,
-            clientUrl: process.env.CLIENT_URL
-        },
-        dbStatus: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
-        dbReadyState: mongoose.connection.readyState,
-        connectionError: connectionError
-    });
-});
-
 app.use("/auth", authRoutes);
 app.use("/media", mediaRoutes);
 app.use("/instructor/course", instructorCourseRoutes);
@@ -76,9 +59,7 @@ app.use((err, req, res, next) => {
     console.log(err.stack);
     res.status(500).json({
         success: false,
-        message: "Some error occured!",
-        error: err.message,
-        stack: err.stack
+        message: "Something went wrong",
     });
 });
 
