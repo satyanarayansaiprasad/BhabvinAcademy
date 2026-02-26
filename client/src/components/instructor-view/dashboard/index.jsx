@@ -15,49 +15,48 @@ function InstructorDashboard({ listOfCourses }) {
   function calculateTotalStudentsAndProfit() {
     if (!listOfCourses || !Array.isArray(listOfCourses)) {
       return {
-        totalProfit: 0,
+        totalProfit: "0.00",
         totalStudents: 0,
         studentList: [],
       };
     }
 
-    const { totalStudents, totalProfit, studentList } = listOfCourses.reduce(
-      (acc, course) => {
-        const studentCount = course.students?.length || 0;
-        acc.totalStudents += studentCount;
+    let totalProfit = 0;
+    let totalStudents = 0;
+    const studentList = [];
 
-        course.students?.forEach((student) => {
-          // Use stored paidAmount if available, otherwise fallback to course pricing
-          const amountPaid = student.paidAmount ? parseFloat(student.paidAmount) : course.pricing;
-          acc.totalProfit += amountPaid;
+    listOfCourses.forEach((course) => {
+      if (course && course.students && Array.isArray(course.students)) {
+        totalStudents += course.students.length;
 
-          acc.studentList.push({
-            courseTitle: course.title,
-            studentName: student.studentName,
-            studentEmail: student.studentEmail,
+        course.students.forEach((student) => {
+          // Sum up the actual profit
+          const amountPaid = student.paidAmount ? parseFloat(student.paidAmount) : (course.pricing || 0);
+          totalProfit += amountPaid;
+
+          // Add to global student list
+          studentList.push({
+            courseTitle: course.title || "Untitled Course",
+            studentName: student.studentName || "Guest Student",
+            studentEmail: student.studentEmail || "Not Provided",
             purchasedDate: student.purchasedDate || null,
           });
         });
-
-        return acc;
-      },
-      {
-        totalStudents: 0,
-        totalProfit: 0,
-        studentList: [],
       }
-    );
+    });
 
-    // Sort students by purchasedDate descending (most recent first)
-    const sortedStudentList = [...studentList].sort((a, b) => {
-      if (!a.purchasedDate || !b.purchasedDate) return 0;
-      return new Date(b.purchasedDate) - new Date(a.purchasedDate);
+    // Simple sort: Most recent at top if date exists, otherwise stay in order
+    const finalStudentList = [...studentList].sort((a, b) => {
+      if (a.purchasedDate && b.purchasedDate) {
+        return new Date(b.purchasedDate) - new Date(a.purchasedDate);
+      }
+      return 0;
     });
 
     return {
       totalProfit: totalProfit.toFixed(2),
       totalStudents,
-      studentList: sortedStudentList,
+      studentList: finalStudentList,
     };
   }
 
@@ -94,7 +93,7 @@ function InstructorDashboard({ listOfCourses }) {
               </div>
               <div className="bg-zinc-100 px-3 py-1 rounded-full text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-1">
                 <TrendingUp className="h-3 w-3" />
-                +12%
+                Active
               </div>
             </div>
             <div>
@@ -115,8 +114,8 @@ function InstructorDashboard({ listOfCourses }) {
         className="bg-white rounded-[40px] border border-zinc-200/60 shadow-sm overflow-hidden"
       >
         <div className="p-8 border-b border-zinc-100 flex items-center justify-between">
-          <h2 className="text-xl font-bold tracking-tight text-zinc-900">Recent Students.</h2>
-          <Button variant="ghost" className="text-zinc-400 font-bold text-sm">View All</Button>
+          <h2 className="text-xl font-bold tracking-tight text-zinc-900">Students Overview.</h2>
+          <Button variant="ghost" className="text-zinc-400 font-bold text-sm underline underline-offset-4">Export List</Button>
         </div>
         <div className="overflow-x-auto">
           <Table className="w-full">
@@ -139,7 +138,7 @@ function InstructorDashboard({ listOfCourses }) {
                     <TableCell className="py-6 px-8 font-medium text-zinc-600">
                       {studentItem.studentName}
                     </TableCell>
-                    <TableCell className="py-6 px-8 font-medium text-zinc-400 font-mono text-sm uppercase">
+                    <TableCell className="py-6 px-8 font-medium text-zinc-400 font-mono text-sm">
                       {studentItem.studentEmail}
                     </TableCell>
                   </TableRow>
@@ -147,7 +146,7 @@ function InstructorDashboard({ listOfCourses }) {
               ) : (
                 <TableRow>
                   <TableCell colSpan={3} className="py-20 text-center text-zinc-400 font-medium italic">
-                    No students enrolled yet. Let's launch some courses!
+                    No student records found in the database.
                   </TableCell>
                 </TableRow>
               )}
