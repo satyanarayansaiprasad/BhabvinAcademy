@@ -7,11 +7,11 @@ const {
 
 const router = express.Router();
 
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.post("/upload", upload.single("file"), async (req, res) => {
   try {
-    const result = await uploadMediaToCloudinary(req.file.path);
+    const result = await uploadMediaToCloudinary(req.file.buffer);
     res.status(200).json({
       success: true,
       data: result,
@@ -50,7 +50,7 @@ router.delete("/delete/:id", async (req, res) => {
 router.post("/bulk-upload", upload.array("files", 10), async (req, res) => {
   try {
     const uploadPromises = req.files.map((fileItem) =>
-      uploadMediaToCloudinary(fileItem.path)
+      uploadMediaToCloudinary(fileItem.buffer)
     );
 
     const results = await Promise.all(uploadPromises);

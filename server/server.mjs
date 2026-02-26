@@ -1,3 +1,6 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -16,20 +19,22 @@ const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
 app.use(
-  cors({
-    origin: process.env.CLIENT_URL,
-    methods: ["GET", "POST", "DELETE", "PUT"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
+    cors({
+        origin: process.env.CLIENT_URL,
+        methods: ["GET", "POST", "DELETE", "PUT"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+    })
 );
 
 app.use(express.json());
 
 //database connection
-mongoose
-  .connect(MONGO_URI)
-  .then(() => console.log("mongodb is connected"))
-  .catch((e) => console.log(e));
+if (MONGO_URI) {
+    mongoose
+        .connect(MONGO_URI)
+        .then(() => console.log("mongodb is connected"))
+        .catch((e) => console.log(e));
+}
 
 //routes configuration
 app.use("/auth", authRoutes);
@@ -42,13 +47,18 @@ app.use("/student/course-progress", studentCourseProgressRoutes);
 app.use("/home-config", homeConfigRoutes);
 
 app.use((err, req, res, next) => {
-  console.log(err.stack);
-  res.status(500).json({
-    success: false,
-    message: "Something went wrong",
-  });
+    console.log(err.stack);
+    res.status(500).json({
+        success: false,
+        message: "Something went wrong",
+    });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is now running on port ${PORT}`);
-});
+// We don't call app.listen() in production (Cloudflare Workers environment)
+if (process.env.NODE_ENV !== "production") {
+    app.listen(PORT, () => {
+        console.log(`Server is now running on port ${PORT}`);
+    });
+}
+
+export default app;

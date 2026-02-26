@@ -7,9 +7,15 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadMediaToCloudinary = async (filePath) => {
+const uploadMediaToCloudinary = async (fileInput) => {
   try {
-    const result = await cloudinary.uploader.upload(filePath, {
+    // If it's a buffer (from memory storage), we need to upload it as base64 or stream
+    let uploadData = fileInput;
+    if (Buffer.isBuffer(fileInput)) {
+      uploadData = `data:image/png;base64,${fileInput.toString("base64")}`;
+    }
+
+    const result = await cloudinary.uploader.upload(uploadData, {
       resource_type: "auto",
     });
 

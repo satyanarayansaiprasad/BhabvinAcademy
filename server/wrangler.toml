@@ -1,5 +1,5 @@
 name = "bhavin-academy-api"
-main = "server.js"
+main = "server.mjs"
 compatibility_date = "2025-02-26"
 compatibility_flags = [ "nodejs_compat" ]
 
