@@ -28,7 +28,7 @@ function StudentViewCommonHeader() {
       transition={{ type: "spring", stiffness: 100, damping: 20 }}
       className="fixed top-0 w-full z-[1000] bg-white/95 backdrop-blur-xl border-b border-zinc-200/50 shadow-sm"
     >
-      <div className="container mx-auto px-4 lg:px-8 h-18 py-4 flex items-center justify-between bg-white relative z-[1001]">
+      <div className="container mx-auto px-4 lg:px-8 h-20 flex items-center justify-between bg-white relative z-[1001]">
         <div className="flex items-center space-x-6">
           <Link to="/home" className="flex items-center group">
             <motion.div whileHover={{ rotate: 15 }} transition={{ type: "spring", stiffness: 300 }}>
@@ -83,9 +83,9 @@ function StudentViewCommonHeader() {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2.5 border border-zinc-200 rounded-xl bg-zinc-50 hover:bg-zinc-100 text-zinc-900 transition-all active:scale-90"
+            className="md:hidden p-3 border border-zinc-200 rounded-xl bg-white hover:bg-zinc-50 text-zinc-900 transition-all active:scale-95 shadow-sm"
           >
-            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
@@ -99,31 +99,31 @@ function StudentViewCommonHeader() {
             animate="animate"
             exit="exit"
             transition={{ type: "spring", damping: 30, stiffness: 200 }}
-            className="fixed inset-0 top-[72px] bg-white z-[999] md:hidden flex flex-col p-0 overflow-hidden"
+            className="fixed inset-0 top-[80px] bg-white !opacity-100 z-[999] md:hidden flex flex-col p-0 overflow-hidden shadow-2xl"
           >
-            {/* Scrollable Content Container to handle absolute positioning issues */}
-            <div className="flex-1 overflow-y-auto bg-white flex flex-col p-8 space-y-12">
-              <nav className="flex flex-col space-y-8">
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 mb-6 block">Navigation</span>
-                  <div className="flex flex-col space-y-4">
+            {/* Scrollable Content Container with guaranteed solid background */}
+            <div className="flex-1 overflow-y-auto bg-white flex flex-col p-10 space-y-12">
+              <nav className="flex flex-col space-y-10">
+                <div className="space-y-6">
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-600 mb-2 block">Menu</span>
+                  <div className="flex flex-col space-y-2">
                     <button
                       onClick={() => {
                         navigate("/courses");
                         setIsMobileMenuOpen(false);
                       }}
-                      className="text-left text-3xl font-black text-zinc-900 tracking-tighter hover:text-emerald-600 transition-colors"
+                      className="text-left text-4xl font-black text-zinc-900 tracking-tighter hover:text-emerald-600 transition-colors py-2"
                     >
-                      Explore Courses.
+                      Explore.
                     </button>
                     <button
                       onClick={() => {
                         navigate("/about");
                         setIsMobileMenuOpen(false);
                       }}
-                      className="text-left text-3xl font-black text-zinc-900 tracking-tighter hover:text-emerald-600 transition-colors"
+                      className="text-left text-4xl font-black text-zinc-900 tracking-tighter hover:text-emerald-600 transition-colors py-2"
                     >
-                      About Academy.
+                      Academy.
                     </button>
                     {auth?.authenticate && (
                       <button
@@ -131,17 +131,17 @@ function StudentViewCommonHeader() {
                           navigate("/student-courses");
                           setIsMobileMenuOpen(false);
                         }}
-                        className="text-left text-3xl font-black text-zinc-900 tracking-tighter hover:text-emerald-600 transition-colors"
+                        className="text-left text-4xl font-black text-zinc-900 tracking-tighter hover:text-emerald-600 transition-colors py-2"
                       >
-                        My Mastery.
+                        Mastery.
                       </button>
                     )}
                   </div>
                 </div>
               </nav>
 
-              <div className="pt-10 border-t border-zinc-100 flex flex-col space-y-6">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 mb-2 block">Account</span>
+              <div className="pt-12 border-t border-zinc-100 flex flex-col space-y-6">
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400 mb-2 block">Profile</span>
                 {auth?.authenticate ? (
                   <Button
                     onClick={() => {
@@ -149,9 +149,9 @@ function StudentViewCommonHeader() {
                       setIsMobileMenuOpen(false);
                     }}
                     variant="outline"
-                    className="w-full rounded-2xl h-16 font-black text-lg border-2 border-zinc-200 hover:bg-zinc-50"
+                    className="w-full rounded-2xl h-16 font-black text-lg border-2 border-zinc-200 hover:bg-zinc-50 tracking-tight"
                   >
-                    Sign Out
+                    Sign Out.
                   </Button>
                 ) : (
                   <Button
@@ -159,16 +159,19 @@ function StudentViewCommonHeader() {
                       navigate("/auth");
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full rounded-2xl h-16 bg-zinc-900 text-white font-black text-lg shadow-2xl shadow-zinc-900/20 active:scale-[0.98] transition-all"
+                    className="w-full rounded-2xl h-16 bg-zinc-900 text-white font-black text-lg shadow-2xl shadow-zinc-900/10 active:scale-[0.98] transition-all tracking-tight"
                   >
-                    Sign In
+                    Sign In.
                   </Button>
                 )}
               </div>
             </div>
 
-            {/* Bottom Accent */}
-            <div className="h-2 bg-emerald-600 w-full shrink-0" />
+            {/* Bottom Brand Bar */}
+            <div className="p-8 bg-zinc-50 border-t border-zinc-100 flex items-center justify-between">
+              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">© 2026 Academy</span>
+              <GraduationCap className="h-5 w-5 text-zinc-300" />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
