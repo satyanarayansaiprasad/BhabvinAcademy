@@ -76,13 +76,24 @@ function StudentViewCoursesPage() {
   }
 
   async function fetchAllStudentViewCourses(filters, sort) {
-    const buildQueryStringForFilters = createSearchParamsHelper(filters);
-    const query = new URLSearchParams(buildQueryStringForFilters);
-    if (sort) query.set("sortBy", sort);
+    setLoadingState(true);
+    try {
+      const buildQueryStringForFilters = createSearchParamsHelper(filters);
+      const query = new URLSearchParams(buildQueryStringForFilters);
+      if (sort) query.set("sortBy", sort);
 
-    const response = await fetchStudentViewCourseListService(query.toString());
-    if (response?.success) {
-      setStudentViewCoursesList(response?.data);
+      const response = await fetchStudentViewCourseListService(query.toString());
+      if (response?.success) {
+        setStudentViewCoursesList(response?.data);
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch courses. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setLoadingState(false);
     }
   }

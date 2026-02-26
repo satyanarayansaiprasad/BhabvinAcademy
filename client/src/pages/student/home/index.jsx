@@ -31,12 +31,11 @@ function StudentHomePage() {
   const scale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
 
   function handleNavigateToCoursesPage(getCurrentId) {
-    sessionStorage.removeItem("filters");
     const currentFilter = {
       category: [getCurrentId],
     };
     sessionStorage.setItem("filters", JSON.stringify(currentFilter));
-    navigate("/courses");
+    navigate(`/courses?category=${encodeURIComponent(getCurrentId)}`);
   }
 
   async function fetchAllStudentViewCourses() {
