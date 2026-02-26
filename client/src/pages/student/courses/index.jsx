@@ -17,10 +17,10 @@ import {
   fetchStudentViewCourseListService,
   getHomeConfigService,
 } from "@/services";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart } from "lucide-react";
+import { ArrowUpDownIcon, Filter, ShoppingCart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 function createSearchParamsHelper(filterParams) {

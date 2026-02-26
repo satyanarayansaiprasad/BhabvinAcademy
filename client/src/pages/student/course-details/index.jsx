@@ -17,6 +17,7 @@ import {
   createPaymentService,
   fetchStudentViewCourseDetailsService,
 } from "@/services";
+import { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, Globe, Lock, PlayCircle, Clock, Users, Play, Star, Share2, Info, ShoppingCart } from "lucide-react";
