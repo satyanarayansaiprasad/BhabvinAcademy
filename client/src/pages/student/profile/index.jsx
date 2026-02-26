@@ -21,7 +21,7 @@ import {
     ExternalLink
 } from "lucide-react";
 import { mediaUploadService, updateUserProfileService } from "@/services";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import MediaProgressbar from "@/components/media-progress-bar";
 
 function StudentProfilePage() {
@@ -227,8 +227,8 @@ function StudentProfilePage() {
                                                 <Mail className="w-4 h-4" /> {auth.user.userEmail}
                                             </p>
                                             <span className="w-1 h-1 rounded-full bg-zinc-300 hidden md:block" />
-                                            <p className="text-zinc-400 text-sm font-medium flex items-center gap-2">
-                                                <Briefcase className="w-4 h-4" /> Student Member
+                                            <p className="text-zinc-400 text-sm font-medium flex items-center gap-2 capitalize">
+                                                <Briefcase className="w-4 h-4" /> {auth.user.role} Member
                                             </p>
                                         </div>
                                     </div>
@@ -285,12 +285,23 @@ function StudentProfilePage() {
                                 </div>
 
                                 {isEditing ? (
-                                    <Textarea
-                                        value={formData.userBio}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, userBio: e.target.value }))}
-                                        className="min-h-[160px] rounded-[24px] border-zinc-200 p-6 font-medium leading-relaxed focus:ring-4 focus:ring-blue-100 transition-all"
-                                        placeholder="Tell your story. What are your goals? What are you learning? Most students write about their passion for tech or business."
-                                    />
+                                    <div className="space-y-6">
+                                        <Textarea
+                                            value={formData.userBio}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, userBio: e.target.value }))}
+                                            className="min-h-[160px] rounded-[24px] border-zinc-200 p-6 font-medium leading-relaxed focus:ring-4 focus:ring-blue-100 transition-all"
+                                            placeholder="Tell your story. What are your goals? What are you learning? Most students write about their passion for tech or business."
+                                        />
+                                        <div className="flex justify-end">
+                                            <Button
+                                                onClick={handleUpdateProfile}
+                                                disabled={updating || uploading}
+                                                className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6 font-bold"
+                                            >
+                                                Save Profile
+                                            </Button>
+                                        </div>
+                                    </div>
                                 ) : (
                                     <div className="bg-zinc-50/50 rounded-[32px] p-8 border border-zinc-100">
                                         <p className="text-zinc-600 font-medium leading-[1.8] italic">

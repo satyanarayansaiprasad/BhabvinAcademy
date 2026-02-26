@@ -17,6 +17,7 @@ import CartPage from "./pages/student/cart";
 import CheckoutPage from "./pages/student/checkout";
 import StudentProfilePage from "./pages/student/profile";
 import ScrollToTop from "./components/scroll-to-top";
+import { Toaster } from "./components/ui/toaster";
 
 function App() {
   const { auth } = useContext(AuthContext);
@@ -132,6 +133,7 @@ function App() {
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      <Toaster />
     </>
   );
 }

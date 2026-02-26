@@ -6,13 +6,15 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AuthContext } from "@/context/auth-context";
 import { InstructorContext } from "@/context/instructor-context";
 import { fetchInstructorCourseListService } from "@/services";
-import { BarChart, Book, LogOut, LayoutDashboard, GraduationCap, Settings as SettingsIcon } from "lucide-react";
+import { BarChart, Book, LogOut, LayoutDashboard, GraduationCap, Settings as SettingsIcon, User } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 function InstructorDashboardpage() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("dashboard");
-  const { resetCredentials } = useContext(AuthContext);
+  const { auth, resetCredentials } = useContext(AuthContext);
   const { instructorCoursesList, setInstructorCoursesList } =
     useContext(InstructorContext);
 
@@ -44,6 +46,12 @@ function InstructorDashboardpage() {
       value: "home-config",
       component: <InstructorHomeConfig />,
     },
+    {
+      icon: User,
+      label: "My Profile",
+      value: "profile",
+      action: () => navigate("/profile"),
+    },
   ];
 
   function handleLogout() {
@@ -69,7 +77,10 @@ function InstructorDashboardpage() {
                 key={menuItem.value}
                 whileHover={{ x: 4 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => setActiveTab(menuItem.value)}
+                onClick={() => {
+                  if (menuItem.action) menuItem.action();
+                  else setActiveTab(menuItem.value);
+                }}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${activeTab === menuItem.value
                   ? "bg-zinc-900 text-white shadow-lg shadow-zinc-200"
                   : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100"
@@ -109,8 +120,17 @@ function InstructorDashboardpage() {
             </motion.div>
 
             <div className="flex items-center gap-4">
-              <div className="h-10 w-10 rounded-full bg-zinc-200 border-2 border-white shadow-sm overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=100" alt="Avatar" />
+              <div
+                onClick={() => navigate("/profile")}
+                className="h-12 w-12 rounded-2xl bg-zinc-100 border-2 border-white shadow-xl overflow-hidden cursor-pointer hover:scale-105 active:scale-95 transition-all group"
+              >
+                {auth?.user?.profileImage ? (
+                  <img src={auth.user.profileImage} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-zinc-400">
+                    <User className="w-6 h-6" />
+                  </div>
+                )}
               </div>
             </div>
           </header>
