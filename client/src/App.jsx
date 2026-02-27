@@ -16,6 +16,8 @@ import AboutUsPage from "./pages/student/about";
 import CartPage from "./pages/student/cart";
 import CheckoutPage from "./pages/student/checkout";
 import StudentProfilePage from "./pages/student/profile";
+import PrivacyPolicyPage from "./pages/student/privacy";
+import TermsPage from "./pages/student/terms";
 import ScrollToTop from "./components/scroll-to-top";
 import { Toaster } from "./components/ui/toaster";
 
@@ -130,6 +132,8 @@ function App() {
               />
             }
           />
+          <Route path="privacy" element={<PrivacyPolicyPage />} />
+          <Route path="terms" element={<TermsPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

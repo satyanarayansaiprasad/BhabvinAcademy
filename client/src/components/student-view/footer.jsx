@@ -24,8 +24,8 @@ function Footer() {
         ],
         support: [
             { label: "Help Center", path: "#" },
-            { label: "Terms of Service", path: "#" },
-            { label: "Privacy Policy", path: "#" },
+            { label: "Terms of Service", path: "/terms" },
+            { label: "Privacy Policy", path: "/privacy" },
             { label: "Community", path: "#" },
             { label: "Contact Us", path: "#" },
         ]
@@ -134,9 +134,8 @@ function Footer() {
                 {/* Bottom Bar */}
                 <div className="pt-12 border-t border-zinc-800 flex flex-col md:flex-row justify-between items-center gap-8">
                     <div className="flex flex-wrap justify-center gap-8 text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                        <Link to="#" className="hover:text-white transition-colors">Privacy Policy</Link>
-                        <Link to="#" className="hover:text-white transition-colors">Terms of Service</Link>
-                        <Link to="#" className="hover:text-white transition-colors">Cookie Policy</Link>
+                        <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+                        <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
                     </div>
 
                     <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">
