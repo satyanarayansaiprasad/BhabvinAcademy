@@ -353,9 +353,13 @@ function StudentHomePage() {
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
-            {(featuredSections?.trending?.length > 0 ? featuredSections.trending : studentViewCoursesList.slice(0, 3)).map((course, index) => (
-              <CourseCard key={course._id} course={course} handleCourseNavigate={handleCourseNavigate} index={index} />
-            ))}
+            {featuredSections?.trending?.length > 0 ? (
+              featuredSections.trending.map((course, index) => (
+                <CourseCard key={course._id} course={course} handleCourseNavigate={handleCourseNavigate} index={index} />
+              ))
+            ) : (
+              <p className="text-zinc-400 font-bold col-span-full text-center py-10">No trending courses selected.</p>
+            )}
           </div>
         </div>
 
@@ -375,16 +379,13 @@ function StudentHomePage() {
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
-            {featuredSections?.mostDemanded?.length > 0
-              ? featuredSections.mostDemanded.map((course, index) => (
+            {featuredSections?.mostDemanded?.length > 0 ? (
+              featuredSections.mostDemanded.map((course, index) => (
                 <CourseCard key={course._id} course={course} handleCourseNavigate={handleCourseNavigate} index={index} />
               ))
-              : studentViewCoursesList && [...studentViewCoursesList]
-                .sort((a, b) => (b.students?.length || 0) - (a.students?.length || 0))
-                .slice(0, 3)
-                .map((course, index) => (
-                  <CourseCard key={course._id} course={course} handleCourseNavigate={handleCourseNavigate} index={index} />
-                ))}
+            ) : (
+              <p className="text-zinc-400 font-bold col-span-full text-center py-10">No demanded courses selected.</p>
+            )}
           </div>
         </div>
 
@@ -397,16 +398,13 @@ function StudentHomePage() {
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
-            {featuredSections?.recent?.length > 0
-              ? featuredSections.recent.map((course, index) => (
+            {featuredSections?.recent?.length > 0 ? (
+              featuredSections.recent.map((course, index) => (
                 <CourseCard key={course._id} course={course} handleCourseNavigate={handleCourseNavigate} index={index} />
               ))
-              : studentViewCoursesList && [...studentViewCoursesList]
-                .sort((a, b) => new Date(b.date) - new Date(a.date))
-                .slice(0, 3)
-                .map((course, index) => (
-                  <CourseCard key={course._id} course={course} handleCourseNavigate={handleCourseNavigate} index={index} />
-                ))}
+            ) : (
+              <p className="text-zinc-400 font-bold col-span-full text-center py-10">No recent additions selected.</p>
+            )}
           </div>
         </div>
       </section>

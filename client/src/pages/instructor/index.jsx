@@ -46,12 +46,6 @@ function InstructorDashboardpage() {
       value: "home-config",
       component: <InstructorHomeConfig />,
     },
-    {
-      icon: User,
-      label: "My Profile",
-      value: "profile",
-      action: () => navigate("/profile"),
-    },
   ];
 
   function handleLogout() {
@@ -120,18 +114,7 @@ function InstructorDashboardpage() {
             </motion.div>
 
             <div className="flex items-center gap-4">
-              <div
-                onClick={() => navigate("/profile")}
-                className="h-12 w-12 rounded-2xl bg-zinc-100 border-2 border-white shadow-xl overflow-hidden cursor-pointer hover:scale-105 active:scale-95 transition-all group"
-              >
-                {auth?.user?.profileImage ? (
-                  <img src={auth.user.profileImage} alt="Avatar" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-zinc-400">
-                    <User className="w-6 h-6" />
-                  </div>
-                )}
-              </div>
+              {/* Profile link removed */}
             </div>
           </header>
 

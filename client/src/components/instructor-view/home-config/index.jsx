@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { getHomeConfigService, updateHomeConfigService } from "@/services";
+import { getHomeConfigService, updateHomeConfigService, fetchInstructorCourseListService } from "@/services";
 import { Plus, Trash2, Save, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,11 +20,16 @@ function InstructorHomeConfig() {
     const [allCourses, setAllCourses] = useState([]);
     const [loading, setLoading] = useState(false);
 
+    const [searchTerm, setSearchTerm] = useState("");
+
     async function fetchConfig() {
         const response = await getHomeConfigService();
         if (response?.success) {
             setSkillPillars(response?.data?.skillPillars || []);
             setStudentReviews(response?.data?.studentReviews || []);
+
+            // Normalize sections to ensure we deal with IDs when updating but keep objects for display if needed
+            // However, it's easier to store IDs in state and find objects from allCourses for display
             setFeaturedSections(response?.data?.featuredCourseSections || {
                 trending: [],
                 mostDemanded: [],
@@ -35,7 +40,6 @@ function InstructorHomeConfig() {
     }
 
     async function fetchAllCourses() {
-        // We reuse the instructor courses list or fetch a fresh one
         const response = await fetchInstructorCourseListService();
         if (response?.success) {
             setAllCourses(response?.data);
@@ -44,14 +48,23 @@ function InstructorHomeConfig() {
 
     async function handleUpdateConfig() {
         setLoading(true);
+
+        // Ensure we only send IDs to the backend
+        const processedSections = {
+            trending: featuredSections.trending.map(c => c._id || c),
+            mostDemanded: featuredSections.mostDemanded.map(c => c._id || c),
+            recent: featuredSections.recent.map(c => c._id || c),
+        };
+
         const response = await updateHomeConfigService({
             skillPillars,
             studentReviews,
-            featuredCourseSections: featuredSections,
+            featuredCourseSections: processedSections,
             categories
         });
         if (response?.success) {
             alert("Home configuration updated successfully!");
+            fetchConfig(); // Refresh to get populated data
         }
         setLoading(false);
     }
@@ -64,8 +77,7 @@ function InstructorHomeConfig() {
     }
 
     function handleRemoveSkill(index) {
-        const updatedSkills = skillPillars.filter((_, i) => i !== index);
-        setSkillPillars(updatedSkills);
+        setSkillPillars(skillPillars.filter((_, i) => i !== index));
     }
 
     function handleAddReview() {
@@ -79,8 +91,7 @@ function InstructorHomeConfig() {
     }
 
     function handleRemoveReview(index) {
-        const updatedReviews = studentReviews.filter((_, i) => i !== index);
-        setStudentReviews(updatedReviews);
+        setStudentReviews(studentReviews.filter((_, i) => i !== index));
     }
 
     function handleAddCategory() {
@@ -99,12 +110,14 @@ function InstructorHomeConfig() {
         fetchAllCourses();
     }, []);
 
-    function toggleCourseInSection(section, courseId) {
+    function toggleCourseInSection(section, course) {
         setFeaturedSections(prev => {
             const currentSection = Array.isArray(prev[section]) ? prev[section] : [];
-            const updatedSection = currentSection.find(c => (c._id || c) === courseId)
-                ? currentSection.filter(c => (c._id || c) !== courseId)
-                : [...currentSection, courseId];
+            const isSelected = currentSection.some(c => (c._id || c) === course._id);
+
+            const updatedSection = isSelected
+                ? currentSection.filter(c => (c._id || c) !== course._id)
+                : [...currentSection, course]; // We store the whole object for immediate UI feedback
 
             return {
                 ...prev,
@@ -112,6 +125,11 @@ function InstructorHomeConfig() {
             };
         });
     }
+
+    const filteredCourses = allCourses.filter(course =>
+        course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        course.category.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <motion.div
@@ -122,7 +140,7 @@ function InstructorHomeConfig() {
             <div className="p-10 border-b border-zinc-100 flex items-center justify-between gap-6">
                 <div>
                     <h2 className="text-3xl font-black tracking-tighter text-zinc-900 mb-1">Home Config.</h2>
-                    <p className="text-zinc-500 font-medium tracking-tight">Manage the dynamic marquee skills on the home page.</p>
+                    <p className="text-zinc-500 font-medium tracking-tight">Manage your platform's curated content.</p>
                 </div>
                 <Button
                     disabled={loading}
@@ -135,13 +153,14 @@ function InstructorHomeConfig() {
             </div>
 
             <div className="p-10 space-y-12">
+                {/* Skill Marquee Section */}
                 <section>
                     <div className="flex flex-col gap-1 mb-8">
                         <span className="text-blue-600 font-black text-[10px] uppercase tracking-widest flex items-center gap-2">
                             <Sparkles className="h-3 w-3" /> Mastery Pillars
                         </span>
                         <h3 className="text-2xl font-black tracking-tighter">Skill Marquee.</h3>
-                        <p className="text-zinc-500 text-sm font-medium">Add or remove skills that slide on the home page marquee section.</p>
+                        <p className="text-zinc-500 text-sm font-medium">Skills that slide on the home page.</p>
                     </div>
 
                     <div className="flex gap-4 mb-10">
@@ -169,7 +188,7 @@ function InstructorHomeConfig() {
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, scale: 0.95 }}
-                                    className="flex items-center justify-between p-4 px-6 rounded-2xl bg-zinc-50 border border-zinc-100 group hover:border-zinc-300 hover:bg-white transition-all shadow-sm hover:shadow-xl"
+                                    className="flex items-center justify-between p-4 px-6 rounded-2xl bg-zinc-50 border border-zinc-100 group hover:border-zinc-300 hover:bg-white transition-all shadow-sm"
                                 >
                                     <span className="font-bold text-lg text-zinc-900">{skill.label}</span>
                                     <Button
@@ -184,21 +203,16 @@ function InstructorHomeConfig() {
                             ))}
                         </AnimatePresence>
                     </div>
-
-                    {skillPillars.length === 0 && (
-                        <div className="py-20 text-center bg-zinc-50 rounded-[32px] border-2 border-dashed border-zinc-200">
-                            <p className="text-zinc-400 font-bold">No skills added yet. Add your first skill above.</p>
-                        </div>
-                    )}
                 </section>
 
+                {/* Testimonials Section */}
                 <section className="pt-12 border-t border-zinc-100">
                     <div className="flex flex-col gap-1 mb-8">
                         <span className="text-emerald-600 font-black text-[10px] uppercase tracking-widest flex items-center gap-2">
                             <Sparkles className="h-3 w-3" /> Testimonials
                         </span>
                         <h3 className="text-2xl font-black tracking-tighter">Student Reviews.</h3>
-                        <p className="text-zinc-500 text-sm font-medium">Manage the scattered "paper" reviews shown on the home page.</p>
+                        <p className="text-zinc-500 text-sm font-medium">Manage student feedback.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -252,40 +266,63 @@ function InstructorHomeConfig() {
                     </div>
                 </section>
 
+                {/* Featured Sections */}
                 <section className="pt-12 border-t border-zinc-100">
                     <div className="flex flex-col gap-1 mb-8">
                         <span className="text-purple-600 font-black text-[10px] uppercase tracking-widest flex items-center gap-2">
                             <Sparkles className="h-3 w-3" /> Curation
                         </span>
-                        <h3 className="text-2xl font-black tracking-tighter">Featured Course Sections.</h3>
-                        <p className="text-zinc-500 text-sm font-medium">Select which courses appear in the home page sections.</p>
+                        <h3 className="text-2xl font-black tracking-tighter">Featured Sections.</h3>
+                        <p className="text-zinc-500 text-sm font-medium">Assign courses to Trending, Most Demanded, or Recent sections.</p>
                     </div>
 
-                    <div className="space-y-12">
+                    <div className="mb-10">
+                        <Input
+                            placeholder="Find a course to add..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="h-16 rounded-2xl border-zinc-200 text-xl font-bold tracking-tight px-8 focus:ring-purple-600 transition-all shadow-sm"
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {['trending', 'mostDemanded', 'recent'].map(section => (
-                            <div key={section} className="bg-zinc-50/50 p-8 rounded-[32px] border border-zinc-100">
-                                <h4 className="text-lg font-bold mb-6 capitalize text-zinc-900 flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-purple-500" />
-                                    {section.replace(/([A-Z])/g, ' $1')}
-                                </h4>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-h-[400px] overflow-y-auto p-2 scrollbar-hide">
-                                    {allCourses.map(course => {
+                            <div key={section} className="flex flex-col gap-6">
+                                <div className="flex items-center justify-between">
+                                    <h4 className="text-xl font-black capitalize text-zinc-900 flex items-center gap-2">
+                                        <div className="w-3 h-3 rounded-full bg-purple-600" />
+                                        {section === 'mostDemanded' ? 'Most Demanded' : section === 'recent' ? 'Recent Additions' : 'Trending Courses'}
+                                    </h4>
+                                    <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-[10px] font-black uppercase">
+                                        {featuredSections[section]?.length || 0} selected
+                                    </span>
+                                </div>
+
+                                <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-200 scrollbar-track-transparent">
+                                    {(searchTerm ? filteredCourses : allCourses).map(course => {
                                         const isSelected = featuredSections[section]?.some(c => (c._id || c) === course._id);
                                         return (
                                             <div
                                                 key={course._id}
-                                                onClick={() => toggleCourseInSection(section, course._id)}
-                                                className={`cursor-pointer p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col gap-2 ${isSelected
+                                                onClick={() => toggleCourseInSection(section, course)}
+                                                className={`group cursor-pointer p-3 rounded-2xl border-2 transition-all duration-300 flex items-center gap-4 ${isSelected
                                                     ? "border-purple-600 bg-purple-50/50 shadow-md"
-                                                    : "border-zinc-100 bg-white hover:border-zinc-300"
+                                                    : "border-zinc-100 bg-white hover:border-zinc-200"
                                                     }`}
                                             >
-                                                <div className="aspect-video rounded-lg overflow-hidden shrink-0">
+                                                <div className="w-16 h-12 rounded-lg overflow-hidden shrink-0 bg-zinc-100">
                                                     <img src={course.image} className="w-full h-full object-cover" alt="" />
                                                 </div>
-                                                <span className={`text-[13px] font-bold line-clamp-2 leading-tight ${isSelected ? "text-purple-900" : "text-zinc-700"}`}>
-                                                    {course.title}
-                                                </span>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className={`text-sm font-bold truncate ${isSelected ? "text-purple-900" : "text-zinc-700"}`}>
+                                                        {course.title}
+                                                    </p>
+                                                    <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest truncate">{course.category}</p>
+                                                </div>
+                                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? "bg-purple-600 border-purple-600" : "border-zinc-200 group-hover:border-zinc-400"
+                                                    }`}>
+                                                    {isSelected && <Plus className="w-3 h-3 text-white rotate-45" />}
+                                                </div>
                                             </div>
                                         );
                                     })}
@@ -295,13 +332,14 @@ function InstructorHomeConfig() {
                     </div>
                 </section>
 
+                {/* Category Section */}
                 <section className="pt-12 border-t border-zinc-100">
                     <div className="flex flex-col gap-1 mb-8">
                         <span className="text-orange-600 font-black text-[10px] uppercase tracking-widest flex items-center gap-2">
                             <Sparkles className="h-3 w-3" /> Taxonomy
                         </span>
-                        <h3 className="text-2xl font-black tracking-tighter">Category Management.</h3>
-                        <p className="text-zinc-500 text-sm font-medium">Add categories for the home page slider and course filters.</p>
+                        <h3 className="text-2xl font-black tracking-tighter">Category Manager.</h3>
+                        <p className="text-zinc-500 text-sm font-medium">Manage categories for home page and filters.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -320,7 +358,7 @@ function InstructorHomeConfig() {
                     </div>
                     <Button
                         onClick={handleAddCategory}
-                        className="w-full bg-orange-600 hover:bg-orange-700 text-white rounded-2xl h-14 font-bold flex items-center gap-2 mb-10 transition-all hover:scale-[1.01] active:scale-[0.99]"
+                        className="w-full bg-orange-600 hover:bg-orange-700 text-white rounded-2xl h-14 font-bold flex items-center gap-2 mb-10"
                     >
                         <Plus className="h-5 w-5" />
                         <span>Add Category</span>
