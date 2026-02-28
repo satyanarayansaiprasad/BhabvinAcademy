@@ -60,6 +60,18 @@ const connectDB = async () => {
 // Initial connection attempt
 connectDB();
 
+// Health check endpoint
+app.get("/health", (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: "Server is healthy",
+        mongodb: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+        env: {
+            RAZORPAY: !!(process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET),
+        }
+    });
+});
+
 //routes configuration
 app.use("/auth", authRoutes);
 app.use("/media", mediaRoutes);
@@ -72,10 +84,11 @@ app.use("/student/cart", studentCartRoutes);
 app.use("/home-config", homeConfigRoutes);
 
 app.use((err, req, res, next) => {
-    console.log(err.stack);
+    console.error(`ERROR at ${req.method} ${req.path}:`, err.stack);
     res.status(500).json({
         success: false,
         message: "Something went wrong",
+        error: process.env.NODE_ENV === "development" ? err.message : undefined
     });
 });
 

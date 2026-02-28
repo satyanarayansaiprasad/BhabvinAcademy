@@ -78,8 +78,9 @@ const updateCourseByID = async (req, res) => {
       });
     }
 
-    // Explicitly update fields and curriculum
-    Object.assign(course, updatedCourseData);
+    // Explicitly update fields and curriculum while protecting immutable fields
+    const { _id, ...safeUpdateData } = updatedCourseData;
+    Object.assign(course, safeUpdateData);
 
     // Save to trigger Mongoose array logic
     const updatedCourse = await course.save();
