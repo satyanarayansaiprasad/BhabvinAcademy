@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
     registerSubAdminService,
     fetchAllSubAdminsService,
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { AuthContext } from "@/context/auth-context";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     Table,
@@ -42,12 +43,13 @@ function InstructorUsers() {
     });
     const [showPassword, setShowPassword] = useState(false);
     const [createdCredentials, setCreatedCredentials] = useState(null);
+    const { auth } = useContext(AuthContext);
 
     const { toast } = useToast();
 
     async function fetchSubAdmins() {
         try {
-            const response = await fetchAllSubAdminsService();
+            const response = await fetchAllSubAdminsService(auth?.user?._id);
             if (response?.success) {
                 setSubAdmins(response.data);
             }

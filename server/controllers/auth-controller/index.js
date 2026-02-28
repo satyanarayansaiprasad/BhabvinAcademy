@@ -201,7 +201,12 @@ const updateUserProfile = async (req, res) => {
 
 const getAllSubAdmins = async (req, res) => {
   try {
-    const subAdmins = await User.find({ role: "sub-admin" }).select("-password");
+    const { currentUserId } = req.query;
+    // Fetch all users who are not students and not the current logged in admin
+    const subAdmins = await User.find({
+      _id: { $ne: currentUserId },
+      role: { $ne: "student" },
+    }).select("-password");
 
     res.status(200).json({
       success: true,

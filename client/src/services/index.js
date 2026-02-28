@@ -28,8 +28,8 @@ export async function checkAuthService() {
   return data;
 }
 
-export async function fetchAllSubAdminsService() {
-  const { data } = await axiosInstance.get("/auth/sub-admins");
+export async function fetchAllSubAdminsService(currentUserId) {
+  const { data } = await axiosInstance.get(`/auth/sub-admins?currentUserId=${currentUserId}`);
 
   return data;
 }
