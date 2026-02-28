@@ -173,14 +173,15 @@ const capturePaymentAndFinalizeOrder = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Order confirmed",
+      message: "Order confirmed and access granted successfully",
       data: order,
     });
   } catch (err) {
-    console.log(err);
+    console.error("DEBUG: capturePaymentAndFinalizeOrder catch block:", err);
     res.status(500).json({
       success: false,
-      message: "Some error occured!",
+      message: "An error occurred while finalizing the order.",
+      error: err.message
     });
   }
 };

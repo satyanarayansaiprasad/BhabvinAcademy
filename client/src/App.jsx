@@ -22,6 +22,7 @@ import CategoryPage from "./pages/student/category";
 import SubCategoryPage from "./pages/student/subcategory";
 import ScrollToTop from "./components/scroll-to-top";
 import { Toaster } from "./components/ui/toaster";
+import PaymentReturnPage from "./pages/student/payment-return";
 
 function App() {
   const { auth } = useContext(AuthContext);
@@ -138,6 +139,16 @@ function App() {
           />
           <Route path="privacy" element={<PrivacyPolicyPage />} />
           <Route path="terms" element={<TermsPage />} />
+          <Route
+            path="payment-return"
+            element={
+              <RouteGuard
+                element={<PaymentReturnPage />}
+                authenticated={auth?.authenticate}
+                user={auth?.user}
+              />
+            }
+          />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

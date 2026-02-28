@@ -6,13 +6,14 @@ import { createPaymentService, captureAndFinalizePaymentService, createFreeOrder
 import { useContext, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ShieldCheck, CreditCard, ShoppingBag } from "lucide-react";
+import { ShieldCheck, CreditCard, ShoppingBag, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 function CheckoutPage() {
     const { auth } = useContext(AuthContext);
     const { cartItems, setCartItems } = useContext(StudentContext);
     const { toast } = useToast();
+    const [isProcessing, setIsProcessing] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
     const singleCourse = location.state?.course;
@@ -66,19 +67,26 @@ function CheckoutPage() {
                     description: "Purchase Courses",
                     order_id: razorpayOrderId,
                     handler: async function (response) {
-                        const captureResponse = await captureAndFinalizePaymentService(
-                            response.razorpay_order_id,
-                            response.razorpay_payment_id,
-                            response.razorpay_signature,
-                            orderId
-                        );
+                        setIsProcessing(true);
+                        try {
+                            const captureResponse = await captureAndFinalizePaymentService(
+                                response.razorpay_order_id,
+                                response.razorpay_payment_id,
+                                response.razorpay_signature,
+                                orderId
+                            );
 
-                        if (captureResponse.success) {
-                            toast({ title: "Purchase Successful", description: "You have purchased the course." });
-                            if (!singleCourse) setCartItems([]);
-                            setTimeout(() => navigate("/student-courses"), 1500);
-                        } else {
-                            toast({ title: "Error", description: "Payment verification failed.", variant: "destructive" });
+                            if (captureResponse.success) {
+                                if (!singleCourse) setCartItems([]);
+                                navigate(`/payment-return?orderId=${orderId}&status=success`);
+                            } else {
+                                navigate(`/payment-return?orderId=${orderId}&status=failed`);
+                            }
+                        } catch (error) {
+                            console.error("Capture Error:", error);
+                            navigate(`/payment-return?orderId=${orderId}&status=failed`);
+                        } finally {
+                            setIsProcessing(false);
                         }
                     },
                     prefill: {
@@ -112,7 +120,20 @@ function CheckoutPage() {
     }
 
     return (
-        <div className="bg-zinc-50 min-h-screen pt-20 xs:pt-24 md:pt-32 pb-16 xs:pb-20">
+        <div className="bg-zinc-50 min-h-screen pt-20 xs:pt-24 md:pt-32 pb-16 xs:pb-20 relative">
+            {isProcessing && (
+                <div className="fixed inset-0 bg-white/80 backdrop-blur-sm z-[100] flex flex-col items-center justify-center p-6 text-center">
+                    <motion.div
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="flex flex-col items-center"
+                    >
+                        <Loader2 className="w-12 h-12 text-zinc-900 animate-spin mb-4" />
+                        <h2 className="text-2xl font-black tracking-tighter text-zinc-900 mb-2">Verifying your payment...</h2>
+                        <p className="text-zinc-500 font-medium">Please do not close or refresh this page.</p>
+                    </motion.div>
+                </div>
+            )}
             <div className="container mx-auto px-4 xs:px-5 lg:px-8 max-w-6xl">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
