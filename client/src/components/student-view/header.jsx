@@ -39,7 +39,7 @@ function StudentViewCommonHeader() {
               <motion.div whileHover={{ rotate: 15 }} transition={{ type: "spring", stiffness: 300 }}>
                 <GraduationCap className="h-6 w-6 xs:h-7 xs:w-7 md:h-8 md:w-8 mr-1.5 xs:mr-2 md:mr-3 text-emerald-600 group-hover:text-emerald-500 transition-colors" />
               </motion.div>
-              <span className="font-extrabold text-sm xs:text-base md:text-xl font-serif tracking-tight text-zinc-900">
+              <span className="font-serif font-bold text-lg md:text-2xl tracking-normal text-zinc-900">
                 Bhavin Academy
               </span>
             </Link>
@@ -156,7 +156,7 @@ function StudentViewCommonHeader() {
             <div className="flex items-center justify-between px-4 xs:px-6 h-14 xs:h-16 border-b border-zinc-100 shrink-0">
               <div className="flex items-center">
                 <GraduationCap className="h-6 w-6 xs:h-7 xs:w-7 mr-2 xs:mr-3 text-emerald-600" />
-                <span className="font-extrabold text-sm xs:text-base font-serif tracking-tight text-zinc-900">
+                <span className="font-serif font-bold text-lg md:text-2xl tracking-normal text-zinc-900">
                   Bhavin Academy
                 </span>
               </div>

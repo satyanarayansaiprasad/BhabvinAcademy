@@ -7,11 +7,10 @@ function Footer() {
 
     const footerLinks = {
         explore: [
-            { label: "Web Development", path: "/courses?category=web-development" },
-            { label: "Data Science", path: "/courses?category=data-science" },
-            { label: "Machine Learning", path: "/courses?category=machine-learning" },
-            { label: "Cloud Computing", path: "/courses?category=cloud-computing" },
-            { label: "UI/UX Design", path: "/courses?category=ui-ux-design" },
+            { label: "Technology", path: "/category/technology" },
+            { label: "Well-being", path: "/category/well-being" },
+            { label: "Personal Mastery", path: "/category/personal-mastery" },
+            { label: "Creative Arts", path: "/category/creative-arts" },
         ],
         platform: [
             { label: "All Courses", path: "/courses" },
@@ -64,7 +63,7 @@ function Footer() {
                             <div className="bg-white p-1.5 xs:p-2 rounded-lg xs:rounded-xl group-hover:scale-110 transition-transform duration-500">
                                 <GraduationCap className="h-5 w-5 xs:h-7 xs:w-7 text-black" />
                             </div>
-                            <span className="font-black text-lg xs:text-2xl tracking-tighter">Bhavin Academy.</span>
+                            <span className="font-serif font-bold text-lg xs:text-2xl tracking-normal">Bhavin Academy</span>
                         </Link>
                         <p className="text-zinc-400 font-medium leading-relaxed text-sm xs:text-base">
                             The world's most immersive learning platform, designed for the next generation of industry leaders.
@@ -116,17 +115,9 @@ function Footer() {
                     <div className="col-span-2 xs:col-span-2 md:col-span-1 flex flex-col gap-4 xs:gap-6">
                         <h4 className="font-black text-xs uppercase tracking-[0.2em] text-purple-400">Contact</h4>
                         <ul className="flex flex-col gap-4 xs:gap-6 font-medium text-zinc-400">
-                            <li className="flex items-start gap-3 xs:gap-4">
-                                <MapPin className="h-4 w-4 xs:h-5 xs:w-5 text-zinc-600 shrink-0 mt-1" />
-                                <span className="text-sm xs:text-base">123 Innovation Drive, <br />Tech City, TC 10101</span>
-                            </li>
                             <li className="flex items-center gap-3 xs:gap-4 group">
                                 <Mail className="h-4 w-4 xs:h-5 xs:w-5 text-zinc-600 group-hover:text-purple-400 transition-colors shrink-0" />
-                                <a href="mailto:hello@bhavinacademy.com" className="hover:text-white transition-colors text-sm xs:text-base break-all">hello@bhavinacademy.com</a>
-                            </li>
-                            <li className="flex items-center gap-3 xs:gap-4 group">
-                                <Phone className="h-4 w-4 xs:h-5 xs:w-5 text-zinc-600 group-hover:text-purple-400 transition-colors shrink-0" />
-                                <a href="tel:+1234567890" className="hover:text-white transition-colors text-sm xs:text-base">+1 (234) 567-890</a>
+                                <a href="mailto:info@bhavinacademy.com" className="hover:text-white transition-colors text-sm xs:text-base break-all">info@bhavinacademy.com</a>
                             </li>
                         </ul>
                     </div>

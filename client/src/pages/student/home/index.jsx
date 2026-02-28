@@ -1,4 +1,4 @@
-import { courseCategories } from "@/config";
+import { topLevelCategories } from "@/config";
 import { Button } from "@/components/ui/button";
 import { useContext, useEffect } from "react";
 import { StudentContext } from "@/context/student-context";
@@ -107,19 +107,11 @@ function StudentHomePage() {
         <div className="absolute top-0 right-0 w-[400px] xs:w-[600px] md:w-[800px] h-[400px] xs:h-[600px] md:h-[800px] bg-blue-600/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[300px] xs:w-[400px] md:w-[600px] h-[300px] xs:h-[400px] md:h-[600px] bg-purple-600/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
-        <div className="container mx-auto px-4 xs:px-5 lg:px-8 relative z-10 pt-16 xs:pt-20">
+        <div className="container mx-auto px-4 xs:px-5 lg:px-8 relative z-10 pt-6 xs:pt-8">
           <div className="flex flex-col lg:flex-row items-center gap-8 xs:gap-12 lg:gap-24">
             {/* Hero Text */}
-            <motion.div style={{ opacity, scale }} className="flex-1 text-center lg:text-left pt-6 xs:pt-12">
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 1, ease: "easeOut" }}
-                className="mb-5 xs:mb-8 inline-flex items-center gap-2 px-3 xs:px-4 py-1.5 rounded-full border border-white/20 bg-white/5 backdrop-blur-md text-white/80 text-xs xs:text-sm font-medium"
-              >
-                <div className="w-1.5 h-1.5 xs:w-2 xs:h-2 rounded-full bg-blue-500 animate-pulse" />
-                <span>Next Generation Learning v2.0</span>
-              </motion.div>
+            <motion.div style={{ opacity, scale }} className="flex-1 text-center lg:text-left pt-4 xs:pt-6">
+
 
               <motion.h1
                 initial={{ opacity: 0, y: 40 }}
@@ -127,9 +119,9 @@ function StudentHomePage() {
                 transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
                 className="text-2xl xs:text-3xl sm:text-4xl md:text-[50px] font-black tracking-tighter text-white mb-5 xs:mb-8 leading-[1.1]"
               >
-                Learn <br />
+                Expand Your <br />
                 <span className="bg-gradient-to-r from-blue-400 via-emerald-400 to-indigo-400 bg-clip-text text-transparent italic">
-                  Without Limits.
+                  Boundaries, Embrace Growth.
                 </span>
               </motion.h1>
 
@@ -192,10 +184,10 @@ function StudentHomePage() {
             >
               <div className="relative aspect-[4/5] w-full max-w-[600px] mx-auto group">
                 <div className="absolute inset-0 rounded-[60px] overflow-hidden border-8 border-white/5 shadow-2xl rotate-3 translate-x-10 -translate-y-10 group-hover:rotate-0 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-1000 z-10 bg-zinc-900">
-                  <img src="/hero_student_learning_1772016137096.png" alt="Student Learning" className="w-full h-full object-cover opacity-80" />
+                  <img src="/hero_learning_community.png" alt="Learning Community" className="w-full h-full object-cover opacity-80" />
                 </div>
                 <div className="absolute top-1/2 -left-20 w-80 aspect-square rounded-[40px] overflow-hidden border-8 border-white/5 shadow-2xl -rotate-6 group-hover:rotate-0 transition-all duration-1000 z-20 hidden xl:block bg-zinc-900">
-                  <img src="/hero_tech_setup_1772016494691.png" alt="Tech Setup" className="w-full h-full object-cover opacity-60" />
+                  <img src="/hero_learning_community.png" alt="Learning Community Detail" className="w-full h-full object-cover opacity-60" />
                 </div>
                 <div className="absolute -bottom-10 -right-10 w-64 aspect-square rounded-[40px] overflow-hidden border-8 border-white/5 shadow-2xl rotate-12 group-hover:rotate-0 transition-all duration-1000 z-0 bg-blue-600/20 backdrop-blur-3xl p-8 flex flex-col justify-end">
                   <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center mb-4">
@@ -240,11 +232,11 @@ function StudentHomePage() {
                 </>
               ) : (
                 <>
-                  {["Web Development", "Cloud Architecture", "Machine Learning", "UI/UX Mastery", "Cyber Security", "Data Science"].map((s, i) => (
-                    <span key={i} className="text-lg xs:text-2xl md:text-3xl font-black tracking-tighter text-zinc-800 uppercase">{s}</span>
+                  {topLevelCategories.map((cat, i) => (
+                    <span key={i} className="text-lg xs:text-2xl md:text-3xl font-black tracking-tighter text-zinc-800 uppercase">{cat.label}</span>
                   ))}
-                  {["Web Development", "Cloud Architecture", "Machine Learning", "UI/UX Mastery", "Cyber Security", "Data Science"].map((s, i) => (
-                    <span key={`d-${i}`} className="text-lg xs:text-2xl md:text-3xl font-black tracking-tighter text-zinc-800 uppercase">{s}</span>
+                  {topLevelCategories.map((cat, i) => (
+                    <span key={`d-${i}`} className="text-lg xs:text-2xl md:text-3xl font-black tracking-tighter text-zinc-800 uppercase">{cat.label}</span>
                   ))}
                 </>
               )}
@@ -253,41 +245,12 @@ function StudentHomePage() {
         </div>
       </section>
 
-      {/* Categories Marquee */}
-      <section className="py-10 xs:py-16 md:py-20 bg-white border-b border-zinc-100 overflow-hidden">
-        <div className="relative flex overflow-x-hidden">
-          <div className="animate-marquee-reverse whitespace-nowrap flex items-center gap-3 xs:gap-4 px-4">
-            {(categories.length > 0 ? categories : courseCategories).map((category) => (
-              <motion.button
-                key={category.id}
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleNavigateToCoursesPage(category.id)}
-                className="px-4 xs:px-6 py-2 xs:py-3 rounded-xl xs:rounded-2xl bg-zinc-50 border border-zinc-200 text-zinc-900 font-bold text-xs xs:text-sm shadow-sm hover:shadow-md transition-all whitespace-nowrap min-h-[44px]"
-              >
-                {category.label}
-              </motion.button>
-            ))}
-            {(categories.length > 0 ? categories : courseCategories).map((category) => (
-              <motion.button
-                key={`dup-${category.id}`}
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleNavigateToCoursesPage(category.id)}
-                className="px-4 xs:px-6 py-2 xs:py-3 rounded-xl xs:rounded-2xl bg-zinc-50 border border-zinc-200 text-zinc-900 font-bold text-xs xs:text-sm shadow-sm hover:shadow-md transition-all whitespace-nowrap min-h-[44px]"
-              >
-                {category.label}
-              </motion.button>
-            ))}
-          </div>
-        </div>
-      </section>
+
 
       {/* Course Sections */}
       <section className="py-16 xs:py-24 md:py-32 space-y-20 xs:py-32 xs:space-y-28 md:space-y-40 bg-slate-50">
         {[
           { key: "trending", label: "Popular Now", color: "text-blue-600", title: "Trending Courses.", btn: "View all →", btnColor: "text-blue-600 hover:text-blue-700 hover:bg-blue-50" },
-          { key: "mostDemanded", label: "High Enrollment", color: "text-emerald-600", title: "Most Demanded.", btn: "Explore →", btnColor: "text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50" },
           { key: "recent", label: "Fresh Content", color: "text-purple-600", title: "Recent Additions.", btn: null, btnColor: "" },
         ].map(({ key, label, color, title, btn, btnColor }) => (
           <div key={key} className="container mx-auto px-4 xs:px-5 lg:px-8">

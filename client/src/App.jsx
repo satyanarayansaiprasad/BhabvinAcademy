@@ -18,6 +18,8 @@ import CheckoutPage from "./pages/student/checkout";
 import StudentProfilePage from "./pages/student/profile";
 import PrivacyPolicyPage from "./pages/student/privacy";
 import TermsPage from "./pages/student/terms";
+import CategoryPage from "./pages/student/category";
+import SubCategoryPage from "./pages/student/subcategory";
 import ScrollToTop from "./components/scroll-to-top";
 import { Toaster } from "./components/ui/toaster";
 
@@ -77,6 +79,8 @@ function App() {
           <Route path="" element={<StudentHomePage />} />
           <Route path="home" element={<StudentHomePage />} />
           <Route path="courses" element={<StudentViewCoursesPage />} />
+          <Route path="category/:id" element={<CategoryPage />} />
+          <Route path="subcategory/:id" element={<SubCategoryPage />} />
           <Route path="about" element={<AboutUsPage />} />
           <Route
             path="course/details/:id"
