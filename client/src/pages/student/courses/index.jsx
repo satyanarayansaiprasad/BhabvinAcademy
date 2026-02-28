@@ -51,7 +51,6 @@ function StudentViewCoursesPage() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { auth } = useContext(AuthContext);
-  const [categories, setCategories] = useState([]);
 
   function handleFilterOnChange(getSectionId, getCurrentOption) {
     let cpyFilters = { ...filters };
@@ -123,12 +122,6 @@ function StudentViewCoursesPage() {
     setSort(queryParams.get("sortBy") || "price-lowtohigh");
   }, []);
 
-  async function fetchHomeConfig() {
-    const response = await getHomeConfigService();
-    if (response?.success) setCategories(response?.data?.categories || []);
-  }
-
-  useEffect(() => { fetchHomeConfig(); }, []);
   useEffect(() => { if (filters !== null && sort !== null) fetchAllStudentViewCourses(filters, sort); }, [filters, sort]);
   useEffect(() => { return () => { sessionStorage.removeItem("filters"); }; }, []);
 
@@ -150,7 +143,7 @@ function StudentViewCoursesPage() {
           <div key={keyItem}>
             <h3 className="text-[10px] xs:text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3 xs:mb-4">{keyItem}</h3>
             <div className="grid gap-2 xs:gap-3">
-              {(keyItem === 'category' && categories.length > 0 ? categories : filterOptions[keyItem]).map((option) => (
+              {filterOptions[keyItem].map((option) => (
                 <Label key={option.id} className="flex items-center gap-2 xs:gap-3 cursor-pointer group">
                   <Checkbox
                     id={option.id}
