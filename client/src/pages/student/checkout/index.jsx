@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { AuthContext } from "@/context/auth-context";
 import { StudentContext } from "@/context/student-context";
 import { createFreeMockPaymentService } from "@/services";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ShieldCheck, CreditCard, ChevronRight, ShoppingBag } from "lucide-react";
+import { ShieldCheck, CreditCard, ShoppingBag } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 function CheckoutPage() {
@@ -15,19 +15,11 @@ function CheckoutPage() {
     const { toast } = useToast();
     const navigate = useNavigate();
     const location = useLocation();
-
-    // If redirected from "Buy Now", we might have a single course in state
     const singleCourse = location.state?.course;
     const itemsToBuy = singleCourse ? [singleCourse] : cartItems;
-
-    const totalAmount = itemsToBuy.reduce(
-        (acc, item) => acc + parseFloat(item.coursePricing || item.pricing),
-        0
-    );
-
+    const totalAmount = itemsToBuy.reduce((acc, item) => acc + parseFloat(item.coursePricing || item.pricing), 0);
 
     async function handlePayment() {
-        // Mocking the payment flow for now as requested
         const orderPayload = {
             userId: auth?.user?._id,
             userName: auth?.user?.userName,
@@ -41,69 +33,50 @@ function CheckoutPage() {
                 coursePricing: item.coursePricing || item.pricing,
             })),
         };
-
         const response = await createFreeMockPaymentService(orderPayload);
-
         if (response.success) {
-            toast({
-                title: "Purchase Successful",
-                description: "You have purchased the course, now it will show in My Learnings page.",
-            });
-
-            // Clear cart globally
-            if (!singleCourse) {
-                setCartItems([]);
-            }
-
-            // Small delay to let user see the toast
-            setTimeout(() => {
-                navigate("/student-courses");
-            }, 1500);
+            toast({ title: "Purchase Successful", description: "You have purchased the course, now it will show in My Learnings page." });
+            if (!singleCourse) setCartItems([]);
+            setTimeout(() => navigate("/student-courses"), 1500);
         } else {
-            toast({
-                title: "Error",
-                description: "Failed to process enrollment. Please try again.",
-                variant: "destructive",
-            });
+            toast({ title: "Error", description: "Failed to process enrollment. Please try again.", variant: "destructive" });
         }
     }
 
     if (itemsToBuy.length === 0) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center p-4">
-                <ShoppingBag className="w-16 h-16 text-zinc-300 mb-4" />
-                <h2 className="text-2xl font-bold text-zinc-900 mb-2">Your checkout is empty</h2>
-                <Button onClick={() => navigate("/courses")} className="rounded-full px-8">
-                    Browse Courses
-                </Button>
+                <ShoppingBag className="w-12 h-12 xs:w-16 xs:h-16 text-zinc-300 mb-4" />
+                <h2 className="text-xl xs:text-2xl font-bold text-zinc-900 mb-2">Your checkout is empty</h2>
+                <Button onClick={() => navigate("/courses")} className="rounded-full px-8 min-h-[44px]">Browse Courses</Button>
             </div>
         );
     }
 
     return (
-        <div className="bg-zinc-50 min-h-screen pt-32 pb-20">
-            <div className="container mx-auto px-4 lg:px-8 max-w-6xl">
+        <div className="bg-zinc-50 min-h-screen pt-20 xs:pt-24 md:pt-32 pb-16 xs:pb-20">
+            <div className="container mx-auto px-4 xs:px-5 lg:px-8 max-w-6xl">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="grid lg:grid-cols-3 gap-12"
+                    className="grid grid-cols-1 lg:grid-cols-3 gap-6 xs:gap-8 md:gap-12"
                 >
-                    <div className="lg:col-span-2 space-y-8">
-                        <h1 className="text-4xl font-black tracking-tighter text-zinc-900">Checkout.</h1>
-
-                        <div className="space-y-4">
+                    {/* Course List */}
+                    <div className="lg:col-span-2 space-y-4 xs:space-y-8">
+                        <h1 className="text-3xl xs:text-4xl font-black tracking-tighter text-zinc-900">Checkout.</h1>
+                        <div className="space-y-3 xs:space-y-4">
                             {itemsToBuy.map((item, index) => (
-                                <Card key={index} className="rounded-3xl border-zinc-200/60 overflow-hidden">
-                                    <CardContent className="p-6 flex gap-6">
+                                <Card key={index} className="rounded-2xl xs:rounded-3xl border-zinc-200/60 overflow-hidden">
+                                    <CardContent className="p-4 xs:p-6 flex flex-col xs:flex-row gap-4 xs:gap-6">
                                         <img
                                             src={item.courseImage || item.image}
-                                            className="w-24 h-24 rounded-2xl object-cover shrink-0"
+                                            className="w-full xs:w-24 h-36 xs:h-24 rounded-xl xs:rounded-2xl object-cover shrink-0"
                                             alt={item.title}
                                         />
                                         <div className="flex-1">
-                                            <h3 className="font-bold text-zinc-900 text-lg mb-1">{item.title}</h3>
-                                            <p className="text-sm text-zinc-500 font-medium mb-2">By {item.instructorName}</p>
-                                            <p className="text-xl font-black text-zinc-900">₹{item.coursePricing || item.pricing}</p>
+                                            <h3 className="font-bold text-zinc-900 text-base xs:text-lg mb-1">{item.title}</h3>
+                                            <p className="text-xs xs:text-sm text-zinc-500 font-medium mb-2">By {item.instructorName}</p>
+                                            <p className="text-lg xs:text-xl font-black text-zinc-900">₹{item.coursePricing || item.pricing}</p>
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -111,37 +84,32 @@ function CheckoutPage() {
                         </div>
                     </div>
 
+                    {/* Summary */}
                     <div className="space-y-6">
-                        <Card className="rounded-[40px] border-zinc-200/60 shadow-xl overflow-hidden sticky top-32">
-                            <CardHeader className="p-8 pb-4">
-                                <CardTitle className="text-xl font-bold">Order Summary</CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-8 pt-0">
-                                <div className="space-y-4 mb-8">
-                                    <div className="flex justify-between text-zinc-500 font-medium">
-                                        <span>Subtotal</span>
-                                        <span>₹{totalAmount}</span>
+                        <Card className="rounded-[32px] xs:rounded-[40px] border-zinc-200/60 shadow-xl overflow-hidden lg:sticky lg:top-32">
+                            <CardContent className="p-6 xs:p-8">
+                                <h2 className="text-lg xs:text-xl font-bold mb-4 xs:mb-6">Order Summary</h2>
+                                <div className="space-y-3 xs:space-y-4 mb-6 xs:mb-8">
+                                    <div className="flex justify-between text-zinc-500 font-medium text-sm xs:text-base">
+                                        <span>Subtotal</span><span>₹{totalAmount}</span>
                                     </div>
-                                    <div className="flex justify-between text-zinc-500 font-medium">
-                                        <span>Tax</span>
-                                        <span>₹0.00</span>
+                                    <div className="flex justify-between text-zinc-500 font-medium text-sm xs:text-base">
+                                        <span>Tax</span><span>₹0.00</span>
                                     </div>
-                                    <div className="pt-4 border-t border-zinc-100 flex justify-between items-end">
+                                    <div className="pt-3 xs:pt-4 border-t border-zinc-100 flex justify-between items-end">
                                         <span className="font-bold text-zinc-900">Total</span>
-                                        <span className="text-3xl font-black text-zinc-900">₹{totalAmount}</span>
+                                        <span className="text-2xl xs:text-3xl font-black text-zinc-900">₹{totalAmount}</span>
                                     </div>
                                 </div>
-
                                 <Button
                                     onClick={handlePayment}
-                                    className="w-full bg-zinc-900 hover:bg-zinc-800 text-white rounded-2xl h-14 text-lg font-bold shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
+                                    className="w-full bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl xs:rounded-2xl h-12 xs:h-14 text-base xs:text-lg font-bold shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 min-h-[44px]"
                                 >
-                                    <CreditCard className="w-5 h-5" />
+                                    <CreditCard className="w-4 h-4 xs:w-5 xs:h-5" />
                                     Pay with Razorpay
                                 </Button>
-
-                                <div className="mt-6 flex items-center justify-center gap-2 text-zinc-400 font-medium text-xs">
-                                    <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                                <div className="mt-4 xs:mt-6 flex items-center justify-center gap-2 text-zinc-400 font-medium text-xs">
+                                    <ShieldCheck className="w-3.5 h-3.5 xs:w-4 xs:h-4 text-emerald-500" />
                                     Secure SSL Encrypted Payment
                                 </div>
                             </CardContent>
