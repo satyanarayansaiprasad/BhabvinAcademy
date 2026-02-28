@@ -9,6 +9,7 @@ const UserSchema = new mongoose.Schema({
   profileImage: String,
   userHeadline: String,
   userBio: String,
+  status: { type: String, default: "active" },
 });
 
 module.exports = mongoose.model("User", UserSchema);

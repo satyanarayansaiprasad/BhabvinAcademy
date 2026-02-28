@@ -28,6 +28,24 @@ export async function checkAuthService() {
   return data;
 }
 
+export async function fetchAllSubAdminsService() {
+  const { data } = await axiosInstance.get("/auth/sub-admins");
+
+  return data;
+}
+
+export async function updateSubAdminService(id, formData) {
+  const { data } = await axiosInstance.put(`/auth/sub-admins/update/${id}`, formData);
+
+  return data;
+}
+
+export async function deleteSubAdminService(id) {
+  const { data } = await axiosInstance.delete(`/auth/sub-admins/delete/${id}`);
+
+  return data;
+}
+
 export async function mediaUploadService(formData, onProgressCallback) {
   const { data } = await axiosInstance.post("/media/upload", formData, {
     onUploadProgress: (progressEvent) => {

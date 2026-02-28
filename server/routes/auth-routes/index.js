@@ -6,12 +6,18 @@ const {
   forgotPassword,
   resetPassword,
   updateUserProfile,
+  getAllSubAdmins,
+  updateSubAdmin,
+  deleteSubAdmin,
 } = require("../../controllers/auth-controller/index");
 const authenticateMiddleware = require("../../middleware/auth-middleware");
 const router = express.Router();
 
 router.post("/register", registerUser);
 router.post("/register-sub-admin", authenticateMiddleware, registerSubAdmin);
+router.get("/sub-admins", authenticateMiddleware, getAllSubAdmins);
+router.put("/sub-admins/update/:id", authenticateMiddleware, updateSubAdmin);
+router.delete("/sub-admins/delete/:id", authenticateMiddleware, deleteSubAdmin);
 router.post("/login", loginUser);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);

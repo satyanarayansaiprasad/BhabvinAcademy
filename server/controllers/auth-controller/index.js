@@ -76,6 +76,13 @@ const loginUser = async (req, res) => {
     });
   }
 
+  if (checkUser.status === "blocked") {
+    return res.status(403).json({
+      success: false,
+      message: "Your account has been blocked. Please contact the administrator.",
+    });
+  }
+
   const accessToken = jwt.sign(
     {
       _id: checkUser._id,
@@ -192,6 +199,85 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
+const getAllSubAdmins = async (req, res) => {
+  try {
+    const subAdmins = await User.find({ role: "sub-admin" }).select("-password");
+
+    res.status(200).json({
+      success: true,
+      data: subAdmins,
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({
+      success: false,
+      message: "Some error occured!",
+    });
+  }
+};
+
+const updateSubAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userName, password, status } = req.body;
+
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found!",
+      });
+    }
+
+    if (userName) user.userName = userName;
+    if (status) user.status = status;
+    if (password) {
+      const hashPassword = await bcrypt.hash(password, 10);
+      user.password = hashPassword;
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Sub-Admin updated successfully!",
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({
+      success: false,
+      message: "Some error occured!",
+    });
+  }
+};
+
+const deleteSubAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findByIdAndDelete(id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found!",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Sub-Admin deleted successfully!",
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({
+      success: false,
+      message: "Some error occured!",
+    });
+  }
+};
+
 module.exports = {
   registerUser,
   registerSubAdmin,
@@ -199,4 +285,7 @@ module.exports = {
   forgotPassword,
   resetPassword,
   updateUserProfile,
+  getAllSubAdmins,
+  updateSubAdmin,
+  deleteSubAdmin,
 };
