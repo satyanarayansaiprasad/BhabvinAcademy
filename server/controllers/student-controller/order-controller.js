@@ -162,6 +162,17 @@ const createFreeOrder = async (req, res) => {
       courses,
     } = req.body;
 
+    // Verify all courses are actually free
+    for (const item of courses) {
+      const course = await Course.findById(item.courseId);
+      if (!course || course.pricing > 0) {
+        return res.status(400).json({
+          success: false,
+          message: `Course "${item.title}" is not a free course and requires payment.`,
+        });
+      }
+    }
+
     const newlyCreatedCourseOrder = new Order({
       userId,
       userName,

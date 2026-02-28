@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AuthContext } from "@/context/auth-context";
 import { StudentContext } from "@/context/student-context";
-import { createPaymentService, captureAndFinalizePaymentService } from "@/services";
+import { createPaymentService, captureAndFinalizePaymentService, createFreeOrderService } from "@/services";
 import { useContext, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -42,6 +42,18 @@ function CheckoutPage() {
         };
 
         try {
+            if (totalAmount === 0) {
+                const response = await createFreeOrderService(orderPayload);
+                if (response.success) {
+                    toast({ title: "Purchase Successful", description: "You have successfully enrolled in the free course." });
+                    if (!singleCourse) setCartItems([]);
+                    setTimeout(() => navigate("/student-courses"), 1500);
+                } else {
+                    toast({ title: "Error", description: response.message || "Failed to enroll.", variant: "destructive" });
+                }
+                return;
+            }
+
             const response = await createPaymentService(orderPayload);
             if (response.success) {
                 const { razorpayOrderId, amount, currency, razorpayKeyId, orderId } = response.data;
@@ -151,8 +163,17 @@ function CheckoutPage() {
                                     onClick={handlePayment}
                                     className="w-full bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl xs:rounded-2xl h-12 xs:h-14 text-base xs:text-lg font-bold shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 min-h-[44px]"
                                 >
-                                    <CreditCard className="w-4 h-4 xs:w-5 xs:h-5" />
-                                    Pay with Razorpay
+                                    {totalAmount === 0 ? (
+                                        <>
+                                            <ShieldCheck className="w-4 h-4 xs:w-5 xs:h-5" />
+                                            <span>Free Enroll</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <CreditCard className="w-4 h-4 xs:w-5 xs:h-5" />
+                                            <span>Pay with Razorpay</span>
+                                        </>
+                                    )}
                                 </Button>
                                 <div className="mt-4 xs:mt-6 flex items-center justify-center gap-2 text-zinc-400 font-medium text-xs">
                                     <ShieldCheck className="w-3.5 h-3.5 xs:w-4 xs:h-4 text-emerald-500" />
