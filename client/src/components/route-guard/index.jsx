@@ -16,6 +16,7 @@ function RouteGuard({ authenticated, user, element }) {
   if (
     authenticated &&
     user?.role !== "instructor" &&
+    user?.role !== "sub-admin" &&
     (location.pathname.includes("instructor") ||
       location.pathname.includes("/auth"))
   ) {
@@ -24,7 +25,7 @@ function RouteGuard({ authenticated, user, element }) {
 
   if (
     authenticated &&
-    user.role === "instructor" &&
+    (user.role === "instructor" || user.role === "sub-admin") &&
     !location.pathname.includes("instructor") &&
     !location.pathname.includes("profile")
   ) {

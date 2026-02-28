@@ -33,10 +33,41 @@ const registerUser = async (req, res) => {
   });
 };
 
+const registerSubAdmin = async (req, res) => {
+  const { userName, password } = req.body;
+
+  const existingUser = await User.findOne({ userName });
+
+  if (existingUser) {
+    return res.status(400).json({
+      success: false,
+      message: "User name already exists",
+    });
+  }
+
+  const hashPassword = await bcrypt.hash(password, 10);
+  const newUser = new User({
+    userName,
+    userFullName: userName,
+    userEmail: `${userName}@subadmin.bhavin.academy`,
+    role: "sub-admin",
+    password: hashPassword,
+  });
+
+  await newUser.save();
+
+  return res.status(201).json({
+    success: true,
+    message: "Sub-Admin created successfully!",
+  });
+};
+
 const loginUser = async (req, res) => {
   const { userEmail, password } = req.body;
 
-  const checkUser = await User.findOne({ userEmail });
+  const checkUser = await User.findOne({
+    $or: [{ userEmail: userEmail }, { userName: userEmail }],
+  });
 
   if (!checkUser || !(await bcrypt.compare(password, checkUser.password))) {
     return res.status(401).json({
@@ -163,6 +194,7 @@ const updateUserProfile = async (req, res) => {
 
 module.exports = {
   registerUser,
+  registerSubAdmin,
   loginUser,
   forgotPassword,
   resetPassword,

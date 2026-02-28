@@ -1,6 +1,7 @@
 import InstructorCourses from "@/components/instructor-view/courses";
 import InstructorDashboard from "@/components/instructor-view/dashboard";
 import InstructorHomeConfig from "@/components/instructor-view/home-config";
+import InstructorUsers from "@/components/instructor-view/users";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AuthContext } from "@/context/auth-context";
@@ -13,8 +14,8 @@ import { motion, AnimatePresence } from "framer-motion";
 
 function InstructorDashboardpage() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("dashboard");
   const { auth, resetCredentials } = useContext(AuthContext);
+  const [activeTab, setActiveTab] = useState(auth?.user?.role === "sub-admin" ? "courses" : "dashboard");
   const { instructorCoursesList, setInstructorCoursesList } =
     useContext(InstructorContext);
 
@@ -27,7 +28,7 @@ function InstructorDashboardpage() {
     fetchAllCourses();
   }, []);
 
-  const menuItems = [
+  const allMenuItems = [
     {
       icon: LayoutDashboard,
       label: "Overview",
@@ -46,7 +47,17 @@ function InstructorDashboardpage() {
       value: "home-config",
       component: <InstructorHomeConfig />,
     },
+    {
+      icon: User,
+      label: "Users",
+      value: "users",
+      component: <InstructorUsers />,
+    },
   ];
+
+  const menuItems = auth?.user?.role === "sub-admin"
+    ? allMenuItems.filter((item) => item.value === "courses" || item.value === "home-config")
+    : allMenuItems;
 
   function handleLogout() {
     resetCredentials();

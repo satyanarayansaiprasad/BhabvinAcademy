@@ -8,6 +8,14 @@ export async function registerService(formData) {
   return data;
 }
 
+export async function registerSubAdminService(formData) {
+  const { data } = await axiosInstance.post("/auth/register-sub-admin", {
+    ...formData,
+  });
+
+  return data;
+}
+
 export async function loginService(formData) {
   const { data } = await axiosInstance.post("/auth/login", formData);
 

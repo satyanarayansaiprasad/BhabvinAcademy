@@ -1,6 +1,7 @@
 const express = require("express");
 const {
   registerUser,
+  registerSubAdmin,
   loginUser,
   forgotPassword,
   resetPassword,
@@ -10,6 +11,7 @@ const authenticateMiddleware = require("../../middleware/auth-middleware");
 const router = express.Router();
 
 router.post("/register", registerUser);
+router.post("/register-sub-admin", authenticateMiddleware, registerSubAdmin);
 router.post("/login", loginUser);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
