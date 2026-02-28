@@ -2,8 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AuthContext } from "@/context/auth-context";
 import { StudentContext } from "@/context/student-context";
-import { createFreeMockPaymentService } from "@/services";
-import { useContext, useState } from "react";
+import { createPaymentService, captureAndFinalizePaymentService } from "@/services";
+import { useContext, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ShieldCheck, CreditCard, ShoppingBag } from "lucide-react";
@@ -19,6 +19,13 @@ function CheckoutPage() {
     const itemsToBuy = singleCourse ? [singleCourse] : cartItems;
     const totalAmount = itemsToBuy.reduce((acc, item) => acc + parseFloat(item.coursePricing || item.pricing), 0);
 
+    useEffect(() => {
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.async = true;
+        document.body.appendChild(script);
+    }, []);
+
     async function handlePayment() {
         const orderPayload = {
             userId: auth?.user?._id,
@@ -33,13 +40,52 @@ function CheckoutPage() {
                 coursePricing: item.coursePricing || item.pricing,
             })),
         };
-        const response = await createFreeMockPaymentService(orderPayload);
-        if (response.success) {
-            toast({ title: "Purchase Successful", description: "You have purchased the course, now it will show in My Learnings page." });
-            if (!singleCourse) setCartItems([]);
-            setTimeout(() => navigate("/student-courses"), 1500);
-        } else {
-            toast({ title: "Error", description: "Failed to process enrollment. Please try again.", variant: "destructive" });
+
+        try {
+            const response = await createPaymentService(orderPayload);
+            if (response.success) {
+                const { razorpayOrderId, amount, currency, razorpayKeyId, orderId } = response.data;
+
+                const options = {
+                    key: razorpayKeyId,
+                    amount: amount,
+                    currency: currency,
+                    name: "Bhavin Academy",
+                    description: "Purchase Courses",
+                    order_id: razorpayOrderId,
+                    handler: async function (response) {
+                        const captureResponse = await captureAndFinalizePaymentService(
+                            response.razorpay_order_id,
+                            response.razorpay_payment_id,
+                            response.razorpay_signature,
+                            orderId
+                        );
+
+                        if (captureResponse.success) {
+                            toast({ title: "Purchase Successful", description: "You have purchased the course." });
+                            if (!singleCourse) setCartItems([]);
+                            setTimeout(() => navigate("/student-courses"), 1500);
+                        } else {
+                            toast({ title: "Error", description: "Payment verification failed.", variant: "destructive" });
+                        }
+                    },
+                    prefill: {
+                        name: auth?.user?.userName,
+                        email: auth?.user?.userEmail,
+                    },
+                    theme: {
+                        color: "#09090b",
+                    },
+                };
+
+                const rzp = new window.Razorpay(options);
+                rzp.open();
+            } else {
+                toast({ title: "Error", description: "Failed to initiate payment. Please try again.", variant: "destructive" });
+            }
+        } catch (error) {
+            console.error(error);
+            toast({ title: "Error", description: "Something went wrong.", variant: "destructive" });
         }
     }
 

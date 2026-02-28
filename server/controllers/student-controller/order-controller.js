@@ -14,72 +14,41 @@ const createOrder = async (req, res) => {
       courses,
     } = req.body;
 
+    const totalAmount = courses.reduce((acc, item) => acc + parseFloat(item.coursePricing), 0);
+
+    // Create Razorpay order
+    const options = {
+      amount: Math.round(totalAmount * 100), // amount in paise
+      currency: "INR",
+      receipt: `receipt_order_${Date.now()}`,
+    };
+
+    const razorpayOrder = await razorpay.orders.create(options);
+
     const newlyCreatedCourseOrder = new Order({
       userId,
       userName,
       userEmail,
-      orderStatus: "confirmed",
-      paymentMethod: "mock_instant",
-      paymentStatus: "paid",
+      orderStatus: "pending",
+      paymentMethod: "razorpay",
+      paymentStatus: "pending",
       orderDate: new Date(),
       courses,
+      razorpayOrderId: razorpayOrder.id,
     });
 
     await newlyCreatedCourseOrder.save();
-
-    //update out student course model
-    let studentCourses = await StudentCourses.findOne({
-      userId: userId,
-    });
-
-    const coursesToAdd = courses.map(course => ({
-      courseId: course.courseId,
-      title: course.title,
-      instructorId: course.instructorId,
-      instructorName: course.instructorName,
-      dateOfPurchase: new Date(),
-      courseImage: course.courseImage,
-    }));
-
-    if (studentCourses) {
-      for (const courseToAdd of coursesToAdd) {
-        if (!studentCourses.courses.some(c => c.courseId === courseToAdd.courseId)) {
-          studentCourses.courses.push(courseToAdd);
-        }
-      }
-      await studentCourses.save();
-    } else {
-      studentCourses = new StudentCourses({
-        userId: userId,
-        courses: coursesToAdd,
-      });
-      await studentCourses.save();
-    }
-
-    //update the course schema students for each course
-    for (const course of courses) {
-      await Course.findByIdAndUpdate(course.courseId, {
-        $addToSet: {
-          students: {
-            studentId: userId,
-            studentName: userName,
-            studentEmail: userEmail,
-            paidAmount: course.coursePricing,
-            purchasedDate: new Date(),
-          },
-        },
-      });
-    }
-
-    // Clear the cart for this user
-    await Cart.findOneAndDelete({ userId: userId });
 
     res.status(201).json({
       success: true,
       data: {
         orderId: newlyCreatedCourseOrder._id,
+        razorpayOrderId: razorpayOrder.id,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        razorpayKeyId: process.env.RAZORPAY_KEY_ID,
       },
-      message: "Purchase successful",
+      message: "Order created successfully",
     });
   } catch (err) {
     console.log(err);
@@ -104,7 +73,7 @@ const capturePaymentAndFinalizeOrder = async (req, res) => {
     }
 
     // Verify signature
-    const secret = process.env.RAZORPAY_KEY_SECRET || "razorpay_secret_placeholder";
+    const secret = process.env.RAZORPAY_KEY_SECRET;
     const hmac = crypto.createHmac("sha256", secret);
     hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
     const generated_signature = hmac.digest("hex");
