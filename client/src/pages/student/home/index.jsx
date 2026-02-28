@@ -117,7 +117,7 @@ function StudentHomePage() {
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
-                className="text-2xl xs:text-3xl sm:text-4xl md:text-[50px] font-black tracking-tighter text-white mb-5 xs:mb-8 leading-[1.1]"
+                className="text-2xl xs:text-3xl sm:text-4xl md:text-[50px] font-black tracking-tighter text-white mb-3 xs:mb-5 leading-none"
               >
                 Expand Your <br />
                 <span className="bg-gradient-to-r from-blue-400 via-emerald-400 to-indigo-400 bg-clip-text text-transparent italic">
@@ -182,19 +182,19 @@ function StudentHomePage() {
               transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
               className="flex-1 relative hidden lg:block"
             >
-              <div className="relative aspect-[4/5] w-full max-w-[600px] mx-auto group">
-                <div className="absolute inset-0 rounded-[60px] overflow-hidden border-8 border-white/5 shadow-2xl rotate-3 translate-x-10 -translate-y-10 group-hover:rotate-0 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-1000 z-10 bg-zinc-900">
-                  <img src="/hero_learning_community.png" alt="Learning Community" className="w-full h-full object-cover opacity-80" />
+              <div className="relative aspect-[4/5] w-full max-w-[480px] mx-auto group">
+                <div className="absolute inset-0 rounded-[60px] overflow-hidden border-8 border-white/5 shadow-2xl transition-all duration-1000 z-10 bg-zinc-900">
+                  <img src="/hero_learning_community.png" alt="Learning Community" className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-1000" />
                 </div>
-                <div className="absolute top-1/2 -left-20 w-80 aspect-square rounded-[40px] overflow-hidden border-8 border-white/5 shadow-2xl -rotate-6 group-hover:rotate-0 transition-all duration-1000 z-20 hidden xl:block bg-zinc-900">
-                  <img src="/hero_learning_community.png" alt="Learning Community Detail" className="w-full h-full object-cover opacity-60" />
+                <div className="absolute top-1/2 -left-12 w-64 aspect-square rounded-[40px] overflow-hidden border-8 border-white/5 shadow-2xl transition-all duration-1000 z-20 hidden xl:block bg-zinc-900">
+                  <img src="/hero_tech_interface.png" alt="Learning Community Detail" className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000" />
                 </div>
-                <div className="absolute -bottom-10 -right-10 w-64 aspect-square rounded-[40px] overflow-hidden border-8 border-white/5 shadow-2xl rotate-12 group-hover:rotate-0 transition-all duration-1000 z-0 bg-blue-600/20 backdrop-blur-3xl p-8 flex flex-col justify-end">
-                  <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center mb-4">
-                    <span className="text-black font-black">AI</span>
+                <div className="absolute -bottom-8 -right-8 w-48 aspect-square rounded-[32px] overflow-hidden border-8 border-white/5 shadow-2xl transition-all duration-1000 z-0 bg-blue-600/20 backdrop-blur-3xl p-6 flex flex-col justify-end">
+                  <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center mb-3">
+                    <span className="text-black font-black text-sm">AI</span>
                   </div>
-                  <p className="text-white font-black leading-none">Smart Features</p>
-                  <p className="text-white/40 text-xs font-bold uppercase tracking-widest mt-2">Enhanced Learning</p>
+                  <p className="text-white font-black leading-none text-sm">Smart Features</p>
+                  <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-1.5">Enhanced Learning</p>
                 </div>
               </div>
             </motion.div>
