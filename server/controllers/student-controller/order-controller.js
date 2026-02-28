@@ -14,7 +14,22 @@ const createOrder = async (req, res) => {
       courses,
     } = req.body;
 
-    const totalAmount = courses.reduce((acc, item) => acc + parseFloat(item.coursePricing), 0);
+    const totalAmount = courses.reduce((acc, item) => acc + parseFloat(item.coursePricing || 0), 0);
+
+    if (isNaN(totalAmount) || totalAmount <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid order amount. Total must be greater than 0.",
+      });
+    }
+
+    // Check if Razorpay keys are configured
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+      return res.status(500).json({
+        success: false,
+        message: "Razorpay is not correctly configured on the server. Please check environment variables.",
+      });
+    }
 
     // Create Razorpay order
     const options = {
@@ -23,7 +38,17 @@ const createOrder = async (req, res) => {
       receipt: `receipt_order_${Date.now()}`,
     };
 
-    const razorpayOrder = await razorpay.orders.create(options);
+    let razorpayOrder;
+    try {
+      razorpayOrder = await razorpay.orders.create(options);
+    } catch (razorError) {
+      console.error("Razorpay Order Creation Error:", razorError);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to create Razorpay order",
+        error: razorError.message
+      });
+    }
 
     const newlyCreatedCourseOrder = new Order({
       userId,
@@ -74,6 +99,13 @@ const capturePaymentAndFinalizeOrder = async (req, res) => {
 
     // Verify signature
     const secret = process.env.RAZORPAY_KEY_SECRET;
+    if (!secret) {
+      return res.status(500).json({
+        success: false,
+        message: "Verification failed: Server secret is missing.",
+      });
+    }
+
     const hmac = crypto.createHmac("sha256", secret);
     hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
     const generated_signature = hmac.digest("hex");
@@ -81,7 +113,7 @@ const capturePaymentAndFinalizeOrder = async (req, res) => {
     if (generated_signature !== razorpay_signature) {
       return res.status(400).json({
         success: false,
-        message: "Payment verification failed!",
+        message: "Payment verification failed: Signature mismatch.",
       });
     }
 
