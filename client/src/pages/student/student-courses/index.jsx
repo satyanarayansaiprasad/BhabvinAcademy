@@ -1,15 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { AuthContext } from "@/context/auth-context";
 import { StudentContext } from "@/context/student-context";
-import { fetchStudentBoughtCoursesService } from "@/services";
-import { PlayCircle, BookOpen, GraduationCap } from "lucide-react";
-import { useContext, useEffect } from "react";
+import { PlayCircle, BookOpen, GraduationCap, Trash2, AlertCircle } from "lucide-react";
+import { fetchStudentBoughtCoursesService, deleteStudentCourseService } from "@/services";
+import { useToast } from "@/hooks/use-toast";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 function StudentCoursesPage() {
   const { auth } = useContext(AuthContext);
   const { studentBoughtCoursesList, setStudentBoughtCoursesList } = useContext(StudentContext);
+  const { toast } = useToast();
+  const [deletingCourseId, setDeletingCourseId] = useState(null);
   const navigate = useNavigate();
 
   async function fetchStudentBoughtCourses() {
@@ -17,7 +20,20 @@ function StudentCoursesPage() {
     if (response?.success) setStudentBoughtCoursesList(response?.data);
   }
 
-  useEffect(() => { fetchStudentBoughtCourses(); }, []);
+  async function handleDeleteCourse(courseId) {
+    setDeletingCourseId(null);
+    const response = await deleteStudentCourseService(auth?.user?._id, courseId);
+    if (response?.success) {
+      toast({ title: "Course Removed", description: "You have removed this course from your learning list." });
+      fetchStudentBoughtCourses();
+    } else {
+      toast({ title: "Error", description: response?.message || "Failed to remove course.", variant: "destructive" });
+    }
+  }
+
+  useEffect(() => {
+    fetchStudentBoughtCourses();
+  }, []);
 
   const fadeUp = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.6 } };
 
@@ -35,7 +51,7 @@ function StudentCoursesPage() {
           {studentBoughtCoursesList && studentBoughtCoursesList.length > 0 ? (
             studentBoughtCoursesList.map((course, index) => (
               <motion.div
-                key={course.id}
+                key={course.courseId}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.1 }}
@@ -71,10 +87,20 @@ function StudentCoursesPage() {
                       <span className="hidden xs:inline">Continue Course</span>
                       <span className="xs:hidden">Continue</span>
                     </div>
-                    <span className="text-blue-600 font-black text-xs uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                      Resume →
-                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeletingCourseId(course.courseId);
+                      }}
+                      className="p-2 rounded-full hover:bg-red-50 text-zinc-300 hover:text-red-500 transition-colors"
+                      title="Delete Course"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
+                  <span className="text-blue-600 font-black text-xs uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity block mt-2 mt-4 pt-4 border-t border-zinc-50">
+                    Resume →
+                  </span>
                 </div>
               </motion.div>
             ))
@@ -95,6 +121,40 @@ function StudentCoursesPage() {
           )}
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      {deletingCourseId && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] flex items-center justify-center p-6">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white rounded-[32px] p-8 xs:p-10 max-w-sm w-full shadow-2xl text-center"
+          >
+            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertCircle className="w-8 h-8" />
+            </div>
+            <h2 className="text-2xl font-black tracking-tighter text-zinc-900 mb-3">Delete Course?</h2>
+            <p className="text-zinc-500 font-medium mb-8 text-center px-4">
+              You will lose access to this course immediately. To regain access, you'll need to purchase it again.
+            </p>
+            <div className="flex flex-col gap-3">
+              <Button
+                onClick={() => handleDeleteCourse(deletingCourseId)}
+                className="w-full bg-red-500 hover:bg-red-600 text-white rounded-2xl h-12 font-bold shadow-lg shadow-red-100"
+              >
+                Yes, Delete Permanently
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => setDeletingCourseId(null)}
+                className="w-full rounded-2xl h-12 text-zinc-500 font-bold hover:bg-zinc-100"
+              >
+                Cancel
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

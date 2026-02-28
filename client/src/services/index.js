@@ -259,3 +259,7 @@ export async function updateUserProfileService(formData) {
   const { data } = await axiosInstance.put("/auth/update-profile", formData);
   return data;
 }
+export async function deleteStudentCourseService(studentId, courseId) {
+  const { data } = await axiosInstance.delete(`/student/courses-bought/delete/${studentId}/${courseId}`);
+  return data;
+}
