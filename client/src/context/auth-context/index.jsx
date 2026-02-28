@@ -28,7 +28,6 @@ export default function AuthProvider({ children }) {
   async function handleLoginUser(event) {
     event.preventDefault();
     const data = await loginService(signInFormData);
-    console.log(data, "datadatadatadatadata");
 
     if (data.success) {
       sessionStorage.setItem(
@@ -97,8 +96,6 @@ export default function AuthProvider({ children }) {
   useEffect(() => {
     checkAuthUser();
   }, []);
-
-  console.log(auth, "gf");
 
   return (
     <AuthContext.Provider

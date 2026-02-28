@@ -20,7 +20,7 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpDown, Filter, ShoppingCart, Layers } from "lucide-react";
+import { ArrowUpDown, Filter, ShoppingCart, Layers, TvMinimalPlay } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 function createSearchParamsHelper(filterParams) {
