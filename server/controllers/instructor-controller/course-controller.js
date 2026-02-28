@@ -69,18 +69,20 @@ const updateCourseByID = async (req, res) => {
     const { id } = req.params;
     const updatedCourseData = req.body;
 
-    const updatedCourse = await Course.findByIdAndUpdate(
-      id,
-      updatedCourseData,
-      { new: true }
-    );
+    const course = await Course.findById(id);
 
-    if (!updatedCourse) {
+    if (!course) {
       return res.status(404).json({
         success: false,
         message: "Course not found!",
       });
     }
+
+    // Explicitly update fields and curriculum
+    Object.assign(course, updatedCourseData);
+
+    // Save to trigger Mongoose array logic
+    const updatedCourse = await course.save();
 
     res.status(200).json({
       success: true,

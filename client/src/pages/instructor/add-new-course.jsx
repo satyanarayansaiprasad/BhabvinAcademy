@@ -62,7 +62,6 @@ function AddNewCoursePage() {
       instructorName: auth?.user?.userName,
       date: new Date(),
       ...courseLandingFormData,
-      students: [],
       curriculum: courseCurriculumFormData,
       isPublished: true,
     };
@@ -73,13 +72,19 @@ function AddNewCoursePage() {
           currentEditedCourseId,
           courseFinalFormData
         )
-        : await addNewCourseService(courseFinalFormData);
+        : await addNewCourseService({
+          ...courseFinalFormData,
+          students: [],
+        });
 
     if (response?.success) {
       setCourseLandingFormData(courseLandingInitialFormData);
       setCourseCurriculumFormData(courseCurriculumInitialFormData);
       navigate(-1);
       setCurrentEditedCourseId(null);
+    } else {
+      // Add error handling feedback
+      console.error("Failed to save course:", response?.message);
     }
   }
 
