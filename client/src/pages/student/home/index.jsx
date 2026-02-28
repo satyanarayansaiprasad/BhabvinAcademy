@@ -11,6 +11,7 @@ import { AuthContext } from "@/context/auth-context";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { Star } from "lucide-react";
 
 function StudentHomePage() {
   const { studentViewCoursesList, setStudentViewCoursesList } = useContext(StudentContext);
@@ -103,109 +104,94 @@ function StudentHomePage() {
   return (
     <div className="min-h-screen bg-slate-50 overflow-x-hidden">
       {/* Hero Section */}
-      <section className="relative min-h-[85vh] bg-black overflow-hidden flex flex-col justify-center">
+      <section className="relative pt-24 pb-16 lg:pt-32 lg:pb-[120px] bg-black overflow-hidden flex flex-col items-center justify-center min-h-[85vh]">
         <div className="absolute top-0 right-0 w-[300px] xs:w-[400px] md:w-[600px] h-[300px] xs:h-[400px] md:h-[600px] bg-blue-600/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[300px] xs:w-[400px] md:w-[600px] h-[300px] xs:h-[400px] md:h-[600px] bg-purple-600/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
-        <div className="container mx-auto px-4 xs:px-5 lg:px-8 relative z-10 pt-6 xs:pt-8">
-          <div className="flex flex-col lg:flex-row items-center gap-8 xs:gap-12 lg:gap-24">
-            {/* Hero Text */}
-            <motion.div style={{ opacity, scale }} className="flex-1 text-center lg:text-left pt-4 xs:pt-6">
+        <div className="container mx-auto px-4 xs:px-5 lg:px-8 relative z-10 w-full max-w-[1200px]">
 
+          {/* Top Title Centered */}
+          <motion.div
+            style={{ opacity, scale }}
+            className="text-center w-full mx-auto mb-10 xs:mb-12"
+          >
+            <motion.h1
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
+              className="text-3xl xs:text-4xl sm:text-5xl md:text-[60px] lg:text-[72px] font-black tracking-tighter text-white leading-none"
+            >
+              Expand Your <br className="hidden sm:block" />
+              <span className="bg-gradient-to-r from-blue-400 via-emerald-400 to-indigo-400 bg-clip-text text-transparent italic pl-0 sm:pl-2">
+                Boundaries, Embrace Growth.
+              </span>
+            </motion.h1>
+          </motion.div>
 
-              <motion.h1
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
-                className="text-2xl xs:text-3xl sm:text-4xl md:text-[50px] font-black tracking-tighter text-white mb-3 xs:mb-5 leading-none"
-              >
-                Expand Your <br />
-                <span className="bg-gradient-to-r from-blue-400 via-emerald-400 to-indigo-400 bg-clip-text text-transparent italic">
-                  Boundaries, Embrace Growth.
-                </span>
-              </motion.h1>
+          {/* Middle Layout */}
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-8 w-full mt-8 lg:mt-16">
 
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
-                className="text-sm xs:text-base text-zinc-400 max-w-xl mb-8 xs:mb-12 font-medium leading-relaxed mx-auto lg:mx-0"
-              >
+            {/* Left Col */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="lg:w-1/3 flex flex-col items-center lg:items-start text-center lg:text-left order-2 lg:order-1"
+            >
+              <div className="bg-white/5 border border-white/10 text-emerald-400 text-[10px] xs:text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-4 xs:mb-5 flex items-center gap-2 shadow-lg w-max backdrop-blur-md">
+                <Star className="h-3.5 w-3.5 fill-current" />
+                Premium Quality
+              </div>
+              <p className="text-zinc-400 font-medium text-sm xs:text-base leading-relaxed max-w-xs xl:max-w-sm">
                 Experience the most immersive learning platform ever built.
                 Industry-leading courses, beautifully rendered on every screen.
-              </motion.p>
+              </p>
+            </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
-                className="flex flex-col xs:flex-row items-center gap-3 xs:gap-4 justify-center lg:justify-start"
-              >
-                <Button
-                  onClick={() => navigate("/courses")}
-                  className="w-full xs:w-auto bg-white text-black hover:bg-zinc-200 hover:text-black rounded-xl xs:rounded-2xl h-12 xs:h-14 md:h-16 px-6 xs:px-8 md:px-10 text-base xs:text-lg md:text-xl font-black transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-white/10"
-                >
+            {/* Center Col: Image */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.8, ease: "easeOut" }}
+              className="lg:w-1/3 relative flex justify-center items-center order-1 lg:order-2"
+            >
+              <div className="relative w-[260px] h-[260px] xs:w-[320px] xs:h-[320px] md:w-[380px] md:h-[380px] rounded-full overflow-hidden border-[10px] xs:border-[16px] border-black shadow-[0_0_80px_rgba(0,0,0,0.8)] bg-black group z-10">
+                <img src="/hero_portrait_dark.png" alt="Happy Student" className="w-full h-full object-cover opacity-90 transition-transform duration-1000 group-hover:scale-105" />
+              </div>
+
+              {/* Overlapping Buttons Bottom Center */}
+              <div className="absolute -bottom-6 xs:-bottom-8 z-20 flex bg-black p-2 xs:p-2.5 rounded-[32px] border border-white/10 shadow-2xl w-max whitespace-nowrap">
+                <Button onClick={() => navigate("/courses")} className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-5 xs:px-8 h-10 xs:h-12 md:h-14 font-black text-sm xs:text-base transition-all hover:scale-105 active:scale-95 shadow-lg shadow-emerald-500/20">
                   Get Started
                 </Button>
-                <Button
-                  variant="outline"
-                  className="w-full xs:w-auto bg-white/5 text-white border-white/20 hover:bg-white/10 hover:text-white rounded-xl xs:rounded-2xl h-12 xs:h-14 md:h-16 px-6 xs:px-8 md:px-10 text-base xs:text-lg md:text-xl font-black backdrop-blur-md transition-all hover:scale-105 active:scale-95"
-                >
+                <Button variant="ghost" className="text-white hover:text-emerald-400 hover:bg-white/5 rounded-full px-5 xs:px-8 h-10 xs:h-12 md:h-14 font-black text-sm xs:text-base transition-all ml-1 border border-transparent hover:border-white/10">
                   Watch Demo
                 </Button>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1, duration: 1 }}
-                className="mt-8 xs:mt-16 flex items-center gap-4 xs:gap-6 justify-center lg:justify-start"
-              >
-                <div className="flex -space-x-2 xs:-space-x-4">
-                  {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="w-8 h-8 xs:w-10 xs:h-10 md:w-12 md:h-12 rounded-full border-2 xs:border-4 border-black bg-zinc-800 overflow-hidden shadow-xl">
-                      <img src={`https://i.pravatar.cc/150?u=${i}`} alt="User" />
-                    </div>
-                  ))}
-                </div>
-                <div>
-                  <p className="text-white font-black text-xs xs:text-sm tracking-tight">20k+ Active Students</p>
-                  <p className="text-zinc-500 text-[10px] xs:text-xs font-bold uppercase tracking-widest">Global Community</p>
-                </div>
-              </motion.div>
-            </motion.div>
-
-            {/* Hero Visuals - hidden on mobile */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, rotate: 2 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              transition={{ duration: 1.2, ease: "easeOut" }}
-              className="flex-1 relative hidden lg:block"
-            >
-              <div className="relative aspect-[4/5] w-full max-w-[320px] mx-auto group">
-                <div className="absolute inset-0 rounded-[40px] overflow-hidden border-4 border-white/10 shadow-xl z-10 bg-zinc-900 transition-shadow duration-500 group-hover:shadow-2xl group-hover:shadow-blue-500/10">
-                  <img src="/hero_learning_community.png" alt="Learning Community" className="w-full h-full object-cover opacity-90" />
-                </div>
-                <div className="absolute top-1/2 -left-6 w-40 aspect-square rounded-[24px] overflow-hidden border-4 border-white/10 shadow-xl z-20 hidden xl:block bg-zinc-900 transition-transform duration-500 group-hover:-translate-y-2">
-                  <img src="/hero_tech_interface.png" alt="Learning Community Detail" className="w-full h-full object-cover opacity-80" />
-                </div>
-                <div className="absolute -bottom-4 -right-4 w-32 aspect-square rounded-[20px] overflow-hidden border-4 border-white/10 shadow-xl z-0 bg-blue-600/20 backdrop-blur-2xl p-4 flex flex-col justify-end transition-transform duration-500 group-hover:translate-x-2">
-                  <div className="w-8 h-8 rounded-xl bg-white flex items-center justify-center mb-2">
-                    <span className="text-black font-black text-xs">AI</span>
-                  </div>
-                  <p className="text-white font-black leading-none text-xs">Smart Features</p>
-                  <p className="text-white/40 text-[8px] font-bold uppercase tracking-widest mt-1">Enhanced Learning</p>
-                </div>
               </div>
             </motion.div>
+
+            {/* Right Col */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.7, duration: 0.8 }}
+              className="lg:w-1/3 flex flex-col items-center lg:items-end text-center lg:text-right order-3 lg:order-3 pt-4 lg:pt-0"
+            >
+              <div className="flex gap-1 text-emerald-400 mb-2 xs:mb-3">
+                {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-5 h-5 xs:w-6 xs:h-6 fill-current" />)}
+              </div>
+              <p className="text-white font-black text-3xl xs:text-4xl lg:text-5xl tracking-tight mb-1">20k+</p>
+              <p className="text-zinc-500 font-bold uppercase tracking-widest text-[10px] xs:text-xs">Active Students</p>
+            </motion.div>
           </div>
+
         </div>
 
         {/* Scroll Indicator */}
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ repeat: Infinity, duration: 2 }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/20 hidden md:block"
+          className="absolute bottom-6 xs:bottom-10 left-1/2 -translate-x-1/2 text-white/20 hidden md:block"
         >
           <div className="w-6 h-10 rounded-full border-2 border-current flex justify-center p-1">
             <div className="w-1 h-2 bg-current rounded-full" />
