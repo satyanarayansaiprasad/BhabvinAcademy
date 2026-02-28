@@ -87,21 +87,17 @@ export const courseLevelOptions = [
 ];
 
 export const courseCategories = [
-  { id: "web-development", label: "Web Development" },
-  { id: "backend-development", label: "Backend Development" },
-  { id: "data-science", label: "Data Science" },
-  { id: "machine-learning", label: "Machine Learning" },
-  { id: "ai-machine-learning", label: "AI & ML" },
-  { id: "cloud-computing", label: "Cloud Computing" },
-  { id: "cyber-security", label: "Cyber Security" },
-  { id: "mobile-development", label: "Mobile Development" },
-  { id: "ui-ux-design", label: "UI/UX Design" },
-  { id: "devops", label: "DevOps" },
-  { id: "marketing", label: "Digital Marketing" },
-  { id: "business", label: "Business Analytics" },
-  { id: "software-testing", label: "Software Testing" },
-  { id: "game-development", label: "Game Development" },
-  { id: "software-engineering", label: "Software Engineering" },
+  { id: "microsoft-365", label: "Microsoft 365" },
+  { id: "microsoft-azure", label: "Microsoft Azure" },
+  { id: "copilot", label: "Copilot" },
+  { id: "open-source", label: "Open Source" },
+  { id: "networking-basics", label: "Networking Basics" },
+  { id: "yoga", label: "Yoga" },
+  { id: "health", label: "Health" },
+  { id: "lifestyle", label: "Lifestyle" },
+  { id: "personal-growth", label: "Personal Growth" },
+  { id: "art", label: "Art" },
+  { id: "books", label: "Books" },
 ];
 
 export const topLevelCategories = [

@@ -35,11 +35,11 @@ function StudentViewCommonHeader() {
         <div className="container mx-auto px-3 xs:px-4 lg:px-8 h-14 xs:h-16 md:h-20 flex items-center justify-between bg-white relative">
           {/* Logo */}
           <div className="flex items-center space-x-2 xs:space-x-6">
-            <Link to="/home" className="flex items-center group">
-              <motion.div whileHover={{ rotate: 15 }} transition={{ type: "spring", stiffness: 300 }}>
-                <GraduationCap className="h-6 w-6 xs:h-7 xs:w-7 md:h-8 md:w-8 mr-1.5 xs:mr-2 md:mr-3 text-emerald-600 group-hover:text-emerald-500 transition-colors" />
+            <Link to="/home" className="flex items-center gap-3 text-zinc-900 group">
+              <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 300 }} className="bg-zinc-900 p-1.5 rounded-lg">
+                <GraduationCap className="h-6 w-6 text-white group-hover:text-emerald-400 transition-colors" />
               </motion.div>
-              <span className="font-serif font-bold text-lg md:text-2xl tracking-normal text-zinc-900">
+              <span className="font-extrabold text-xl tracking-tight">
                 Bhavin Academy
               </span>
             </Link>
@@ -154,9 +154,11 @@ function StudentViewCommonHeader() {
           >
             {/* Mobile Drawer Header */}
             <div className="flex items-center justify-between px-4 xs:px-6 h-14 xs:h-16 border-b border-zinc-100 shrink-0">
-              <div className="flex items-center">
-                <GraduationCap className="h-6 w-6 xs:h-7 xs:w-7 mr-2 xs:mr-3 text-emerald-600" />
-                <span className="font-serif font-bold text-lg md:text-2xl tracking-normal text-zinc-900">
+              <div className="flex items-center gap-3 text-zinc-900">
+                <div className="bg-zinc-900 p-1.5 rounded-lg">
+                  <GraduationCap className="h-6 w-6 text-white" />
+                </div>
+                <span className="font-extrabold text-xl tracking-tight">
                   Bhavin Academy
                 </span>
               </div>

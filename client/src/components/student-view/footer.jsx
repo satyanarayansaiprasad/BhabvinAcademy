@@ -57,11 +57,11 @@ function Footer() {
                 <div className="grid grid-cols-2 xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8 xs:gap-10 md:gap-12 md:gap-16 mb-12 xs:mb-16 md:mb-24">
                     {/* Brand Column */}
                     <div className="col-span-2 xs:col-span-2 md:col-span-2 lg:col-span-1 flex flex-col gap-5 xs:gap-8">
-                        <Link to="/" className="flex items-center gap-2 xs:gap-3 group">
-                            <div className="bg-white p-1.5 xs:p-2 rounded-lg xs:rounded-xl group-hover:scale-110 transition-transform duration-500">
-                                <GraduationCap className="h-5 w-5 xs:h-7 xs:w-7 text-black" />
+                        <Link to="/" className="flex items-center gap-3 group text-white">
+                            <div className="bg-white p-1.5 rounded-lg group-hover:scale-110 transition-transform duration-500">
+                                <GraduationCap className="h-6 w-6 text-black" />
                             </div>
-                            <span className="font-serif font-bold text-lg xs:text-2xl tracking-normal">Bhavin Academy</span>
+                            <span className="font-extrabold text-xl tracking-tight">Bhavin Academy</span>
                         </Link>
                         <p className="text-zinc-400 font-medium leading-relaxed text-sm xs:text-base">
                             The world's most immersive learning platform, designed for the next generation of industry leaders.

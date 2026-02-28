@@ -26,11 +26,11 @@ function AuthPage() {
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       {/* Header */}
       <header className="fixed top-0 w-full px-4 xs:px-6 py-3 xs:py-6 flex items-center justify-between z-20">
-        <Link to={"/"} className="flex items-center gap-2 xs:gap-3 group">
-          <div className="bg-zinc-900 p-1.5 xs:p-2 rounded-lg xs:rounded-xl group-hover:scale-110 transition-transform">
-            <GraduationCap className="h-5 w-5 xs:h-6 xs:w-6 text-white" />
+        <Link to={"/"} className="flex items-center gap-3 text-zinc-900 group">
+          <div className="bg-zinc-900 p-1.5 rounded-lg group-hover:scale-110 transition-transform">
+            <GraduationCap className="h-6 w-6 text-white" />
           </div>
-          <span className="font-black text-base xs:text-xl tracking-tighter text-zinc-900">Bhavin Academy</span>
+          <span className="font-extrabold text-xl tracking-tight">Bhavin Academy</span>
         </Link>
         <button
           onClick={() => navigate("/")}
