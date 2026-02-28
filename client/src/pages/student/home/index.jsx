@@ -103,8 +103,8 @@ function StudentHomePage() {
   return (
     <div className="min-h-screen bg-slate-50 overflow-x-hidden">
       {/* Hero Section */}
-      <section className="relative min-h-screen bg-black overflow-hidden flex flex-col justify-center">
-        <div className="absolute top-0 right-0 w-[400px] xs:w-[600px] md:w-[800px] h-[400px] xs:h-[600px] md:h-[800px] bg-blue-600/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+      <section className="relative min-h-[85vh] bg-black overflow-hidden flex flex-col justify-center">
+        <div className="absolute top-0 right-0 w-[300px] xs:w-[400px] md:w-[600px] h-[300px] xs:h-[400px] md:h-[600px] bg-blue-600/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[300px] xs:w-[400px] md:w-[600px] h-[300px] xs:h-[400px] md:h-[600px] bg-purple-600/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
         <div className="container mx-auto px-4 xs:px-5 lg:px-8 relative z-10 pt-6 xs:pt-8">
@@ -177,24 +177,24 @@ function StudentHomePage() {
 
             {/* Hero Visuals - hidden on mobile */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.8, rotate: 5 }}
+              initial={{ opacity: 0, scale: 0.9, rotate: 2 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 1.2, ease: "easeOut" }}
               className="flex-1 relative hidden lg:block"
             >
-              <div className="relative aspect-[4/5] w-full max-w-[480px] mx-auto group">
-                <div className="absolute inset-0 rounded-[60px] overflow-hidden border-8 border-white/5 shadow-2xl transition-all duration-1000 z-10 bg-zinc-900">
-                  <img src="/hero_learning_community.png" alt="Learning Community" className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-1000" />
+              <div className="relative aspect-[4/5] w-full max-w-[320px] mx-auto group">
+                <div className="absolute inset-0 rounded-[40px] overflow-hidden border-4 border-white/10 shadow-xl z-10 bg-zinc-900 transition-shadow duration-500 group-hover:shadow-2xl group-hover:shadow-blue-500/10">
+                  <img src="/hero_learning_community.png" alt="Learning Community" className="w-full h-full object-cover opacity-90" />
                 </div>
-                <div className="absolute top-1/2 -left-12 w-64 aspect-square rounded-[40px] overflow-hidden border-8 border-white/5 shadow-2xl transition-all duration-1000 z-20 hidden xl:block bg-zinc-900">
-                  <img src="/hero_tech_interface.png" alt="Learning Community Detail" className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000" />
+                <div className="absolute top-1/2 -left-6 w-40 aspect-square rounded-[24px] overflow-hidden border-4 border-white/10 shadow-xl z-20 hidden xl:block bg-zinc-900 transition-transform duration-500 group-hover:-translate-y-2">
+                  <img src="/hero_tech_interface.png" alt="Learning Community Detail" className="w-full h-full object-cover opacity-80" />
                 </div>
-                <div className="absolute -bottom-8 -right-8 w-48 aspect-square rounded-[32px] overflow-hidden border-8 border-white/5 shadow-2xl transition-all duration-1000 z-0 bg-blue-600/20 backdrop-blur-3xl p-6 flex flex-col justify-end">
-                  <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center mb-3">
-                    <span className="text-black font-black text-sm">AI</span>
+                <div className="absolute -bottom-4 -right-4 w-32 aspect-square rounded-[20px] overflow-hidden border-4 border-white/10 shadow-xl z-0 bg-blue-600/20 backdrop-blur-2xl p-4 flex flex-col justify-end transition-transform duration-500 group-hover:translate-x-2">
+                  <div className="w-8 h-8 rounded-xl bg-white flex items-center justify-center mb-2">
+                    <span className="text-black font-black text-xs">AI</span>
                   </div>
-                  <p className="text-white font-black leading-none text-sm">Smart Features</p>
-                  <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-1.5">Enhanced Learning</p>
+                  <p className="text-white font-black leading-none text-xs">Smart Features</p>
+                  <p className="text-white/40 text-[8px] font-bold uppercase tracking-widest mt-1">Enhanced Learning</p>
                 </div>
               </div>
             </motion.div>
