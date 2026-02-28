@@ -3,7 +3,7 @@ const Course = require("../../models/Course");
 
 const getHomeConfig = async (req, res) => {
     try {
-        const config = await HomeConfig.findOne({}).populate('featuredCourseSections.trending featuredCourseSections.mostDemanded featuredCourseSections.recent');
+        const config = await HomeConfig.findOne({}).populate('featuredCourseSections.trending featuredCourseSections.recent');
         if (!config) {
             // Default initial config if none exists
             const defaultConfig = new HomeConfig({

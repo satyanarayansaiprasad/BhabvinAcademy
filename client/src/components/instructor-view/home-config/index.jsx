@@ -12,7 +12,6 @@ function InstructorHomeConfig() {
     const [newReview, setNewReview] = useState({ studentName: "", reviewText: "" });
     const [featuredSections, setFeaturedSections] = useState({
         trending: [],
-        mostDemanded: [],
         recent: [],
     });
     const [categories, setCategories] = useState([]);
@@ -32,7 +31,6 @@ function InstructorHomeConfig() {
             // However, it's easier to store IDs in state and find objects from allCourses for display
             setFeaturedSections(response?.data?.featuredCourseSections || {
                 trending: [],
-                mostDemanded: [],
                 recent: [],
             });
             setCategories(response?.data?.categories || []);
@@ -52,7 +50,6 @@ function InstructorHomeConfig() {
         // Ensure we only send IDs to the backend
         const processedSections = {
             trending: featuredSections.trending.map(c => c._id || c),
-            mostDemanded: featuredSections.mostDemanded.map(c => c._id || c),
             recent: featuredSections.recent.map(c => c._id || c),
         };
 
@@ -285,13 +282,13 @@ function InstructorHomeConfig() {
                         />
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        {['trending', 'mostDemanded', 'recent'].map(section => (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {['trending', 'recent'].map(section => (
                             <div key={section} className="flex flex-col gap-6">
                                 <div className="flex items-center justify-between">
                                     <h4 className="text-xl font-black capitalize text-zinc-900 flex items-center gap-2">
                                         <div className="w-3 h-3 rounded-full bg-purple-600" />
-                                        {section === 'mostDemanded' ? 'Most Demanded' : section === 'recent' ? 'Recent Additions' : 'Trending Courses'}
+                                        {section === 'recent' ? 'Recent Additions' : 'Trending Courses'}
                                     </h4>
                                     <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-[10px] font-black uppercase">
                                         {featuredSections[section]?.length || 0} selected

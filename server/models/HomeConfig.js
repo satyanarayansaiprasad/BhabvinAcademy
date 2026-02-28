@@ -15,7 +15,6 @@ const HomeConfigSchema = new mongoose.Schema({
     ],
     featuredCourseSections: {
         trending: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
-        mostDemanded: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
         recent: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
     },
     categories: [

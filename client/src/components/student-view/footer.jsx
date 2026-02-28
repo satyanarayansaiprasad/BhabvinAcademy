@@ -7,17 +7,15 @@ function Footer() {
 
     const footerLinks = {
         explore: [
-            { label: "Technology", path: "/category/technology" },
-            { label: "Well-being", path: "/category/well-being" },
-            { label: "Personal Mastery", path: "/category/personal-mastery" },
-            { label: "Creative Arts", path: "/category/creative-arts" },
+            { label: "Technology", path: "/courses?category=technology" },
+            { label: "Well-being", path: "/courses?category=well-being" },
+            { label: "Personal Mastery", path: "/courses?category=personal-mastery" },
+            { label: "Creative Arts", path: "/courses?category=creative-arts" },
         ],
         platform: [
             { label: "All Courses", path: "/courses" },
             { label: "Instructor Portal", path: "/instructor" },
             { label: "Student Dashboard", path: "/student-courses" },
-            { label: "Success Stories", path: "#" },
-            { label: "Learning Path", path: "#" },
         ],
         support: [
             { label: "Help Center", path: "#" },
@@ -124,17 +122,18 @@ function Footer() {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="pt-8 xs:pt-12 border-t border-zinc-800 flex flex-col items-center gap-4 xs:gap-6 md:gap-8 text-center">
-                    <div className="flex flex-wrap justify-center gap-4 xs:gap-8 text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                <div className="pt-8 xs:pt-12 border-t border-zinc-800 flex flex-col md:flex-row items-center justify-between gap-4 xs:gap-6 md:gap-8 text-center md:text-left">
+                    <div className="flex flex-wrap justify-center md:justify-start gap-4 xs:gap-8 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                         <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
                         <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">
-                        © {currentYear} Bhavin Academy. All rights reserved.
-                    </p>
-                    <div className="flex items-center gap-2 px-4 py-2 bg-zinc-800/50 rounded-full border border-zinc-700/50">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[10px] font-black uppercase tracking-tighter text-zinc-400">System Online</span>
+                    <div className="flex flex-col items-center md:items-end gap-1">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">
+                            © {currentYear} Bhavin Academy. All rights reserved.
+                        </p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">
+                            Design and developed by <a href="https://pagetraffics.com" target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-white transition-colors">PageTraffics</a>
+                        </p>
                     </div>
                 </div>
             </div>
