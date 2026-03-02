@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { AuthContext } from "@/context/auth-context";
 import { StudentContext } from "@/context/student-context";
-import { PlayCircle, BookOpen, GraduationCap, Trash2, AlertCircle } from "lucide-react";
+import { PlayCircle, BookOpen, GraduationCap, Trash2, AlertCircle, RefreshCw, ChevronLeft } from "lucide-react";
 import { fetchStudentBoughtCoursesService, deleteStudentCourseService } from "@/services";
 import { useToast } from "@/hooks/use-toast";
 import { useContext, useEffect, useState } from "react";
@@ -13,6 +13,7 @@ function StudentCoursesPage() {
   const { studentBoughtCoursesList, setStudentBoughtCoursesList } = useContext(StudentContext);
   const { toast } = useToast();
   const [deletingCourseId, setDeletingCourseId] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
 
   async function fetchStudentBoughtCourses() {
@@ -21,8 +22,10 @@ function StudentCoursesPage() {
   }
 
   async function handleDeleteCourse(courseId) {
-    setDeletingCourseId(null);
+    setIsDeleting(true);
     const response = await deleteStudentCourseService(auth?.user?._id, courseId);
+    setIsDeleting(false);
+    setDeletingCourseId(null);
     if (response?.success) {
       toast({ title: "Course Removed", description: "You have removed this course from your learning list." });
       fetchStudentBoughtCourses();
@@ -140,9 +143,10 @@ function StudentCoursesPage() {
             <div className="flex flex-col gap-3">
               <Button
                 onClick={() => handleDeleteCourse(deletingCourseId)}
-                className="w-full bg-red-500 hover:bg-red-600 text-white rounded-2xl h-12 font-bold shadow-lg shadow-red-100"
+                disabled={isDeleting}
+                className="w-full bg-red-500 hover:bg-red-600 text-white rounded-2xl h-12 font-bold shadow-lg shadow-red-100 flex items-center justify-center gap-2"
               >
-                Yes, Delete Permanently
+                {isDeleting ? <RefreshCw className="h-4 w-4 animate-spin" /> : "Yes, Delete Permanently"}
               </Button>
               <Button
                 variant="ghost"

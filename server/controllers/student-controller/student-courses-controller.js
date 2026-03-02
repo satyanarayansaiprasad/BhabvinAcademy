@@ -30,7 +30,7 @@ const deleteCourseByStudentId = async (req, res) => {
     const studentCourses = await StudentCourses.findOne({ userId: studentId });
     if (studentCourses) {
       studentCourses.courses = studentCourses.courses.filter(
-        (course) => course.courseId !== courseId
+        (course) => course.courseId.toString() !== courseId.toString()
       );
       await studentCourses.save();
     }
