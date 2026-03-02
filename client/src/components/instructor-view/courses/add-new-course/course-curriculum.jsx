@@ -12,7 +12,7 @@ import {
   mediaDeleteService,
   mediaUploadService,
 } from "@/services";
-import { Upload, Plus, Trash2, Video, Check, Eye, EyeOff, FileVideo, Youtube, Link as LinkIcon, RefreshCw, Lock, FileText, X, ExternalLink } from "lucide-react";
+import { Upload, Plus, Trash2, Video, Check, Eye, EyeOff, FileVideo, Youtube, Link as LinkIcon, RefreshCw, Lock, FileText, X, ExternalLink, ChevronUp, ChevronDown } from "lucide-react";
 import { useContext, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -319,6 +319,32 @@ function CourseCurriculum() {
     setCourseCurriculumFormData(cpyCourseCurriculumFormData);
   }
 
+  function handleMoveLectureUp(currentIndex) {
+    if (currentIndex === 0) return;
+    const cpyCourseCurriculumFormData = [...courseCurriculumFormData];
+    [
+      cpyCourseCurriculumFormData[currentIndex],
+      cpyCourseCurriculumFormData[currentIndex - 1],
+    ] = [
+        cpyCourseCurriculumFormData[currentIndex - 1],
+        cpyCourseCurriculumFormData[currentIndex],
+      ];
+    setCourseCurriculumFormData(cpyCourseCurriculumFormData);
+  }
+
+  function handleMoveLectureDown(currentIndex) {
+    if (currentIndex === courseCurriculumFormData.length - 1) return;
+    const cpyCourseCurriculumFormData = [...courseCurriculumFormData];
+    [
+      cpyCourseCurriculumFormData[currentIndex],
+      cpyCourseCurriculumFormData[currentIndex + 1],
+    ] = [
+        cpyCourseCurriculumFormData[currentIndex + 1],
+        cpyCourseCurriculumFormData[currentIndex],
+      ];
+    setCourseCurriculumFormData(cpyCourseCurriculumFormData);
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.98 }}
@@ -500,12 +526,34 @@ function CourseCurriculum() {
                   <div className="flex-1 space-y-8 pt-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="relative">
+                        <div className="relative group/number">
                           <div className="w-12 h-12 rounded-2xl bg-zinc-900 flex items-center justify-center">
                             <span className="text-white font-black text-lg leading-none">{index + 1}</span>
                           </div>
                           <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-blue-600 border-2 border-zinc-50 flex items-center justify-center">
                             <Check className="h-2.5 w-2.5 text-white" />
+                          </div>
+
+                          {/* Reordering Controls */}
+                          <div className="absolute -left-14 top-0 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              disabled={index === 0}
+                              onClick={() => handleMoveLectureUp(index)}
+                              className="h-6 w-6 rounded-lg hover:bg-zinc-100 disabled:opacity-30"
+                            >
+                              <ChevronUp className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              disabled={index === courseCurriculumFormData.length - 1}
+                              onClick={() => handleMoveLectureDown(index)}
+                              className="h-6 w-6 rounded-lg hover:bg-zinc-100 disabled:opacity-30"
+                            >
+                              <ChevronDown className="h-4 w-4" />
+                            </Button>
                           </div>
                         </div>
                         <div>
