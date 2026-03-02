@@ -5,6 +5,9 @@ import { GraduationCap, ArrowLeft, ShieldCheck, Sparkles } from "lucide-react";
 import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { GoogleLogin } from "@react-oauth/google";
+import { useMsal } from "@azure/msal-react";
+import { loginRequest } from "@/config/oauth-config"; // I need to add this to config
 
 function AuthPage() {
   const [activeTab, setActiveTab] = useState("signin");
@@ -13,7 +16,10 @@ function AuthPage() {
     signInFormData, setSignInFormData,
     signUpFormData, setSignUpFormData,
     handleRegisterUser, handleLoginUser,
+    handleGoogleLogin, handleMicrosoftLogin,
   } = useContext(AuthContext);
+
+  const { instance } = useMsal();
 
   function checkIfSignInFormIsValid() {
     return signInFormData && signInFormData.userEmail !== "" && signInFormData.password !== "";
@@ -21,6 +27,27 @@ function AuthPage() {
   function checkIfSignUpFormIsValid() {
     return signUpFormData && signUpFormData.userName !== "" && signUpFormData.userEmail !== "" && signUpFormData.password !== "";
   }
+
+  const onGoogleSuccess = async (response) => {
+    await handleGoogleLogin(response.credential);
+  };
+
+  const onMicrosoftLogin = async () => {
+    try {
+      const loginResponse = await instance.loginPopup({
+        ...loginRequest,
+      });
+      if (loginResponse) {
+        await handleMicrosoftLogin({
+          microsoftId: loginResponse.uniqueId,
+          email: loginResponse.account.username,
+          name: loginResponse.account.name,
+        });
+      }
+    } catch (error) {
+      console.error("Microsoft Login Error:", error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
@@ -141,6 +168,43 @@ function AuthPage() {
                 )}
               </motion.div>
             </AnimatePresence>
+
+            <div className="mt-8 space-y-4">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-zinc-200" />
+                </div>
+                <div className="relative flex justify-center text-[10px] uppercase font-black tracking-widest">
+                  <span className="bg-white px-4 text-zinc-400">Or continue with</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="w-full flex justify-center">
+                  <GoogleLogin
+                    onSuccess={onGoogleSuccess}
+                    onError={() => console.log("Google Login Failed")}
+                    useOneTap
+                    theme="outline"
+                    shape="pill"
+                    width="100%"
+                  />
+                </div>
+                <button
+                  onClick={onMicrosoftLogin}
+                  className="w-full h-[40px] flex items-center justify-center gap-2 border border-zinc-200 rounded-full hover:bg-zinc-50 transition-all font-bold text-xs"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 23 23">
+                    <path fill="#f3f3f3" d="M0 0h23v23H0z" />
+                    <path fill="#f35325" d="M1 1h10v10H1z" />
+                    <path fill="#81bc06" d="M12 1h10v10H12z" />
+                    <path fill="#05a6f0" d="M1 12h10v10H1z" />
+                    <path fill="#ffba08" d="M12 12h10v10H12z" />
+                  </svg>
+                  Microsoft
+                </button>
+              </div>
+            </div>
 
             <p className="mt-8 xs:mt-12 text-center text-xs text-zinc-400 font-medium">
               By continuing, you agree to our <span className="text-zinc-900 font-bold underline cursor-pointer">Terms of Service</span> and <span className="text-zinc-900 font-bold underline cursor-pointer">Privacy Policy</span>.

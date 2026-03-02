@@ -9,6 +9,8 @@ const {
   getAllSubAdmins,
   updateSubAdmin,
   deleteSubAdmin,
+  googleLogin,
+  microsoftLogin,
 } = require("../../controllers/auth-controller/index");
 const authenticateMiddleware = require("../../middleware/auth-middleware");
 const router = express.Router();
@@ -21,6 +23,8 @@ router.delete("/sub-admins/delete/:id", authenticateMiddleware, deleteSubAdmin);
 router.post("/login", loginUser);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
+router.post("/google-login", googleLogin);
+router.post("/microsoft-login", microsoftLogin);
 router.put("/update-profile", authenticateMiddleware, updateUserProfile);
 router.get("/check-auth", authenticateMiddleware, (req, res) => {
   const user = req.user;

@@ -263,3 +263,12 @@ export async function deleteStudentCourseService(studentId, courseId) {
   const { data } = await axiosInstance.delete(`/student/courses-bought/delete/${studentId}/${courseId}`);
   return data;
 }
+export async function googleLoginService(formData) {
+  const { data } = await axiosInstance.post("/auth/google-login", formData);
+  return data;
+}
+
+export async function microsoftLoginService(formData) {
+  const { data } = await axiosInstance.post("/auth/microsoft-login", formData);
+  return data;
+}

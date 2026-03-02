@@ -6,6 +6,8 @@ import {
   loginService,
   registerService,
   resetPasswordService,
+  googleLoginService,
+  microsoftLoginService,
 } from "@/services";
 import { createContext, useEffect, useState } from "react";
 
@@ -44,6 +46,36 @@ export default function AuthProvider({ children }) {
         user: null,
       });
     }
+  }
+
+  async function handleGoogleLogin(credential) {
+    const data = await googleLoginService({ credential });
+    if (data.success) {
+      sessionStorage.setItem(
+        "accessToken",
+        JSON.stringify(data.data.accessToken)
+      );
+      setAuth({
+        authenticate: true,
+        user: data.data.user,
+      });
+    }
+    return data;
+  }
+
+  async function handleMicrosoftLogin(msData) {
+    const data = await microsoftLoginService(msData);
+    if (data.success) {
+      sessionStorage.setItem(
+        "accessToken",
+        JSON.stringify(data.data.accessToken)
+      );
+      setAuth({
+        authenticate: true,
+        user: data.data.user,
+      });
+    }
+    return data;
   }
 
   async function handleForgotPassword(userEmail) {
@@ -108,6 +140,8 @@ export default function AuthProvider({ children }) {
         handleLoginUser,
         handleForgotPassword,
         handleResetPassword,
+        handleGoogleLogin,
+        handleMicrosoftLogin,
         auth,
         setAuth,
         resetCredentials,

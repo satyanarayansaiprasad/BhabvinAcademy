@@ -10,6 +10,8 @@ const UserSchema = new mongoose.Schema({
   userHeadline: String,
   userBio: String,
   status: { type: String, default: "active" },
+  googleId: String,
+  microsoftId: String,
 });
 
 module.exports = mongoose.model("User", UserSchema);

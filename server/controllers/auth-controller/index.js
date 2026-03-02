@@ -1,6 +1,8 @@
 const User = require("../../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { OAuth2Client } = require("google-auth-library");
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const registerUser = async (req, res) => {
   const { userName, userFullName, userEmail, password, role } = req.body;
@@ -283,6 +285,145 @@ const deleteSubAdmin = async (req, res) => {
   }
 };
 
+const googleLogin = async (req, res) => {
+  try {
+    const { credential, role = "student" } = req.body;
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name, picture } = payload;
+
+    let user = await User.findOne({
+      $or: [{ googleId }, { userEmail: email }]
+    });
+
+    if (!user) {
+      // Create new user if not exists
+      user = new User({
+        userName: email.split("@")[0] + "_" + Math.random().toString(36).slice(-4),
+        userFullName: name,
+        userEmail: email,
+        role: role,
+        googleId: googleId,
+        profileImage: picture,
+        password: await bcrypt.hash(Math.random().toString(36), 10), // Random password for OAuth users
+      });
+      await user.save();
+    } else if (!user.googleId) {
+      // Link googleId to existing email account
+      user.googleId = googleId;
+      if (!user.profileImage) user.profileImage = picture;
+      await user.save();
+    }
+
+    if (user.status === "blocked") {
+      return res.status(403).json({
+        success: false,
+        message: "Your account has been blocked.",
+      });
+    }
+
+    const accessToken = jwt.sign(
+      {
+        _id: user._id,
+        userName: user.userName,
+        userFullName: user.userFullName,
+        userEmail: user.userEmail,
+        role: user.role,
+        profileImage: user.profileImage,
+      },
+      process.env.JWT_SECRET || "JWT_SECRET",
+      { expiresIn: process.env.JWT_EXPIRES_IN || "120m" }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Logged in with Google successfully",
+      data: {
+        accessToken,
+        user: {
+          _id: user._id,
+          userName: user.userName,
+          userFullName: user.userFullName,
+          userEmail: user.userEmail,
+          role: user.role,
+          profileImage: user.profileImage,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Google Login Error:", error);
+    res.status(500).json({ success: false, message: "Google authentication failed" });
+  }
+};
+
+const microsoftLogin = async (req, res) => {
+  try {
+    const { microsoftId, email, name, role = "student" } = req.body;
+
+    if (!microsoftId || !email) {
+      return res.status(400).json({ success: false, message: "Invalid Microsoft login data" });
+    }
+
+    let user = await User.findOne({
+      $or: [{ microsoftId }, { userEmail: email }]
+    });
+
+    if (!user) {
+      user = new User({
+        userName: email.split("@")[0] + "_" + Math.random().toString(36).slice(-4),
+        userFullName: name,
+        userEmail: email,
+        role: role,
+        microsoftId: microsoftId,
+        password: await bcrypt.hash(Math.random().toString(36), 10),
+      });
+      await user.save();
+    } else if (!user.microsoftId) {
+      user.microsoftId = microsoftId;
+      await user.save();
+    }
+
+    if (user.status === "blocked") {
+      return res.status(403).json({ success: false, message: "Your account has been blocked." });
+    }
+
+    const accessToken = jwt.sign(
+      {
+        _id: user._id,
+        userName: user.userName,
+        userFullName: user.userFullName,
+        userEmail: user.userEmail,
+        role: user.role,
+        profileImage: user.profileImage,
+      },
+      process.env.JWT_SECRET || "JWT_SECRET",
+      { expiresIn: process.env.JWT_EXPIRES_IN || "120m" }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Logged in with Microsoft successfully",
+      data: {
+        accessToken,
+        user: {
+          _id: user._id,
+          userName: user.userName,
+          userFullName: user.userFullName,
+          userEmail: user.userEmail,
+          role: user.role,
+          profileImage: user.profileImage,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Microsoft Login Error:", error);
+    res.status(500).json({ success: false, message: "Microsoft authentication failed" });
+  }
+};
+
 module.exports = {
   registerUser,
   registerSubAdmin,
@@ -293,4 +434,6 @@ module.exports = {
   getAllSubAdmins,
   updateSubAdmin,
   deleteSubAdmin,
+  googleLogin,
+  microsoftLogin,
 };
