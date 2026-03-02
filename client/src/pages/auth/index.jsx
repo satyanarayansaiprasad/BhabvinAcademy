@@ -7,7 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { GoogleLogin } from "@react-oauth/google";
 import { useMsal } from "@azure/msal-react";
-import { loginRequest } from "@/config/oauth-config"; // I need to add this to config
+import { loginRequest } from "@/config/oauth-config";
 
 function AuthPage() {
   const [activeTab, setActiveTab] = useState("signin");

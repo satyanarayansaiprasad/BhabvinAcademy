@@ -10,18 +10,20 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { MsalProvider } from "@azure/msal-react";
 import { msalInstance, googleClientId } from "./config/oauth-config";
 
-createRoot(document.getElementById("root")).render(
-  <BrowserRouter>
-    <GoogleOAuthProvider clientId={googleClientId}>
-      <MsalProvider instance={msalInstance}>
-        <AuthProvider>
-          <InstructorProvider>
-            <StudentProvider>
-              <App />
-            </StudentProvider>
-          </InstructorProvider>
-        </AuthProvider>
-      </MsalProvider>
-    </GoogleOAuthProvider>
-  </BrowserRouter>
-);
+msalInstance.initialize().then(() => {
+  createRoot(document.getElementById("root")).render(
+    <BrowserRouter>
+      <GoogleOAuthProvider clientId={googleClientId}>
+        <MsalProvider instance={msalInstance}>
+          <AuthProvider>
+            <InstructorProvider>
+              <StudentProvider>
+                <App />
+              </StudentProvider>
+            </InstructorProvider>
+          </AuthProvider>
+        </MsalProvider>
+      </GoogleOAuthProvider>
+    </BrowserRouter>
+  );
+});
