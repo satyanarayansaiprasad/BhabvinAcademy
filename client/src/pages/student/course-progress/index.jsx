@@ -172,6 +172,69 @@ function StudentViewCourseProgressPage() {
                 </div>
               </div>
             )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12 pt-12 border-t border-white/5">
+              {currentLecture?.links && currentLecture?.links.length > 0 && (
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3 text-zinc-400">
+                    <LayoutList className="h-4 w-4" />
+                    <h3 className="text-xs font-black uppercase tracking-widest">Resources</h3>
+                  </div>
+                  <div className="grid grid-cols-1 gap-3">
+                    {currentLecture?.links.map((link, index) => (
+                      <motion.a
+                        key={index}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{ x: 8 }}
+                        className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center">
+                            <Play className="h-3.5 w-3.5" />
+                          </div>
+                          <span className="text-sm font-bold text-zinc-200 group-hover:text-white transition-colors">{link.title}</span>
+                        </div>
+                        <ChevronLeft className="h-4 w-4 text-zinc-600 rotate-180" />
+                      </motion.a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {currentLecture?.pdfs && currentLecture?.pdfs.length > 0 && (
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3 text-zinc-400">
+                    <Info className="h-4 w-4" />
+                    <h3 className="text-xs font-black uppercase tracking-widest">Attachments</h3>
+                  </div>
+                  <div className="grid grid-cols-1 gap-3">
+                    {currentLecture?.pdfs.map((pdf, index) => (
+                      <motion.a
+                        key={index}
+                        href={pdf.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{ scale: 1.02 }}
+                        className="flex items-center gap-4 p-4 rounded-2xl bg-zinc-900 border border-white/5 hover:border-blue-500/50 transition-all group"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-red-500/10 text-red-500 flex items-center justify-center">
+                          <Info className="h-5 w-5" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-zinc-200 truncate group-hover:text-white transition-colors">{pdf.title}</p>
+                          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">PDF Document</span>
+                        </div>
+                        <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-zinc-400 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                          <ChevronLeft className="h-4 w-4 rotate-180" />
+                        </div>
+                      </motion.a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </motion.div>
         </main>
 

@@ -12,7 +12,7 @@ import {
   mediaDeleteService,
   mediaUploadService,
 } from "@/services";
-import { Upload, Plus, Trash2, Video, Check, Eye, EyeOff, FileVideo, Youtube, Link as LinkIcon, RefreshCw, Lock } from "lucide-react";
+import { Upload, Plus, Trash2, Video, Check, Eye, EyeOff, FileVideo, Youtube, Link as LinkIcon, RefreshCw, Lock, Link as Link, FileText, X, ExternalLink } from "lucide-react";
 import { useContext, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -63,6 +63,95 @@ function CourseCurriculum() {
       ...cpyCourseCurriculumFormData[currentIndex],
       notes: event.target.value,
     };
+
+    setCourseCurriculumFormData(cpyCourseCurriculumFormData);
+  }
+
+  function handleAddLink(currentIndex) {
+    let cpyCourseCurriculumFormData = [...courseCurriculumFormData];
+    cpyCourseCurriculumFormData[currentIndex] = {
+      ...cpyCourseCurriculumFormData[currentIndex],
+      links: [
+        ...cpyCourseCurriculumFormData[currentIndex].links,
+        { title: "", url: "" },
+      ],
+    };
+
+    setCourseCurriculumFormData(cpyCourseCurriculumFormData);
+  }
+
+  function handleLinkChange(event, currentIndex, linkIndex, field) {
+    let cpyCourseCurriculumFormData = [...courseCurriculumFormData];
+    cpyCourseCurriculumFormData[currentIndex].links[linkIndex] = {
+      ...cpyCourseCurriculumFormData[currentIndex].links[linkIndex],
+      [field]: event.target.value,
+    };
+
+    setCourseCurriculumFormData(cpyCourseCurriculumFormData);
+  }
+
+  function handleRemoveLink(currentIndex, linkIndex) {
+    let cpyCourseCurriculumFormData = [...courseCurriculumFormData];
+    cpyCourseCurriculumFormData[currentIndex].links =
+      cpyCourseCurriculumFormData[currentIndex].links.filter(
+        (_, index) => index !== linkIndex
+      );
+
+    setCourseCurriculumFormData(cpyCourseCurriculumFormData);
+  }
+
+  async function handlePdfUpload(event, currentIndex) {
+    const selectedFile = event.target.files[0];
+    if (selectedFile) {
+      if (selectedFile.size > 30 * 1024) {
+        alert("PDF size must be less than 30KB");
+        return;
+      }
+
+      const pdfFormData = new FormData();
+      pdfFormData.append("file", selectedFile);
+
+      try {
+        setMediaUploadProgress(true);
+        const response = await mediaUploadService(
+          pdfFormData,
+          setMediaUploadProgressPercentage
+        );
+        if (response.success) {
+          let cpyCourseCurriculumFormData = [...courseCurriculumFormData];
+          cpyCourseCurriculumFormData[currentIndex] = {
+            ...cpyCourseCurriculumFormData[currentIndex],
+            pdfs: [
+              ...cpyCourseCurriculumFormData[currentIndex].pdfs,
+              {
+                title: selectedFile.name,
+                url: response?.data?.url,
+                public_id: response?.data?.public_id,
+              },
+            ],
+          };
+          setCourseCurriculumFormData(cpyCourseCurriculumFormData);
+          setMediaUploadProgress(false);
+        }
+      } catch (error) {
+        console.log(error);
+        setMediaUploadProgress(false);
+      }
+    }
+  }
+
+  async function handleRemovePdf(currentIndex, pdfIndex) {
+    let cpyCourseCurriculumFormData = [...courseCurriculumFormData];
+    const pdfToRemove = cpyCourseCurriculumFormData[currentIndex].pdfs[pdfIndex];
+
+    if (pdfToRemove.public_id) {
+      await mediaDeleteService(pdfToRemove.public_id);
+    }
+
+    cpyCourseCurriculumFormData[currentIndex].pdfs =
+      cpyCourseCurriculumFormData[currentIndex].pdfs.filter(
+        (_, index) => index !== pdfIndex
+      );
 
     setCourseCurriculumFormData(cpyCourseCurriculumFormData);
   }
@@ -451,6 +540,100 @@ function CourseCurriculum() {
                           onChange={(event) => handleLectureNotesChange(event, index)}
                           value={curriculumItem?.notes}
                         />
+                      </div>
+
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">External Links</Label>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleAddLink(index)}
+                            className="rounded-xl h-8 px-3 font-bold text-[10px] border-zinc-200 hover:bg-zinc-900 hover:text-white transition-all flex items-center gap-1"
+                          >
+                            <Plus className="w-3 h-3" />
+                            Add Link
+                          </Button>
+                        </div>
+                        <div className="space-y-3">
+                          {curriculumItem?.links?.map((link, linkIndex) => (
+                            <div key={linkIndex} className="flex gap-3 items-start animate-in fade-in slide-in-from-top-2 duration-300">
+                              <div className="flex-1 space-y-2">
+                                <Input
+                                  placeholder="Link Title (e.g. Documentation)"
+                                  className="rounded-xl h-10 px-4 bg-white border-zinc-200 text-xs font-bold focus:ring-2 focus:ring-blue-500/5 shadow-sm"
+                                  value={link.title}
+                                  onChange={(e) => handleLinkChange(e, index, linkIndex, "title")}
+                                />
+                                <Input
+                                  placeholder="URL (https://...)"
+                                  className="rounded-xl h-10 px-4 bg-white border-zinc-200 text-xs font-medium focus:ring-2 focus:ring-blue-500/5 shadow-sm"
+                                  value={link.url}
+                                  onChange={(e) => handleLinkChange(e, index, linkIndex, "url")}
+                                />
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleRemoveLink(index, linkIndex)}
+                                className="rounded-xl h-10 w-10 text-red-500 hover:text-red-600 hover:bg-red-50"
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-4 pt-4 border-t border-zinc-100">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">PDF Attachments (Max 30KB)</Label>
+                          <div className="relative">
+                            <input
+                              type="file"
+                              accept=".pdf"
+                              className="hidden"
+                              id={`pdf-upload-${index}`}
+                              onChange={(e) => handlePdfUpload(e, index)}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              asChild
+                              className="rounded-xl h-8 px-3 font-bold text-[10px] border-zinc-200 hover:bg-zinc-900 hover:text-white transition-all cursor-pointer"
+                            >
+                              <label htmlFor={`pdf-upload-${index}`} className="flex items-center gap-1">
+                                <Upload className="w-3 h-3" />
+                                Upload PDF
+                              </label>
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 gap-3">
+                          {curriculumItem?.pdfs?.map((pdf, pdfIndex) => (
+                            <div key={pdfIndex} className="flex items-center justify-between p-4 bg-white border border-zinc-100 rounded-2xl shadow-sm group/pdf hover:border-zinc-200 transition-all">
+                              <div className="flex items-center gap-3 min-w-0">
+                                <div className="w-8 h-8 rounded-lg bg-red-50 text-red-500 flex items-center justify-center shrink-0">
+                                  <FileText className="h-4 w-4" />
+                                </div>
+                                <div className="truncate">
+                                  <p className="text-xs font-bold text-zinc-900 truncate">{pdf.title}</p>
+                                  <a href={pdf.url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-500 hover:underline flex items-center gap-1">
+                                    View File <ExternalLink className="w-2 h-2" />
+                                  </a>
+                                </div>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleRemovePdf(index, pdfIndex)}
+                                className="rounded-xl h-8 w-8 text-red-500 opacity-0 group-hover/pdf:opacity-100 transition-opacity hover:bg-red-50"
+                              >
+                                <X className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
 

@@ -7,6 +7,19 @@ const LectureSchema = new mongoose.Schema({
   freePreview: Boolean,
   videoSource: String,
   notes: String,
+  links: [
+    {
+      title: String,
+      url: String,
+    },
+  ],
+  pdfs: [
+    {
+      title: String,
+      url: String,
+      public_id: String,
+    },
+  ],
 });
 
 const CourseSchema = new mongoose.Schema({

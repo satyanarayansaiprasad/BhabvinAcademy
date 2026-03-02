@@ -225,6 +225,8 @@ export const courseCurriculumInitialFormData = [
     public_id: "",
     videoSource: "upload",
     notes: "",
+    links: [],
+    pdfs: [],
   },
 ];
 
