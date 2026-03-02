@@ -224,6 +224,7 @@ export const courseCurriculumInitialFormData = [
     freePreview: false,
     public_id: "",
     videoSource: "upload",
+    notes: "",
   },
 ];
 

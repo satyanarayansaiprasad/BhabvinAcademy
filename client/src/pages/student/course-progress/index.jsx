@@ -155,9 +155,23 @@ function StudentViewCourseProgressPage() {
           >
             <span className="text-blue-500 font-bold text-[10px] xs:text-xs uppercase tracking-widest mb-1 xs:mb-2 block">Now playing</span>
             <h2 className="text-lg xs:text-xl md:text-[28px] font-black tracking-tighter text-white mb-2 xs:mb-4 line-clamp-2">{currentLecture?.title}</h2>
-            <p className="text-zinc-500 font-medium max-w-3xl leading-relaxed text-sm xs:text-base line-clamp-3 md:line-clamp-none">
+            <p className="text-zinc-500 font-medium max-w-3xl leading-relaxed text-sm xs:text-base line-clamp-3 md:line-clamp-none mb-8">
               {studentCurrentCourseProgress?.courseDetails?.subtitle}
             </p>
+
+            {currentLecture?.notes && (
+              <div className="mt-8 space-y-4">
+                <div className="flex items-center gap-2 text-blue-500">
+                  <Info className="h-4 w-4" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Lesson Notes</span>
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-3xl p-6 xs:p-8">
+                  <pre className="text-zinc-300 font-mono text-xs xs:text-sm leading-relaxed whitespace-pre-wrap break-words">
+                    {currentLecture?.notes}
+                  </pre>
+                </div>
+              </div>
+            )}
           </motion.div>
         </main>
 
@@ -202,8 +216,8 @@ function StudentViewCourseProgressPage() {
                               whileHover={{ x: 4 }}
                               onClick={() => setCurrentLecture(item)}
                               className={`flex items-center gap-3 xs:gap-4 p-3 xs:p-4 rounded-xl xs:rounded-2xl cursor-pointer transition-all border ${isCurrent
-                                  ? "bg-blue-600 border-blue-500 shadow-lg shadow-blue-600/20"
-                                  : "bg-white/0 border-transparent hover:bg-white/5 hover:border-white/5"
+                                ? "bg-blue-600 border-blue-500 shadow-lg shadow-blue-600/20"
+                                : "bg-white/0 border-transparent hover:bg-white/5 hover:border-white/5"
                                 }`}
                             >
                               <div className={`w-7 h-7 xs:w-8 xs:h-8 rounded-lg xs:rounded-xl flex items-center justify-center shrink-0 ${isCurrent ? "bg-white/20" : isViewed ? "bg-emerald-500/10 text-emerald-500" : "bg-white/5 text-zinc-500"

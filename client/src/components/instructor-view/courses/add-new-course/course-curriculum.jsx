@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import VideoPlayer from "@/components/video-player";
 import { courseCurriculumInitialFormData } from "@/config";
 import { InstructorContext } from "@/context/instructor-context";
@@ -51,6 +52,16 @@ function CourseCurriculum() {
     cpyCourseCurriculumFormData[currentIndex] = {
       ...cpyCourseCurriculumFormData[currentIndex],
       freePreview: currentValue,
+    };
+
+    setCourseCurriculumFormData(cpyCourseCurriculumFormData);
+  }
+
+  function handleLectureNotesChange(event, currentIndex) {
+    let cpyCourseCurriculumFormData = [...courseCurriculumFormData];
+    cpyCourseCurriculumFormData[currentIndex] = {
+      ...cpyCourseCurriculumFormData[currentIndex],
+      notes: event.target.value,
     };
 
     setCourseCurriculumFormData(cpyCourseCurriculumFormData);
@@ -430,6 +441,16 @@ function CourseCurriculum() {
                             className="data-[state=checked]:bg-emerald-500"
                           />
                         </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Lecture Notes</Label>
+                        <Textarea
+                          placeholder="Enter commands, strings or other notes here..."
+                          className="rounded-2xl min-h-[120px] px-6 py-4 bg-white border-zinc-200 font-mono text-sm focus:ring-4 focus:ring-blue-500/5 transition-all shadow-sm"
+                          onChange={(event) => handleLectureNotesChange(event, index)}
+                          value={curriculumItem?.notes}
+                        />
                       </div>
                     </div>
 
