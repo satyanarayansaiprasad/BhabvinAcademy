@@ -65,7 +65,7 @@ function InstructorDashboard({ listOfCourses }) {
   const config = [
     {
       icon: Users,
-      label: "Total Students",
+      label: "Total Sell",
       value: stats.totalStudents,
       color: "bg-blue-50 text-blue-600",
     },
