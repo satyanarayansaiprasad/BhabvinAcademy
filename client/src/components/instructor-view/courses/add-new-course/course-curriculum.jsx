@@ -12,7 +12,7 @@ import {
   mediaDeleteService,
   mediaUploadService,
 } from "@/services";
-import { Upload, Plus, Trash2, Video, Check, Eye, EyeOff, FileVideo, Youtube, Link as LinkIcon, RefreshCw, Lock, Link as Link, FileText, X, ExternalLink } from "lucide-react";
+import { Upload, Plus, Trash2, Video, Check, Eye, EyeOff, FileVideo, Youtube, Link as LinkIcon, RefreshCw, Lock, FileText, X, ExternalLink } from "lucide-react";
 import { useContext, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -72,7 +72,7 @@ function CourseCurriculum() {
     cpyCourseCurriculumFormData[currentIndex] = {
       ...cpyCourseCurriculumFormData[currentIndex],
       links: [
-        ...cpyCourseCurriculumFormData[currentIndex].links,
+        ...(cpyCourseCurriculumFormData[currentIndex].links || []),
         { title: "", url: "" },
       ],
     };
@@ -82,9 +82,15 @@ function CourseCurriculum() {
 
   function handleLinkChange(event, currentIndex, linkIndex, field) {
     let cpyCourseCurriculumFormData = [...courseCurriculumFormData];
-    cpyCourseCurriculumFormData[currentIndex].links[linkIndex] = {
-      ...cpyCourseCurriculumFormData[currentIndex].links[linkIndex],
+    const updatedLinks = [...(cpyCourseCurriculumFormData[currentIndex].links || [])];
+    updatedLinks[linkIndex] = {
+      ...updatedLinks[linkIndex],
       [field]: event.target.value,
+    };
+
+    cpyCourseCurriculumFormData[currentIndex] = {
+      ...cpyCourseCurriculumFormData[currentIndex],
+      links: updatedLinks,
     };
 
     setCourseCurriculumFormData(cpyCourseCurriculumFormData);
@@ -92,10 +98,14 @@ function CourseCurriculum() {
 
   function handleRemoveLink(currentIndex, linkIndex) {
     let cpyCourseCurriculumFormData = [...courseCurriculumFormData];
-    cpyCourseCurriculumFormData[currentIndex].links =
-      cpyCourseCurriculumFormData[currentIndex].links.filter(
-        (_, index) => index !== linkIndex
-      );
+    const updatedLinks = (cpyCourseCurriculumFormData[currentIndex].links || []).filter(
+      (_, index) => index !== linkIndex
+    );
+
+    cpyCourseCurriculumFormData[currentIndex] = {
+      ...cpyCourseCurriculumFormData[currentIndex],
+      links: updatedLinks,
+    };
 
     setCourseCurriculumFormData(cpyCourseCurriculumFormData);
   }
@@ -122,7 +132,7 @@ function CourseCurriculum() {
           cpyCourseCurriculumFormData[currentIndex] = {
             ...cpyCourseCurriculumFormData[currentIndex],
             pdfs: [
-              ...cpyCourseCurriculumFormData[currentIndex].pdfs,
+              ...(cpyCourseCurriculumFormData[currentIndex].pdfs || []),
               {
                 title: selectedFile.name,
                 url: response?.data?.url,
@@ -142,16 +152,19 @@ function CourseCurriculum() {
 
   async function handleRemovePdf(currentIndex, pdfIndex) {
     let cpyCourseCurriculumFormData = [...courseCurriculumFormData];
-    const pdfToRemove = cpyCourseCurriculumFormData[currentIndex].pdfs[pdfIndex];
+    const pdfs = cpyCourseCurriculumFormData[currentIndex].pdfs || [];
+    const pdfToRemove = pdfs[pdfIndex];
 
-    if (pdfToRemove.public_id) {
+    if (pdfToRemove?.public_id) {
       await mediaDeleteService(pdfToRemove.public_id);
     }
 
-    cpyCourseCurriculumFormData[currentIndex].pdfs =
-      cpyCourseCurriculumFormData[currentIndex].pdfs.filter(
-        (_, index) => index !== pdfIndex
-      );
+    const updatedPdfs = pdfs.filter((_, index) => index !== pdfIndex);
+
+    cpyCourseCurriculumFormData[currentIndex] = {
+      ...cpyCourseCurriculumFormData[currentIndex],
+      pdfs: updatedPdfs,
+    };
 
     setCourseCurriculumFormData(cpyCourseCurriculumFormData);
   }
