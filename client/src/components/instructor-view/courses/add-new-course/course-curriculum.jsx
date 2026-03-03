@@ -29,12 +29,12 @@ function CourseCurriculum() {
   const bulkUploadInputRef = useRef(null);
 
   function handleNewLecture() {
-    setCourseCurriculumFormData([
+    setCourseCurriculumFormData((prev) => [
       {
         ...courseCurriculumInitialFormData[0],
-        id: Date.now(),
+        id: Math.random().toString(36).substring(2, 11),
       },
-      ...courseCurriculumFormData,
+      ...prev,
     ]);
   }
 
@@ -292,7 +292,7 @@ function CourseCurriculum() {
               }`,
             freePreview: false,
             videoSource: "upload",
-            id: Date.now() + index,
+            id: Math.random().toString(36).substring(2, 11) + index,
           })),
           ...cpyCourseCurriculumFormdata,
         ];
@@ -381,7 +381,7 @@ function CourseCurriculum() {
           <AnimatePresence>
             {courseCurriculumFormData.map((curriculumItem, index) => (
               <motion.div
-                key={curriculumItem.id || curriculumItem._id || index}
+                key={curriculumItem.id || curriculumItem._id || `lecture-${index}`}
                 layout
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
