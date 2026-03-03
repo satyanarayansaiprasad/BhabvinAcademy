@@ -184,10 +184,10 @@ export const courseLandingPageFormControls = [
   },
   {
     name: "objectives",
-    label: "Objectives",
+    label: "What you'll learn",
     componentType: "textarea",
     type: "text",
-    placeholder: "Enter course objectives",
+    placeholder: "Enter course what you'll learn",
   },
   {
     name: "welcomeMessage",

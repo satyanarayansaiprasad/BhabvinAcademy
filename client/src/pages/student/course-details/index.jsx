@@ -235,7 +235,7 @@ function StudentViewCourseDetailsPage() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {studentViewCourseDetails?.objectives
-                  ?.split(",")
+                  ?.split("\n")
                   .map((objective, index) => (
                     <div key={index} className="flex items-start gap-4 group">
                       <div className="mt-1 flex-shrink-0 w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
