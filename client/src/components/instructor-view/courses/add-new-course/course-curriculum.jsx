@@ -288,8 +288,8 @@ function CourseCurriculum() {
           ...response?.data.map((item, index) => ({
             videoUrl: item?.url,
             public_id: item?.public_id,
-            title: `Lecture ${cpyCourseCurriculumFormdata.length + (index + 1)
-              }`,
+            title: `Lecture ${cpyCourseCurriculumFormdata.length +
+              (response?.data.length - index)}`,
             freePreview: false,
             videoSource: "upload",
             id: Math.random().toString(36).substring(2, 11) + index,
@@ -504,7 +504,7 @@ function CourseCurriculum() {
                       <div className="flex items-center gap-4">
                         <div className="relative">
                           <div className="w-12 h-12 rounded-2xl bg-zinc-900 flex items-center justify-center">
-                            <span className="text-white font-black text-lg leading-none">{index + 1}</span>
+                            <span className="text-white font-black text-lg leading-none">{courseCurriculumFormData.length - index}</span>
                           </div>
                           <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-blue-600 border-2 border-zinc-50 flex items-center justify-center">
                             <Check className="h-2.5 w-2.5 text-white" />
