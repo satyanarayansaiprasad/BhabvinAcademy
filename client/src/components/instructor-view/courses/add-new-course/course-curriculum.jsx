@@ -30,10 +30,10 @@ function CourseCurriculum() {
 
   function handleNewLecture() {
     setCourseCurriculumFormData([
-      ...courseCurriculumFormData,
       {
         ...courseCurriculumInitialFormData[0],
       },
+      ...courseCurriculumFormData,
     ]);
   }
 
@@ -284,7 +284,6 @@ function CourseCurriculum() {
             : [...courseCurriculumFormData];
 
         cpyCourseCurriculumFormdata = [
-          ...cpyCourseCurriculumFormdata,
           ...response?.data.map((item, index) => ({
             videoUrl: item?.url,
             public_id: item?.public_id,
@@ -293,6 +292,7 @@ function CourseCurriculum() {
             freePreview: false,
             videoSource: "upload",
           })),
+          ...cpyCourseCurriculumFormdata,
         ];
         setCourseCurriculumFormData(cpyCourseCurriculumFormdata);
         setMediaUploadProgress(false);
