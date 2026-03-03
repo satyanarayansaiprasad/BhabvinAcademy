@@ -289,10 +289,7 @@ function StudentProfilePage() {
                             <div className="absolute top-0 right-0 w-24 xs:w-32 h-24 xs:h-32 bg-amber-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                             <Star className="w-8 h-8 xs:w-10 xs:h-10 text-amber-500 mb-4 xs:mb-6 group-hover:rotate-12 transition-transform" />
                             <h3 className="text-xl xs:text-2xl font-black tracking-tight mb-2">Learning Streak</h3>
-                            <p className="text-white/50 text-xs xs:text-sm leading-relaxed mb-4 xs:mb-6">You've completed 4 modules this week. Keep the momentum going to unlock the Master Badge.</p>
-                            <Button variant="link" className="text-amber-400 p-0 h-auto font-black flex items-center gap-2 group/btn text-sm xs:text-base">
-                                View Dashboard <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                            </Button>
+                            <p className="text-white/50 text-xs xs:text-sm leading-relaxed">You've completed 4 modules this week. Keep the momentum going to unlock the Master Badge.</p>
                         </div>
                     </div>
 
