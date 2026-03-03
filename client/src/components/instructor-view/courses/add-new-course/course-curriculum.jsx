@@ -32,6 +32,7 @@ function CourseCurriculum() {
     setCourseCurriculumFormData([
       {
         ...courseCurriculumInitialFormData[0],
+        id: Date.now(),
       },
       ...courseCurriculumFormData,
     ]);
@@ -291,6 +292,7 @@ function CourseCurriculum() {
               }`,
             freePreview: false,
             videoSource: "upload",
+            id: Date.now() + index,
           })),
           ...cpyCourseCurriculumFormdata,
         ];
@@ -379,7 +381,7 @@ function CourseCurriculum() {
           <AnimatePresence>
             {courseCurriculumFormData.map((curriculumItem, index) => (
               <motion.div
-                key={index}
+                key={curriculumItem.id || curriculumItem._id || index}
                 layout
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
