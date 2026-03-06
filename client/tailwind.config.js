@@ -21,6 +21,30 @@ export default {
 			colors: {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				sage: {
+					50: '#F4F7F6',
+					100: '#E9EFED',
+					200: '#C4D4CB',
+					300: '#A3B9AE',
+					400: '#8BA396',
+					500: '#6B8377',
+					600: '#54685E',
+					700: '#3E4D45',
+					800: '#28322D',
+					900: '#131816',
+				},
+				lime: {
+					50: '#FDFFE5',
+					100: '#FBFFCC',
+					200: '#F6FF99',
+					300: '#F1FF66',
+					400: '#EBFF33',
+					500: '#E6FF55',
+					600: '#D4EB00',
+					700: '#A9BC00',
+					800: '#7E8D00',
+					900: '#545E00',
+				},
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
