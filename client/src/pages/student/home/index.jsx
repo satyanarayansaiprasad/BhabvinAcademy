@@ -65,298 +65,233 @@ function StudentHomePage() {
     const { studentBoughtCoursesList } = useContext(StudentContext);
     const isOwned = studentBoughtCoursesList.some(item => item.courseId === course._id);
     return (
-      <div
+      <motion.div
+        variants={{
+          initial: { opacity: 0, y: 20 },
+          animate: { opacity: 1, y: 0 }
+        }}
         onClick={() => handleCourseNavigate(course._id)}
-        className="group cursor-pointer bg-white rounded-sm overflow-hidden border border-[#e6e6e6] hover:border-[#0067b8] transition-all duration-200"
+        className="group cursor-pointer bg-white overflow-hidden flex flex-col h-full border border-transparent hover:shadow-[0_12px_24px_rgba(0,0,0,0.08)] transition-all duration-300"
       >
-        <div className="aspect-[16/9] overflow-hidden relative border-b border-[#e6e6e6]">
-          <img src={course.image} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-          <div className="absolute top-2 left-2 flex gap-1.5">
-            <span className="px-2 py-0.5 rounded-sm bg-white/90 backdrop-blur-sm text-[10px] font-semibold uppercase tracking-wider text-black border border-[#e6e6e6]">
-              {course.category}
-            </span>
-            {isOwned && (
-              <span className="px-2 py-0.5 rounded-sm bg-[#0067b8] text-white text-[10px] font-semibold uppercase tracking-wider border-none">
-                Owned
-              </span>
-            )}
+        <div className="aspect-[16/9] overflow-hidden relative">
+          <img src={course.image} alt={course.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+          {isOwned && (
+            <div className="absolute top-2 left-2 px-2 py-0.5 bg-[#0067b8] text-white text-[10px] font-bold uppercase tracking-widest rounded-sm">
+              Owned
+            </div>
+          )}
+        </div>
+        <div className="p-5 flex flex-col flex-grow">
+          <h3 className="text-lg font-semibold text-black mb-2 line-clamp-2 leading-tight group-hover:text-[#0067b8] transition-colors">{course.title}</h3>
+          <p className="text-[#616161] text-xs font-normal mb-4">By <span className="text-black">{course.instructorName}</span></p>
+          <div className="mt-auto flex items-center justify-between">
+            <span className="text-xl font-bold text-black">₹{course.pricing}</span>
+            <Button variant="link" className={`p-0 h-auto font-bold text-sm ${isOwned ? "text-emerald-700" : "text-[#0067b8]"} hover:no-underline`}>
+              {isOwned ? "Continue" : "Learn more"} →
+            </Button>
           </div>
         </div>
-        <div className="p-4 flex flex-col h-full">
-          <h3 className="text-base font-semibold text-black mb-1 line-clamp-2 leading-tight group-hover:text-[#0067b8] transition-colors">{course.title}</h3>
-          <p className="text-[#616161] text-xs font-normal mb-auto">By <span className="text-black">{course.instructorName}</span></p>
-          <div className="mt-4 flex items-center justify-between">
-            <span className="text-lg font-bold text-black">₹{course.pricing}</span>
-            <span className={`text-sm font-semibold transition-colors ${isOwned ? "text-emerald-700" : "text-[#0067b8]"}`}>
-              {isOwned ? "Continue" : "Details"} →
-            </span>
-          </div>
-        </div>
-      </div>
+      </motion.div>
     );
   };
 
   return (
-    <div className="min-h-screen bg-white overflow-x-hidden">
-      {/* Hero Section */}
-      <section className="relative pt-24 pb-20 lg:pt-32 lg:pb-40 bg-white overflow-hidden border-b border-[#e6e6e6]">
-        {/* Advanced Mesh Gradient Background */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#0067b8]/10 blur-[120px] rounded-full animate-pulse" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#0067b8]/5 blur-[150px] rounded-full" />
-          <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] bg-emerald-500/5 blur-[100px] rounded-full" />
-          
-          {/* Animated Grid Pattern */}
-          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#0067b8 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-        </div>
-
-        <div className="container mx-auto px-4 lg:px-6 relative z-10 max-w-7xl">
-          <div className="flex flex-col lg:flex-row items-center gap-16 xl:gap-24">
-            {/* Left Content */}
+    <div className="min-h-screen bg-white">
+      {/* Microsoft Style Hero Section */}
+      <section className="relative bg-white pt-20 pb-12 lg:pt-32 lg:pb-24 border-b border-[#e6e6e6]">
+        <div className="container mx-auto px-4 lg:px-6 max-w-7xl">
+          <div className="flex flex-col lg:flex-row items-center gap-12 xl:gap-20">
+            {/* Left Column: Text */}
             <motion.div 
               initial="initial"
               animate="animate"
               variants={{
-                initial: { opacity: 0 },
-                animate: { opacity: 1, transition: { staggerChildren: 0.15 } }
+                initial: { opacity: 0, x: -20 },
+                animate: { opacity: 1, x: 0, transition: { staggerChildren: 0.1, duration: 0.8 } }
               }}
-              className="lg:w-3/5 text-center lg:text-left"
+              className="lg:w-1/2 text-center lg:text-left z-10"
             >
-              <motion.div 
-                variants={{
-                  initial: { opacity: 0, y: 10 },
-                  animate: { opacity: 1, y: 0 }
-                }}
-                className="inline-flex items-center gap-2 bg-[#0067b8]/10 text-[#0067b8] text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-sm mb-8 border border-[#0067b8]/20"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-[#0067b8] animate-ping" />
-                Trusted by 10,000+ developers
-              </motion.div>
-              
               <motion.h1 
-                variants={{
-                  initial: { opacity: 0, y: 20 },
-                  animate: { opacity: 1, y: 0 }
-                }}
-                className="text-4xl md:text-6xl lg:text-7xl font-semibold tracking-tight text-black leading-[1.05] mb-8"
+                variants={{ initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 } }}
+                className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-black leading-[1.1] mb-6"
               >
-                The future of <br />
-                <span className="text-[#0067b8] relative">
-                  technical learning.
-                  <svg className="absolute -bottom-3 left-0 w-full h-3 text-[#0067b8]/20" viewBox="0 0 100 10" preserveAspectRatio="none">
-                    <path d="M0 5 Q 25 0, 50 5 T 100 5" fill="none" stroke="currentColor" strokeWidth="4" />
-                  </svg>
-                </span>
+                Build your future with <br />
+                <span className="text-[#0067b8]">professional learning.</span>
               </motion.h1>
               
               <motion.p 
-                variants={{
-                  initial: { opacity: 0, y: 20 },
-                  animate: { opacity: 1, y: 0 }
-                }}
-                className="text-[#616161] text-lg md:text-xl max-w-2xl mb-12 leading-relaxed mx-auto lg:mx-0"
+                variants={{ initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 } }}
+                className="text-[#616161] text-lg md:text-xl max-w-xl mb-10 leading-relaxed mx-auto lg:mx-0"
               >
-                Access high-fidelity training modules and professional-grade developer documentation. 
-                Built by experts, designed for the modern developer ecosystem.
+                Discover a world of knowledge with structured courses and official developer 
+                documentation designed to help you master new skills at every stage.
               </motion.p>
               
               <motion.div 
-                variants={{
-                  initial: { opacity: 0, y: 20 },
-                  animate: { opacity: 1, y: 0 }
-                }}
+                variants={{ initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 } }}
                 className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
               >
                 <Button 
                   onClick={() => navigate("/courses")} 
-                  className="bg-[#0067b8] text-white rounded-sm px-10 h-14 text-base font-semibold hover:bg-[#005a9e] transition-all hover:scale-[1.02] shadow-xl shadow-[#0067b8]/20 w-full sm:w-auto active:scale-95"
+                  className="bg-[#0067b8] text-white rounded-sm px-10 h-12 text-sm font-semibold hover:bg-[#005a9e] transition-all shadow-md w-full sm:w-auto"
                 >
-                  Start Learning Free
+                  Explore Documentation
                 </Button>
                 <Button 
                   variant="outline" 
                   onClick={() => navigate("/about")}
-                  className="bg-white text-black border-[#e6e6e6] rounded-sm px-10 h-14 text-base font-semibold hover:bg-[#f2f2f2] w-full sm:w-auto transition-all active:scale-95"
+                  className="bg-transparent text-black border-black border-[1.5px] rounded-sm px-10 h-12 text-sm font-semibold hover:bg-black/5 w-full sm:w-auto transition-all"
                 >
-                  Explore Catalog
+                  Learn how it works
                 </Button>
               </motion.div>
             </motion.div>
 
-            {/* Right Image/Graphic */}
+            {/* Right Column: High-Fidelity Image */}
             <motion.div 
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1, ease: "easeOut" }}
-              className="lg:w-2/5 relative"
+              className="lg:w-1/2 relative w-full"
             >
-              <div className="relative z-10 w-full aspect-square max-w-[520px] rounded-sm overflow-hidden bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-[#e6e6e6] group">
+              <div className="relative rounded-sm overflow-hidden shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)] bg-[#f2f2f2]">
                 <img 
-                  src="/hero_learning_illustration.png" 
-                  alt="Premium Tech Illustration" 
-                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+                  src="/microsoft_hero.png" 
+                  alt="Professional Learning Ecosystem" 
+                  className="w-full h-auto object-cover" 
                 />
-                
-                {/* Glass Overlay on Image */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              </div>
+              {/* Dynamic Overlay Label */}
+              <div className="absolute -bottom-6 -left-6 bg-white p-5 shadow-2xl rounded-sm border border-[#e6e6e6] hidden md:block">
+                <div className="flex items-center gap-3">
+                  <div className="w-1.5 h-10 bg-[#0067b8] rounded-full" />
+                  <div>
+                    <p className="text-[10px] font-bold text-[#616161] uppercase tracking-widest">Enrollment Active</p>
+                    <p className="text-base font-semibold text-black">Join 10k+ Learners</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Structured Skill Pillars Grid (Redesigned from Marquee) */}
+      <section className="py-20 lg:py-28 bg-[#f2f2f2]">
+        <div className="container mx-auto px-4 lg:px-6 max-w-7xl">
+          <div className="mb-16 text-center lg:text-left">
+            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-black mb-4">Choose your learning path.</h2>
+            <p className="text-[#616161] text-lg max-w-2xl">Tailored experiences for every discipline, from advanced technology to creative arts.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+            {/* Featured Technology Pillar with Image */}
+            <div className="col-span-1 md:col-span-2 lg:col-span-2 row-span-1 bg-white p-2 rounded-sm border border-[#e6e6e6] flex flex-col sm:flex-row gap-6 hover:shadow-lg transition-shadow">
+              <div className="w-full sm:w-1/2 overflow-hidden rounded-sm bg-[#0067b8]/5">
+                <img src="/technical_skills.png" alt="Technology Pillar" className="w-full h-full object-cover" />
+              </div>
+              <div className="w-full sm:w-1/2 p-4 flex flex-col justify-center">
+                <span className="text-[#0067b8] font-bold text-xs uppercase tracking-[0.2em] mb-3">Featured</span>
+                <h3 className="text-2xl font-semibold text-black mb-4">Advanced Tech</h3>
+                <p className="text-[#616161] text-sm mb-6 leading-relaxed">Master Azure, Copilot, and cloud infrastructure with expert-led paths.</p>
+                <Button onClick={() => handleNavigateToCoursesPage('technology')} variant="link" className="p-0 h-auto justify-start text-[#0067b8] font-bold text-sm hover:translate-x-1 transition-transform">
+                  Explore Tech →
+                </Button>
+              </div>
+            </div>
+
+            {/* Other Pillars */}
+            {[
+              { id: "well-being", label: "Well-being", icon: <Heart className="w-6 h-6" />, desc: "Yoga, health, and balanced lifestyle practices.", color: "bg-orange-500" },
+              { id: "personal-mastery", label: "Growth", icon: <Star className="w-6 h-6" />, desc: "Strategies for personal and professional development.", color: "bg-blue-500" },
+              { id: "creative-arts", label: "Creative Arts", icon: <Palette className="w-6 h-6" />, desc: "Expression through digital and physical art forms.", color: "bg-purple-500" },
+              { id: "certification", label: "Certifications", icon: <BookOpen className="w-6 h-6" />, desc: "Validate your skills with professional badges.", color: "bg-emerald-500" },
+            ].map((pillar) => (
+              <div 
+                key={pillar.id}
+                onClick={() => handleNavigateToCoursesPage(pillar.id)}
+                className="group cursor-pointer bg-white p-8 rounded-sm border border-[#e6e6e6] hover:border-[#0067b8] hover:shadow-xl transition-all flex flex-col justify-between"
+              >
+                <div className={`${pillar.color} w-12 h-12 rounded-sm flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform`}>
+                  {pillar.icon}
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-black mb-3">{pillar.label}</h3>
+                  <p className="text-[#616161] text-sm mb-6 leading-relaxed">{pillar.desc}</p>
+                </div>
+                <span className="text-[#0067b8] font-bold text-xs uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                  View Path →
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Courses Sections */}
+      <section className="py-24 lg:py-32 bg-white">
+        <div className="container mx-auto px-4 lg:px-6 max-w-7xl">
+          {[
+            { key: "trending", label: "Trending Now", title: "Popular paths.", desc: "The most sought-after skills in the industry right now." },
+            { key: "recent", label: "Recently Added", title: "New releases.", desc: "Stay ahead of the curve with our latest course additions." },
+          ].map(({ key, label, title, desc }) => (
+            <div key={key} className="mb-32 last:mb-0">
+              <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 border-b border-[#e6e6e6] pb-8 gap-6">
+                <div className="max-w-xl">
+                  <span className="text-[#0067b8] font-bold text-xs uppercase tracking-[0.3em] block mb-3">{label}</span>
+                  <h2 className="text-3xl md:text-5xl font-semibold tracking-tight text-black mb-4">{title}</h2>
+                  <p className="text-[#616161] text-lg">{desc}</p>
+                </div>
+                <Button onClick={() => navigate("/courses")} variant="outline" className="border-black border-[1.5px] rounded-sm font-bold h-12 px-8 text-sm hover:bg-black/5 transition-all">
+                  View catalog
+                </Button>
               </div>
               
-              {/* Dynamic Information Cards */}
-              <motion.div 
-                animate={{ y: [0, -15, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-10 -right-6 z-20 bg-white/90 backdrop-blur-md p-5 rounded-sm shadow-2xl border border-white/50 hidden md:block"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-sm bg-[#0067b8] flex items-center justify-center shadow-lg">
-                    <Star className="w-6 h-6 text-white" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                {featuredSections?.[key]?.length > 0 ? (
+                  featuredSections[key].map((course, index) => (
+                    <CourseCard key={course._id} course={course} handleCourseNavigate={handleCourseNavigate} index={index} />
+                  ))
+                ) : (
+                  <div className="col-span-full py-20 text-center bg-[#f2f2f2] rounded-sm border border-dashed border-[#e6e6e6]">
+                    <p className="text-[#616161] font-medium italic">No courses available for this track yet.</p>
                   </div>
-                  <div>
-                    <p className="text-[10px] font-bold text-[#616161] uppercase tracking-[0.2em] mb-0.5">Premier Content</p>
-                    <p className="text-base font-semibold text-black tracking-tight">Verified Excellence</p>
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div 
-                animate={{ y: [0, 15, 0] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                className="absolute -bottom-10 -left-6 z-20 bg-white/90 backdrop-blur-md p-5 rounded-sm shadow-2xl border border-white/50 hidden md:block"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="flex -space-x-3">
-                    {[
-                      "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80",
-                      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80",
-                      "https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&w=100&q=80"
-                    ].map((src, i) => (
-                      <div key={i} className="w-10 h-10 rounded-full border-2 border-white overflow-hidden shadow-sm">
-                        <img src={src} alt="Learner" className="w-full h-full object-cover" />
-                      </div>
-                    ))}
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-bold text-[#616161] uppercase tracking-[0.2em] mb-0.5">Global Reach</p>
-                    <p className="text-base font-semibold text-black tracking-tight">10k+ Active Learners</p>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Floating Decorative Shapes */}
-              <div className="absolute top-1/2 left-[-15%] w-24 h-24 border border-[#0067b8]/10 rounded-sm -z-10 rotate-12" />
-              <div className="absolute bottom-[20%] right-[-10%] w-32 h-32 bg-[#0067b8]/5 rounded-sm -z-10 -rotate-6" />
-            </motion.div>
-          </div>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Category Marquee Section */}
-      <section className="bg-white border-b border-[#e6e6e6] py-12 lg:py-16 overflow-hidden">
-        <div className="container mx-auto px-4 lg:px-6 mb-8 text-center lg:text-left">
-          <div className="flex items-center justify-center lg:justify-start gap-4">
-            <div className="w-2 h-8 bg-[#0067b8] rounded-full hidden lg:block" />
-            <h2 className="text-base font-semibold uppercase tracking-[0.3em] text-[#616161]">Professional Skill Pillars</h2>
-          </div>
-        </div>
+      {/* Clean Call to Action */}
+      <section className="py-24 md:py-40 bg-black text-white relative overflow-hidden">
+        {/* Subtle Background Graphic */}
+        <div className="absolute top-0 right-0 w-1/3 h-full bg-[#0067b8]/10 skew-x-[-15deg] translate-x-1/2 z-0" />
         
-        <div className="relative">
-          {/* Fading Edges */}
-          <div className="absolute inset-y-0 left-0 w-40 bg-gradient-to-r from-white via-white/80 to-transparent z-10 pointer-events-none" />
-          <div className="absolute inset-y-0 right-0 w-40 bg-gradient-to-l from-white via-white/80 to-transparent z-10 pointer-events-none" />
-          
-          <div className="flex overflow-hidden">
-            <motion.div 
-              animate={{ x: ["0%", "-50%"] }}
-              transition={{ 
-                duration: 40, 
-                repeat: Infinity, 
-                ease: "linear"
-              }}
-              className="flex gap-6 py-6"
-            >
-              {[...(categories?.length > 0 ? categories : topLevelCategories), ...(categories?.length > 0 ? categories : topLevelCategories), ...(categories?.length > 0 ? categories : topLevelCategories)].map((category, idx) => (
-                <div 
-                  key={`${category.id}-${idx}`}
-                  onClick={() => handleNavigateToCoursesPage(category.id)}
-                  className="flex-shrink-0 flex items-center gap-4 px-8 py-5 bg-white border border-[#e6e6e6] rounded-sm hover:border-[#0067b8] hover:shadow-[0_20px_40px_-12px_rgba(0,103,184,0.12)] cursor-pointer transition-all duration-300 group/item active:scale-95"
-                >
-                  <div className="w-10 h-10 rounded-sm bg-[#f2f2f2] group-hover/item:bg-[#0067b8] flex items-center justify-center transition-all duration-300">
-                    <Star className="w-5 h-5 text-[#616161] group-hover/item:text-white" />
-                  </div>
-                  <span className="text-base font-semibold text-black tracking-tight">{category.label}</span>
-                </div>
-              ))}
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Course Sections */}
-      <section className="py-20 md:py-32 space-y-32 bg-white">
-        {[
-          { key: "trending", label: "Most popular", color: "text-[#0067b8]", title: "Popular paths.", btn: "View everything", btnColor: "text-[#0067b8] hover:bg-[#f2f2f2]" },
-          { key: "recent", label: "Recently added", color: "text-[#616161]", title: "New releases.", btn: null, btnColor: "" },
-        ].map(({ key, label, color, title, btn, btnColor }) => (
-          <div key={key} className="container mx-auto px-4 lg:px-6 max-w-7xl">
-            <div className="flex items-end justify-between mb-10 border-b border-[#e6e6e6] pb-6">
-              <div>
-                <span className={`${color} font-semibold text-xs uppercase tracking-wider block mb-2`}>{label}</span>
-                <h2 className="text-2xl md:text-4xl font-semibold tracking-tight text-black">{title}</h2>
-              </div>
-              {btn && (
-                <Button onClick={() => navigate("/courses")} variant="ghost" className={`font-semibold rounded-sm h-12 px-6 text-sm ${btnColor} transition-none`}>
-                  {btn} →
-                </Button>
-              )}
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {featuredSections?.[key]?.length > 0 ? (
-                featuredSections[key].map((course, index) => (
-                  <CourseCard key={course._id} course={course} handleCourseNavigate={handleCourseNavigate} index={index} />
-                ))
-              ) : (
-                <p className="text-[#616161] font-normal col-span-full py-16 text-center bg-[#f2f2f2] rounded-sm border border-dashed border-[#e6e6e6]">
-                  No courses matching your criteria were found.
-                </p>
-              )}
-            </div>
-          </div>
-        ))}
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-24 md:py-40 bg-[#f2f2f2] border-t border-[#e6e6e6]">
-        <div className="container mx-auto px-4 lg:px-6 max-w-5xl">
+        <div className="container mx-auto px-4 lg:px-6 max-w-5xl relative z-10">
           <div className="text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-            >
-              <h2 className="text-3xl md:text-5xl font-semibold tracking-tight text-black mb-8 leading-tight">
-                Unlock your potential. <br /> Start learning for free today.
-              </h2>
-              <p className="text-[#616161] text-lg md:text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
-                Whether you're just starting out or looking to advance your career, 
-                Bhavin Academy has the resources you need to succeed.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Button
-                  onClick={() => navigate("/auth")}
-                  className="bg-[#0067b8] text-white hover:bg-[#005a9e] rounded-sm h-14 px-12 text-base font-semibold transition-all hover:shadow-lg w-full sm:w-auto active:scale-95"
-                >
-                  Join Now
-                </Button>
-                <Button
-                  onClick={() => navigate("/courses")}
-                  variant="outline"
-                  className="bg-white text-black border-[#e6e6e6] rounded-sm h-14 px-12 text-base font-semibold hover:bg-[#f2f2f2] w-full sm:w-auto transition-all active:scale-95"
-                >
-                  Browse Catalog
-                </Button>
-              </div>
-            </motion.div>
+            <h2 className="text-4xl md:text-6xl font-semibold tracking-tight mb-8 leading-tight">
+              Empowering every developer <br /> to achieve more.
+            </h2>
+            <p className="text-gray-400 text-lg md:text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
+              Join Bhavin Academy today and gain access to premium curriculum, official documentation, 
+              and a community of professional learners.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+              <Button
+                onClick={() => navigate("/auth")}
+                className="bg-white text-black hover:bg-gray-200 rounded-sm h-14 px-14 text-base font-bold transition-all w-full sm:w-auto"
+              >
+                Join for free
+              </Button>
+              <Button
+                onClick={() => navigate("/courses")}
+                variant="outline"
+                className="bg-transparent text-white border-white border-[2px] rounded-sm h-14 px-14 text-base font-bold hover:bg-white/10 w-full sm:w-auto transition-all"
+              >
+                Explore catalog
+              </Button>
+            </div>
           </div>
         </div>
       </section>
