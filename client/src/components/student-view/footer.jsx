@@ -54,12 +54,12 @@ function Footer() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
                     {/* Brand Column */}
                     <div className="flex flex-col gap-6">
-                        <Link to="/" className="flex items-center gap-3 text-black">
-                            <div className="bg-black p-1.5 rounded-sm">
-                                <GraduationCap className="h-6 w-6 text-white" />
-                            </div>
-                            <span className="font-semibold text-xl tracking-tight">Bhavin Academy</span>
-                        </Link>
+                        <Link to={"/"} className="flex items-center gap-2 text-black group">
+          <div className="bg-[#0067b8] p-1 rounded-sm">
+            <GraduationCap className="h-5 w-5 text-white" />
+          </div>
+          <span className="font-semibold text-lg tracking-tight">Bhavin Academy</span>
+        </Link>
                         <p className="text-[#616161] font-normal leading-relaxed text-sm">
                             The world's most immersive learning platform, designed for the next generation of industry leaders.
                         </p>

@@ -156,8 +156,8 @@ function StudentHomePage() {
             >
               <div className="relative rounded-sm overflow-hidden shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)] bg-[#f2f2f2]">
                 <img 
-                  src="/technical_skills.png" 
-                  alt="Professional Learning Illustration" 
+                  src="/learning_hero.png" 
+                  alt="Comprehensive Learning Illustration" 
                   className="w-full h-auto object-cover" 
                 />
               </div>

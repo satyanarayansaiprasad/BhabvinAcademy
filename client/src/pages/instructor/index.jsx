@@ -69,11 +69,11 @@ function InstructorDashboardpage() {
       {/* Sidebar */}
       <aside className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-zinc-200 hidden md:flex flex-col z-30">
         <div className="p-8">
-          <div className="flex items-center gap-3 mb-10 px-2 text-zinc-900">
-            <div className="bg-zinc-900 p-1.5 rounded-lg">
-              <GraduationCap className="h-6 w-6 text-white" />
+          <div className="flex items-center gap-2 mb-10 px-2 text-zinc-900 group cursor-pointer" onClick={() => navigate("/home")}>
+            <div className="bg-[#0067b8] p-1 rounded-sm">
+              <GraduationCap className="h-5 w-5 text-white" />
             </div>
-            <span className="font-extrabold text-xl tracking-tight">Bhavin Academy</span>
+            <span className="font-semibold text-lg tracking-tight">Bhavin Academy</span>
           </div>
 
           <nav className="space-y-1">
