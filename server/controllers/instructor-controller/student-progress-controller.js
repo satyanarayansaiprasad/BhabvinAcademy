@@ -2,6 +2,23 @@ const User = require("../../models/User");
 const StudentCourses = require("../../models/StudentCourses");
 const Progress = require("../../models/CourseProgress");
 
+const deleteStudent = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const user = await User.findById(studentId);
+    if (!user || user.role !== "student") {
+      return res.status(404).json({ success: false, message: "Student not found" });
+    }
+    await User.findByIdAndDelete(studentId);
+    await StudentCourses.deleteOne({ userId: studentId });
+    await Progress.deleteMany({ userId: studentId });
+    res.status(200).json({ success: true, message: "Student deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting student:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
 const getAllStudentsProgress = async (req, res) => {
   try {
     // Only fetch users with role "student" — excludes admins, sub-admins, instructors

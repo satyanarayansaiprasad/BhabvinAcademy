@@ -280,3 +280,8 @@ export async function fetchAdminStudentProgressService() {
   const { data } = await axiosInstance.get("/instructor/student-progress/get");
   return data;
 }
+
+export async function deleteAdminStudentService(studentId) {
+  const { data } = await axiosInstance.delete(`/instructor/student-progress/delete/${studentId}`);
+  return data;
+}
