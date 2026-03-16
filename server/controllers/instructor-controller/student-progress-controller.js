@@ -4,9 +4,10 @@ const Progress = require("../../models/CourseProgress");
 
 const getAllStudentsProgress = async (req, res) => {
   try {
-    // 1. Fetch all users who are students
-    // Students can have role "student" (from form/OAuth signup). Exclude admins and sub-admins.
-    const students = await User.find({ role: { $nin: ["admin", "sub-admin"] } }).select("userName userEmail _id role");
+    // Only fetch users with role "student" — excludes admins, sub-admins, instructors
+    const students = await User.find({ role: "student" }).select(
+      "userName userFullName userEmail profileImage userHeadline userBio status _id"
+    );
 
     if (!students || students.length === 0) {
       return res.status(200).json({
@@ -17,12 +18,12 @@ const getAllStudentsProgress = async (req, res) => {
 
     const studentsProgressData = await Promise.all(
       students.map(async (student) => {
-        // 2. Fetch courses purchased by each student
+        // Fetch courses purchased by each student
         const studentCourses = await StudentCourses.findOne({ userId: student._id });
-        
+
         const coursesWithProgress = studentCourses ? await Promise.all(
           studentCourses.courses.map(async (course) => {
-            // 3. Fetch progress for each course
+            // Fetch progress for each course
             const progress = await Progress.findOne({
               userId: student._id,
               courseId: course.courseId,
@@ -38,6 +39,7 @@ const getAllStudentsProgress = async (req, res) => {
             return {
               courseId: course.courseId,
               title: course.title,
+              dateOfPurchase: course.dateOfPurchase,
               completionPercentage: Math.round(completionPercentage),
               isCompleted: progress ? progress.completed : false,
             };
@@ -47,7 +49,12 @@ const getAllStudentsProgress = async (req, res) => {
         return {
           studentId: student._id,
           userName: student.userName,
+          userFullName: student.userFullName,
           userEmail: student.userEmail,
+          profileImage: student.profileImage,
+          userHeadline: student.userHeadline,
+          userBio: student.userBio,
+          status: student.status,
           courses: coursesWithProgress,
         };
       })
@@ -67,3 +74,5 @@ const getAllStudentsProgress = async (req, res) => {
 };
 
 module.exports = { getAllStudentsProgress };
+
+
