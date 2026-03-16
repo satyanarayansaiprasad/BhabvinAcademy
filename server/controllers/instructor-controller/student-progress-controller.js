@@ -5,7 +5,8 @@ const Progress = require("../../models/CourseProgress");
 const getAllStudentsProgress = async (req, res) => {
   try {
     // 1. Fetch all users who are students
-    const students = await User.find({ role: "user" }).select("userName userEmail _id");
+    // Students can have role "student" (from form/OAuth signup). Exclude admins and sub-admins.
+    const students = await User.find({ role: { $nin: ["admin", "sub-admin"] } }).select("userName userEmail _id role");
 
     if (!students || students.length === 0) {
       return res.status(200).json({
