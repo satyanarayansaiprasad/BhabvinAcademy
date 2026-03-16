@@ -11,7 +11,7 @@ import { AuthContext } from "@/context/auth-context";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Star } from "lucide-react";
+import { Star, Heart, Palette, BookOpen } from "lucide-react";
 
 function StudentHomePage() {
   const { studentViewCoursesList, setStudentViewCoursesList } = useContext(StudentContext);
