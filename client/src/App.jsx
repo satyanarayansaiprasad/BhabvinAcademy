@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import AuthPage from "./pages/auth";
 import RouteGuard from "./components/route-guard";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AuthContext } from "./context/auth-context";
 import InstructorDashboardpage from "./pages/instructor";
 import StudentViewCommonLayout from "./components/student-view/common-layout";
@@ -26,6 +26,70 @@ import PaymentReturnPage from "./pages/student/payment-return";
 
 function App() {
   const { auth } = useContext(AuthContext);
+
+  // Block DevTools and inspect globally
+  useEffect(() => {
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+      return false;
+    };
+
+    const handleKeyDown = (e) => {
+      // Block F12
+      if (e.keyCode === 123) {
+        e.preventDefault();
+        return false;
+      }
+      // Block Ctrl+Shift+I (Inspector)
+      if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
+        e.preventDefault();
+        return false;
+      }
+      // Block Ctrl+Shift+J (Console)
+      if (e.ctrlKey && e.shiftKey && e.keyCode === 74) {
+        e.preventDefault();
+        return false;
+      }
+      // Block Ctrl+Shift+C (Element picker)
+      if (e.ctrlKey && e.shiftKey && e.keyCode === 67) {
+        e.preventDefault();
+        return false;
+      }
+      // Block Ctrl+U (View source)
+      if (e.ctrlKey && e.keyCode === 85) {
+        e.preventDefault();
+        return false;
+      }
+      // Block Cmd+Option+I (Mac Inspector)
+      if (e.metaKey && e.altKey && e.keyCode === 73) {
+        e.preventDefault();
+        return false;
+      }
+      // Block Cmd+Option+J (Mac Console)
+      if (e.metaKey && e.altKey && e.keyCode === 74) {
+        e.preventDefault();
+        return false;
+      }
+      // Block Cmd+Option+C (Mac Element picker)
+      if (e.metaKey && e.altKey && e.keyCode === 67) {
+        e.preventDefault();
+        return false;
+      }
+      // Block Cmd+Option+U (Mac View source)
+      if (e.metaKey && e.altKey && e.keyCode === 85) {
+        e.preventDefault();
+        return false;
+      }
+    };
+
+    document.addEventListener("contextmenu", handleContextMenu);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("contextmenu", handleContextMenu);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   return (
     <>
