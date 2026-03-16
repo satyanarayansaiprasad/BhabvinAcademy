@@ -116,13 +116,29 @@ function VideoPlayer({
   }, []);
 
   useEffect(() => {
-    if (played === 1) {
-      onProgressUpdate({
-        ...progressData,
-        progressValue: played,
-      });
-    }
-  }, [played]);
+    const handleKeyDown = (e) => {
+      // Block F12
+      if (e.keyCode === 123) {
+        e.preventDefault();
+        return false;
+      }
+      // Block Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+      if (
+        (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
+        (e.ctrlKey && e.keyCode === 85) ||
+        (e.metaKey && e.altKey && (e.keyCode === 73 || e.keyCode === 74)) || // Mac Support
+        (e.metaKey && e.keyCode === 85) // Mac Support
+      ) {
+        e.preventDefault();
+        return false;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   return (
     <div
@@ -133,6 +149,7 @@ function VideoPlayer({
       style={{ width, height }}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setShowControls(false)}
+      onContextMenu={(e) => e.preventDefault()}
     >
       <ReactPlayer
         ref={playerRef}
@@ -147,14 +164,24 @@ function VideoPlayer({
         onEnded={handleProgress}
         playsinline
         config={{
+          file: {
+            attributes: {
+              controlsList: "nodownload",
+              onContextMenu: (e) => e.preventDefault(),
+            },
+          },
           youtube: {
             playerVars: { showinfo: 0, rel: 0, modestbranding: 1 }
           }
         }}
       />
+      
+      {/* Security Overlay: Transparent div to deter direct interaction with video element */}
+      <div className="absolute inset-0 z-10 select-none pointer-events-none" />
+
       {showControls && (
         <div
-          className={`absolute bottom-0 left-0 right-0 bg-gray-800 bg-opacity-75 p-4 transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0"
+          className={`absolute bottom-0 left-0 right-0 bg-gray-800 bg-opacity-75 p-4 transition-opacity duration-300 z-20 ${showControls ? "opacity-100" : "opacity-0"
             }`}
         >
           <Slider

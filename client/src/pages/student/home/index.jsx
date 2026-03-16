@@ -156,8 +156,8 @@ function StudentHomePage() {
             >
               <div className="relative rounded-sm overflow-hidden shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)] bg-[#f2f2f2]">
                 <img 
-                  src="/microsoft_hero.png" 
-                  alt="Professional Learning Ecosystem" 
+                  src="/technical_skills.png" 
+                  alt="Professional Learning Illustration" 
                   className="w-full h-auto object-cover" 
                 />
               </div>
@@ -176,54 +176,47 @@ function StudentHomePage() {
         </div>
       </section>
 
-      {/* Structured Skill Pillars Grid (Redesigned from Marquee) */}
-      <section className="py-20 lg:py-28 bg-[#f2f2f2]">
-        <div className="container mx-auto px-4 lg:px-6 max-w-7xl">
-          <div className="mb-16 text-center lg:text-left">
-            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-black mb-4">Choose your learning path.</h2>
-            <p className="text-[#616161] text-lg max-w-2xl">Tailored experiences for every discipline, from advanced technology to creative arts.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-            {/* Featured Technology Pillar with Image */}
-            <div className="col-span-1 md:col-span-2 lg:col-span-2 row-span-1 bg-white p-2 rounded-sm border border-[#e6e6e6] flex flex-col sm:flex-row gap-6 hover:shadow-lg transition-shadow">
-              <div className="w-full sm:w-1/2 overflow-hidden rounded-sm bg-[#0067b8]/5">
-                <img src="/technical_skills.png" alt="Technology Pillar" className="w-full h-full object-cover" />
-              </div>
-              <div className="w-full sm:w-1/2 p-4 flex flex-col justify-center">
-                <span className="text-[#0067b8] font-bold text-xs uppercase tracking-[0.2em] mb-3">Featured</span>
-                <h3 className="text-2xl font-semibold text-black mb-4">Advanced Tech</h3>
-                <p className="text-[#616161] text-sm mb-6 leading-relaxed">Master Azure, Copilot, and cloud infrastructure with expert-led paths.</p>
-                <Button onClick={() => handleNavigateToCoursesPage('technology')} variant="link" className="p-0 h-auto justify-start text-[#0067b8] font-bold text-sm hover:translate-x-1 transition-transform">
-                  Explore Tech →
-                </Button>
-              </div>
+      {/* Infinite Scrolling Category Marquee (Reverted to Slider) */}
+      <section className="py-20 lg:py-24 bg-[#f2f2f2] overflow-hidden">
+        <div className="container mx-auto px-4 lg:px-6 max-w-7xl mb-12">
+          <div className="flex items-center gap-4">
+            <div className="w-2 h-10 bg-[#0067b8] rounded-full" />
+            <div>
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-black">Choose your learning path.</h2>
+              <p className="text-[#616161] text-base">Tailored experiences for every discipline.</p>
             </div>
+          </div>
+        </div>
 
-            {/* Other Pillars */}
-            {[
-              { id: "well-being", label: "Well-being", icon: <Heart className="w-6 h-6" />, desc: "Yoga, health, and balanced lifestyle practices.", color: "bg-orange-500" },
-              { id: "personal-mastery", label: "Growth", icon: <Star className="w-6 h-6" />, desc: "Strategies for personal and professional development.", color: "bg-blue-500" },
-              { id: "creative-arts", label: "Creative Arts", icon: <Palette className="w-6 h-6" />, desc: "Expression through digital and physical art forms.", color: "bg-purple-500" },
-              { id: "certification", label: "Certifications", icon: <BookOpen className="w-6 h-6" />, desc: "Validate your skills with professional badges.", color: "bg-emerald-500" },
-            ].map((pillar) => (
-              <div 
-                key={pillar.id}
-                onClick={() => handleNavigateToCoursesPage(pillar.id)}
-                className="group cursor-pointer bg-white p-8 rounded-sm border border-[#e6e6e6] hover:border-[#0067b8] hover:shadow-xl transition-all flex flex-col justify-between"
-              >
-                <div className={`${pillar.color} w-12 h-12 rounded-sm flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform`}>
-                  {pillar.icon}
+        <div className="relative">
+          {/* Fading Edges */}
+          <div className="absolute inset-y-0 left-0 w-40 bg-gradient-to-r from-[#f2f2f2] via-[#f2f2f2]/80 to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-40 bg-gradient-to-l from-[#f2f2f2] via-[#f2f2f2]/80 to-transparent z-10 pointer-events-none" />
+          
+          <div className="flex">
+            <motion.div 
+              animate={{ x: ["0%", "-50%"] }}
+              transition={{ 
+                duration: 40, 
+                repeat: Infinity, 
+                ease: "linear"
+              }}
+              className="flex gap-6 pr-6"
+            >
+              {[...(categories?.length > 0 ? categories : topLevelCategories), ...(categories?.length > 0 ? categories : topLevelCategories), ...(categories?.length > 0 ? categories : topLevelCategories), ...(categories?.length > 0 ? categories : topLevelCategories)].map((category, idx) => (
+                <div 
+                  key={`${category.id}-${idx}`}
+                  onClick={() => handleNavigateToCoursesPage(category.id)}
+                  className="flex-shrink-0 w-72 bg-white px-8 py-10 rounded-sm border border-[#e6e6e6] hover:border-[#0067b8] hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.08)] cursor-pointer transition-all duration-300 group/item active:scale-95 flex flex-col items-center text-center"
+                >
+                  <div className="w-16 h-16 rounded-sm bg-[#f2f2f2] group-hover/item:bg-[#0067b8] flex items-center justify-center mb-6 transition-all duration-300">
+                    <Star className="w-8 h-8 text-[#616161] group-hover/item:text-white" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-black mb-2">{category.label}</h3>
+                  <p className="text-[#616161] text-xs leading-relaxed line-clamp-2">Master professional skills with expert-led paths.</p>
                 </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-black mb-3">{pillar.label}</h3>
-                  <p className="text-[#616161] text-sm mb-6 leading-relaxed">{pillar.desc}</p>
-                </div>
-                <span className="text-[#0067b8] font-bold text-xs uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                  View Path →
-                </span>
-              </div>
-            ))}
+              ))}
+            </motion.div>
           </div>
         </div>
       </section>
