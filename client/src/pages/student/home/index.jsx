@@ -99,52 +99,161 @@ function StudentHomePage() {
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       {/* Hero Section */}
-      <section className="relative pt-20 pb-12 lg:pt-24 lg:pb-32 bg-[#f2f2f2] overflow-hidden border-b border-[#e6e6e6]">
+      <section className="relative pt-24 pb-20 lg:pt-32 lg:pb-40 bg-[#f2f2f2] overflow-hidden border-b border-[#e6e6e6]">
+        {/* Background Decorative Elements */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full opacity-30">
+            <svg width="100%" height="100%" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="grad1" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                  <stop offset="0%" style={{ stopColor: '#0067b8', stopOpacity: 0.1 }} />
+                  <stop offset="100%" style={{ stopColor: '#f2f2f2', stopOpacity: 0 }} />
+                </radialGradient>
+              </defs>
+              <circle cx="200" cy="200" r="400" fill="url(#grad1)" />
+              <circle cx="800" cy="800" r="400" fill="url(#grad1)" />
+            </svg>
+          </div>
+          {/* Subtle Geometric Accents */}
+          <motion.div 
+            animate={{ 
+              y: [0, -20, 0],
+              rotate: [0, 5, 0]
+            }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-1/4 right-[10%] w-32 h-32 border-2 border-[#0067b8]/5 rounded-sm" 
+          />
+          <motion.div 
+            animate={{ 
+              x: [0, 20, 0],
+              scale: [1, 1.1, 1]
+            }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-1/4 left-[5%] w-48 h-48 bg-[#0067b8]/5 rounded-full blur-3xl" 
+          />
+        </div>
+
         <div className="container mx-auto px-4 lg:px-6 relative z-10 max-w-7xl">
-          <div className="flex flex-col lg:flex-row items-center gap-12">
+          <div className="flex flex-col lg:flex-row items-center gap-16 xl:gap-24">
             {/* Left Content */}
-            <div className="lg:w-3/5 text-center lg:text-left">
-              <div className="inline-block bg-[#0067b8]/10 text-[#0067b8] text-xs font-semibold uppercase tracking-wider px-3 py-1 rounded-sm mb-6">
-                Redefining Online Learning
-              </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-black leading-tight mb-6">
-                Skills for your future. <br />
-                <span className="text-[#0067b8]">Start your journey today.</span>
-              </h1>
-              <p className="text-[#616161] text-lg md:text-xl max-w-2xl mb-10 leading-relaxed mx-auto lg:mx-0">
-                Access world-class training and documentation on Bhavin Academy. 
-                Learn at your own pace with our comprehensive, expert-led courses.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+            <motion.div 
+              initial="initial"
+              animate="animate"
+              variants={{
+                initial: { opacity: 0 },
+                animate: { opacity: 1, transition: { staggerChildren: 0.2 } }
+              }}
+              className="lg:w-3/5 text-center lg:text-left"
+            >
+              <motion.div 
+                variants={{
+                  initial: { opacity: 0, y: 10 },
+                  animate: { opacity: 1, y: 0 }
+                }}
+                className="inline-flex items-center gap-2 bg-[#0067b8]/10 text-[#0067b8] text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-sm mb-8"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-[#0067b8] animate-pulse" />
+                Empowering the future of tech
+              </motion.div>
+              
+              <motion.h1 
+                variants={{
+                  initial: { opacity: 0, y: 20 },
+                  animate: { opacity: 1, y: 0 }
+                }}
+                className="text-4xl md:text-6xl lg:text-7xl font-semibold tracking-tight text-black leading-[1.1] mb-8"
+              >
+                Skills for your <br />
+                <span className="text-[#0067b8]">professional journey.</span>
+              </motion.h1>
+              
+              <motion.p 
+                variants={{
+                  initial: { opacity: 0, y: 20 },
+                  animate: { opacity: 1, y: 0 }
+                }}
+                className="text-[#616161] text-lg md:text-xl max-w-2xl mb-12 leading-relaxed mx-auto lg:mx-0"
+              >
+                Discover professional-grade training and developer documentation. 
+                Master new skills at your own pace with expert-led courses designed for real-world impact.
+              </motion.p>
+              
+              <motion.div 
+                variants={{
+                  initial: { opacity: 0, y: 20 },
+                  animate: { opacity: 1, y: 0 }
+                }}
+                className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
+              >
                 <Button 
                   onClick={() => navigate("/courses")} 
-                  className="bg-[#0067b8] text-white rounded-sm px-8 h-12 text-base font-semibold hover:bg-[#005a9e] transition-colors w-full sm:w-auto shadow-sm"
+                  className="bg-[#0067b8] text-white rounded-sm px-10 h-14 text-base font-semibold hover:bg-[#005a9e] transition-all hover:shadow-lg w-full sm:w-auto active:scale-95"
                 >
                   Explore Documentation
                 </Button>
                 <Button 
                   variant="outline" 
                   onClick={() => navigate("/about")}
-                  className="bg-white text-black border-[#e6e6e6] rounded-sm px-8 h-12 text-base font-semibold hover:bg-[#f2f2f2] w-full sm:w-auto transition-colors"
+                  className="bg-white text-black border-[#e6e6e6] rounded-sm px-10 h-14 text-base font-semibold hover:bg-[#f2f2f2] w-full sm:w-auto transition-all active:scale-95"
                 >
-                  Learn More
+                  How it works
                 </Button>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
             {/* Right Image/Graphic */}
-            <div className="lg:w-2/5 relative flex justify-center">
-              <div className="relative w-full aspect-square max-w-[440px] rounded-sm overflow-hidden border border-[#e6e6e6] bg-white shadow-lg">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="lg:w-2/5 relative"
+            >
+              <div className="relative z-10 w-full aspect-square max-w-[500px] rounded-sm overflow-hidden bg-white shadow-2xl border border-[#e6e6e6] group">
                 <img 
-                  src="/hero_portrait_dark.png" 
-                  alt="Learning" 
-                  className="w-full h-full object-cover grayscale-[20%]" 
+                  src="/hero_learning_illustration.png" 
+                  alt="Professional Learning Illustration" 
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                 />
               </div>
-              {/* Subtle accent squares common in MS designs */}
-              <div className="absolute -top-4 -right-4 w-24 h-24 bg-[#0067b8]/10 -z-10" />
-              <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-[#0067b8]/5 -z-10" />
-            </div>
+              
+              {/* Decorative Floating Cards/Elements */}
+              <motion.div 
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -top-6 -left-6 z-20 bg-white p-4 rounded-sm shadow-xl border border-[#e6e6e6] hidden sm:block"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-sm bg-[#0067b8]/10 flex items-center justify-center">
+                    <Star className="w-5 h-5 text-[#0067b8]" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-semibold text-[#616161] uppercase tracking-wider">Top Rated</p>
+                    <p className="text-sm font-semibold text-black">Master Class</p>
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div 
+                animate={{ y: [0, 10, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                className="absolute -bottom-6 -right-6 z-20 bg-white p-4 rounded-sm shadow-xl border border-[#e6e6e6] hidden sm:block"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex -space-x-2">
+                    {[1, 2, 3].map(i => (
+                      <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-[#f2f2f2]" />
+                    ))}
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-semibold text-[#616161] uppercase tracking-wider">Join Over</p>
+                    <p className="text-sm font-semibold text-black">10k+ Learners</p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Offset border frame */}
+              <div className="absolute top-6 left-6 w-full h-full border-2 border-[#0067b8]/10 rounded-sm -z-10" />
+            </motion.div>
           </div>
         </div>
       </section>
