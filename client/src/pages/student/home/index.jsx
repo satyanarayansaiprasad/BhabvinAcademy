@@ -258,31 +258,74 @@ function StudentHomePage() {
         </div>
       </section>
 
+      {/* Category Marquee Section */}
+      <section className="bg-white border-b border-[#e6e6e6] py-8 lg:py-12 overflow-hidden">
+        <div className="container mx-auto px-4 lg:px-6 mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-1.5 h-6 bg-[#0067b8] rounded-full" />
+            <h2 className="text-sm font-semibold uppercase tracking-widest text-[#616161]">Explore Skill Pillars</h2>
+          </div>
+        </div>
+        
+        <div className="relative group">
+          {/* Gradients for fading edges */}
+          <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+          
+          <div className="flex overflow-hidden whitespace-nowrap">
+            <motion.div 
+              animate={{ x: ["0%", "-50%"] }}
+              transition={{ 
+                duration: 30, 
+                repeat: Infinity, 
+                ease: "linear"
+              }}
+              className="flex gap-4 md:gap-6 py-4 px-4"
+            >
+              {[...categories, ...categories, ...categories, ...categories].map((category, idx) => (
+                <div 
+                  key={`${category.id}-${idx}`}
+                  onClick={() => handleNavigateToCoursesPage(category.id)}
+                  className="inline-flex items-center gap-3 px-6 py-4 bg-white border border-[#e6e6e6] rounded-sm hover:border-[#0067b8] hover:shadow-md cursor-pointer transition-all group/item"
+                >
+                  <div className="w-8 h-8 rounded-sm bg-[#f2f2f2] group-hover/item:bg-[#0067b8]/10 flex items-center justify-center transition-colors">
+                    <Star className="w-4 h-4 text-[#616161] group-hover/item:text-[#0067b8]" />
+                  </div>
+                  <span className="text-sm font-semibold text-black tracking-tight">{category.label}</span>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* Course Sections */}
-      <section className="py-16 md:py-24 space-y-24 bg-white">
+      <section className="py-20 md:py-32 space-y-32 bg-white">
         {[
           { key: "trending", label: "Most popular", color: "text-[#0067b8]", title: "Popular paths.", btn: "View everything", btnColor: "text-[#0067b8] hover:bg-[#f2f2f2]" },
           { key: "recent", label: "Recently added", color: "text-[#616161]", title: "New releases.", btn: null, btnColor: "" },
         ].map(({ key, label, color, title, btn, btnColor }) => (
           <div key={key} className="container mx-auto px-4 lg:px-6 max-w-7xl">
-            <div className="flex items-end justify-between mb-8 border-b border-[#e6e6e6] pb-4">
+            <div className="flex items-end justify-between mb-10 border-b border-[#e6e6e6] pb-6">
               <div>
-                <span className={`${color} font-semibold text-xs uppercase tracking-wider block mb-1`}>{label}</span>
-                <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-black">{title}</h2>
+                <span className={`${color} font-semibold text-xs uppercase tracking-wider block mb-2`}>{label}</span>
+                <h2 className="text-2xl md:text-4xl font-semibold tracking-tight text-black">{title}</h2>
               </div>
               {btn && (
-                <Button onClick={() => navigate("/courses")} variant="ghost" className={`font-semibold rounded-sm h-10 text-sm ${btnColor} transition-none`}>
+                <Button onClick={() => navigate("/courses")} variant="ghost" className={`font-semibold rounded-sm h-12 px-6 text-sm ${btnColor} transition-none`}>
                   {btn} →
                 </Button>
               )}
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {featuredSections?.[key]?.length > 0 ? (
                 featuredSections[key].map((course, index) => (
                   <CourseCard key={course._id} course={course} handleCourseNavigate={handleCourseNavigate} index={index} />
                 ))
               ) : (
-                <p className="text-[#616161] font-normal col-span-full py-10">No courses matching your criteria were found.</p>
+                <p className="text-[#616161] font-normal col-span-full py-16 text-center bg-[#f2f2f2] rounded-sm border border-dashed border-[#e6e6e6]">
+                  No courses matching your criteria were found.
+                </p>
               )}
             </div>
           </div>
@@ -290,31 +333,38 @@ function StudentHomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 md:py-32 bg-[#f2f2f2] border-t border-[#e6e6e6]">
+      <section className="py-24 md:py-40 bg-[#f2f2f2] border-t border-[#e6e6e6]">
         <div className="container mx-auto px-4 lg:px-6 max-w-5xl">
           <div className="text-center">
-            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-black mb-6">
-              Unlock your potential. <br /> Start learning for free today.
-            </h2>
-            <p className="text-[#616161] text-lg mb-10 max-w-2xl mx-auto">
-              Whether you're just starting out or looking to advance your career, 
-              Bhavin Academy has the resources you need to succeed.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button
-                onClick={() => navigate("/auth")}
-                className="bg-[#0067b8] text-white hover:bg-[#005a9e] rounded-sm h-12 px-10 text-base font-semibold transition-none w-full sm:w-auto shadow-sm"
-              >
-                Join Now
-              </Button>
-              <Button
-                onClick={() => navigate("/courses")}
-                variant="outline"
-                className="bg-white text-black border-[#e6e6e6] rounded-sm h-12 px-10 text-base font-semibold hover:bg-[#f2f2f2] w-full sm:w-auto transition-none"
-              >
-                Browse Catalog
-              </Button>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+            >
+              <h2 className="text-3xl md:text-5xl font-semibold tracking-tight text-black mb-8 leading-tight">
+                Unlock your potential. <br /> Start learning for free today.
+              </h2>
+              <p className="text-[#616161] text-lg md:text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
+                Whether you're just starting out or looking to advance your career, 
+                Bhavin Academy has the resources you need to succeed.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Button
+                  onClick={() => navigate("/auth")}
+                  className="bg-[#0067b8] text-white hover:bg-[#005a9e] rounded-sm h-14 px-12 text-base font-semibold transition-all hover:shadow-lg w-full sm:w-auto active:scale-95"
+                >
+                  Join Now
+                </Button>
+                <Button
+                  onClick={() => navigate("/courses")}
+                  variant="outline"
+                  className="bg-white text-black border-[#e6e6e6] rounded-sm h-14 px-12 text-base font-semibold hover:bg-[#f2f2f2] w-full sm:w-auto transition-all active:scale-95"
+                >
+                  Browse Catalog
+                </Button>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
