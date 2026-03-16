@@ -2,12 +2,13 @@ import InstructorCourses from "@/components/instructor-view/courses";
 import InstructorDashboard from "@/components/instructor-view/dashboard";
 import InstructorHomeConfig from "@/components/instructor-view/home-config";
 import InstructorUsers from "@/components/instructor-view/users";
+import InstructorStudentsData from "@/components/instructor-view/students";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AuthContext } from "@/context/auth-context";
 import { InstructorContext } from "@/context/instructor-context";
 import { fetchInstructorCourseListService } from "@/services";
-import { BarChart, Book, LogOut, LayoutDashboard, GraduationCap, Settings as SettingsIcon, User } from "lucide-react";
+import { BarChart, Book, LogOut, LayoutDashboard, GraduationCap, Settings as SettingsIcon, User, Users } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -52,6 +53,12 @@ function InstructorDashboardpage() {
       label: "Users",
       value: "users",
       component: <InstructorUsers />,
+    },
+    {
+      icon: Users,
+      label: "Students",
+      value: "students",
+      component: <InstructorStudentsData />,
     },
   ];
 

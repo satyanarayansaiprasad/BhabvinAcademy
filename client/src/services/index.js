@@ -275,3 +275,8 @@ export async function microsoftLoginService(formData) {
   const { data } = await axiosInstance.post("/auth/microsoft-login", formData);
   return data;
 }
+
+export async function fetchAdminStudentProgressService() {
+  const { data } = await axiosInstance.get("/instructor/student-progress/get");
+  return data;
+}
