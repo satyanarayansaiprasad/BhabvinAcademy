@@ -155,137 +155,116 @@ function StudentViewCourseDetailsPage() {
   };
 
   return (
-    <div className="bg-[#FBFBFC] min-h-screen">
-      {/* Cinematic Hero Section */}
-      <section className="relative bg-zinc-950 text-white pt-32 pb-24 overflow-hidden">
-        {/* Abstract Glow */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
-
-        <div className="container mx-auto px-4 lg:px-8 relative z-10">
+    <div className="bg-white min-h-screen">
+      {/* Breadcrumb / Category Header */}
+      <section className="bg-[#f2f2f2] border-b border-[#e6e6e6] pt-20 pb-8 lg:pt-24">
+        <div className="container mx-auto px-4 lg:px-6 relative z-10">
           <div className="max-w-4xl">
-            <motion.div {...fadeUp} className="flex items-center gap-3 mb-6">
-              <span className="px-3 py-1 rounded-full bg-blue-500/80 backdrop-blur-md text-[10px] font-bold tracking-widest uppercase">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="px-2 py-0.5 rounded-sm bg-[#0067b8] text-white text-[10px] font-semibold tracking-wider uppercase">
                 {studentViewCourseDetails?.category}
               </span>
-              <span className="flex items-center gap-1 text-yellow-500 text-sm font-bold">
-                <Star className="h-4 w-4 fill-current" />
+              <span className="flex items-center gap-1 text-black text-sm font-semibold">
+                <Star className="h-4 w-4 fill-current text-black" />
                 4.9 (1,240 reviews)
               </span>
-            </motion.div>
+            </div>
 
-            <motion.h1
-              {...fadeUp}
-              transition={{ delay: 0.1 }}
-              className="text-3xl md:text-[50px] font-black tracking-tighter leading-tight mb-8"
-            >
+            <h1 className="text-3xl md:text-5xl font-semibold tracking-tight text-black leading-tight mb-4">
               {studentViewCourseDetails?.title}
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              {...fadeUp}
-              transition={{ delay: 0.2 }}
-              className="text-base text-zinc-400 font-medium mb-12 leading-relaxed"
-            >
+            <p className="text-lg text-[#616161] font-normal mb-8 leading-relaxed max-w-3xl">
               {studentViewCourseDetails?.subtitle}
-            </motion.p>
+            </p>
 
-            <motion.div
-              {...fadeUp}
-              transition={{ delay: 0.3 }}
-              className="flex flex-wrap items-center gap-8 text-zinc-400 font-bold text-sm tracking-tight"
-            >
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 overflow-hidden">
+            <div className="flex flex-wrap items-center gap-6 text-[#616161] font-semibold text-sm">
+              <div className="flex items-center gap-2 text-black">
+                <div className="w-6 h-6 rounded-full bg-[#e6e6e6] border border-[#d2d2d2] overflow-hidden">
                   <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=100" alt="Avatar" />
                 </div>
                 <span>{studentViewCourseDetails?.instructorName}</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <Clock className="h-4 w-4" />
                 <span>Last updated {studentViewCourseDetails?.date?.split("T")[0]}</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <Globe className="h-4 w-4" />
                 <span>{studentViewCourseDetails?.primaryLanguage}</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <Users className="h-4 w-4" />
                 <span>{studentViewCourseDetails?.students?.length} enrolled</span>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
 
-      <div className="container mx-auto px-4 lg:px-8 py-16">
-        <div className="flex flex-col lg:flex-row gap-16">
+      <div className="container mx-auto px-4 lg:px-6 py-12">
+        <div className="flex flex-col lg:flex-row gap-12">
           {/* Main Content */}
-          <main className="flex-1 space-y-16">
+          <main className="flex-1 space-y-12">
 
             {/* What you'll learn */}
-            <motion.section
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              className="bg-white rounded-[40px] border border-zinc-200/60 p-10 shadow-sm"
-            >
-              <h2 className="text-[22px] font-black tracking-tighter mb-8 text-zinc-900 flex items-center gap-3">
-                <Info className="h-8 w-8 text-blue-600" />
+            <section className="bg-white rounded-sm border border-[#e6e6e6] p-8">
+              <h2 className="text-xl font-semibold tracking-tight mb-6 text-black flex items-center gap-3">
+                <Info className="h-6 w-6 text-[#0067b8]" />
                 What you'll learn.
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {studentViewCourseDetails?.objectives
                   ?.split("\n")
                   .map((objective, index) => (
-                    <div key={index} className="flex items-start gap-4 group">
-                      <div className="mt-1 flex-shrink-0 w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
-                        <CheckCircle className="h-4 w-4 text-blue-600 group-hover:text-white transition-colors" />
+                    <div key={index} className="flex items-start gap-3">
+                      <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-sm bg-[#0067b8]/5 flex items-center justify-center">
+                        <CheckCircle className="h-3.5 w-3.5 text-[#0067b8]" />
                       </div>
-                      <span className="text-zinc-600 font-medium leading-relaxed group-hover:text-zinc-900 transition-colors">{objective}</span>
+                      <span className="text-[#616161] text-sm font-normal leading-normal">{objective}</span>
                     </div>
                   ))}
               </div>
-            </motion.section>
+            </section>
 
             {/* Curriculum */}
             <section>
-              <h2 className="text-[22px] font-black tracking-tighter mb-8 text-zinc-900">Curriculum.</h2>
-              <div className="bg-white rounded-[40px] border border-zinc-200/60 shadow-sm divide-y divide-zinc-100 overflow-hidden">
+              <h2 className="text-xl font-semibold tracking-tight mb-6 text-black">Curriculum.</h2>
+              <div className="bg-white rounded-sm border border-[#e6e6e6] divide-y divide-[#e6e6e6] overflow-hidden">
                 {studentViewCourseDetails?.curriculum?.map(
                   (curriculumItem, index) => (
-                    <motion.div
+                    <div
                       key={index}
-                      whileHover={{ x: 10 }}
-                      className={`${curriculumItem?.freePreview
-                        ? "cursor-pointer hover:bg-zinc-50/50"
-                        : "cursor-not-allowed opacity-60"
-                        } flex items-center justify-between p-8 transition-all group`}
+                      className={`flex items-center justify-between p-6 transition-colors ${curriculumItem?.freePreview
+                        ? "cursor-pointer hover:bg-[#f2f2f2]"
+                        : "opacity-60"
+                        }`}
                       onClick={
                         curriculumItem?.freePreview
                           ? () => handleSetFreePreview(curriculumItem)
                           : null
                       }
                     >
-                      <div className="flex items-center gap-6">
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${curriculumItem?.freePreview ? "bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white" : "bg-zinc-100 text-zinc-400"}`}>
+                      <div className="flex items-center gap-4">
+                        <div className={`w-10 h-10 rounded-sm flex items-center justify-center ${curriculumItem?.freePreview ? "bg-[#0067b8]/10 text-[#0067b8]" : "bg-[#f2f2f2] text-[#616161]"}`}>
                           {curriculumItem?.freePreview ? (
-                            <Play className="h-5 w-5 fill-current" />
+                            <Play className="h-4 w-4 fill-current" />
                           ) : (
-                            <Lock className="h-5 w-5" />
+                            <Lock className="h-4 w-4" />
                           )}
                         </div>
                         <div>
-                          <p className="font-bold text-zinc-900 text-base group-hover:text-blue-600 transition-colors">{curriculumItem?.title}</p>
-                          <p className="text-zinc-400 text-xs font-medium">{curriculumItem?.freePreview ? "Free Preview" : "Paid Content"}</p>
+                          <p className="font-semibold text-black text-sm">{curriculumItem?.title}</p>
+                          <p className="text-[#616161] text-xs font-normal">{curriculumItem?.freePreview ? "Free Preview" : "Private"}</p>
                         </div>
                       </div>
 
                       {curriculumItem?.freePreview && (
-                        <span className="text-blue-600 font-black text-xs uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                          Watch now →
+                        <span className="text-[#0067b8] font-semibold text-xs transition-opacity">
+                          Watch →
                         </span>
                       )}
-                    </motion.div>
+                    </div>
                   )
                 )}
               </div>
@@ -293,9 +272,9 @@ function StudentViewCourseDetailsPage() {
 
             {/* Description */}
             <section>
-              <h2 className="text-[22px] font-black tracking-tighter mb-8 text-zinc-900">Description.</h2>
-              <div className="bg-white rounded-[40px] border border-zinc-200/60 p-10 shadow-sm">
-                <p className="text-base text-zinc-600 leading-relaxed font-medium whitespace-pre-line">
+              <h2 className="text-xl font-semibold tracking-tight mb-6 text-black">Description.</h2>
+              <div className="bg-white rounded-sm border border-[#e6e6e6] p-8">
+                <p className="text-sm text-[#616161] leading-relaxed font-normal whitespace-pre-line">
                   {studentViewCourseDetails?.description}
                 </p>
               </div>
@@ -303,80 +282,76 @@ function StudentViewCourseDetailsPage() {
           </main>
 
           {/* Sticky Enrollment Sidebar */}
-          <aside className="w-full lg:w-[450px] shrink-0">
-            <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="sticky top-28"
-            >
-              <Card className="rounded-[48px] border-zinc-200/60 shadow-2xl overflow-hidden group">
+          <aside className="w-full lg:w-[400px] shrink-0">
+            <div className="sticky top-24">
+              <Card className="rounded-sm border-[#e6e6e6] shadow-md overflow-hidden bg-white">
                 <CardContent className="p-0">
                   {/* Preview Container */}
-                  <div className="relative aspect-video bg-zinc-900 overflow-hidden">
+                  <div className="relative aspect-video bg-[#000000] overflow-hidden group">
                     <img
                       src={studentViewCourseDetails?.image}
                       alt={studentViewCourseDetails?.title}
-                      className="w-full h-full object-cover opacity-60 transition-transform duration-1000 group-hover:scale-110"
+                      className="w-full h-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-700"
                     />
-                    <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center text-white">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center text-white bg-black/20">
                       <div
                         onClick={() => {
                           if (getIndexOfFreePreviewUrl !== -1) {
                             handleSetFreePreview(studentViewCourseDetails?.curriculum[getIndexOfFreePreviewUrl]);
                           }
                         }}
-                        className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center mb-4 cursor-pointer hover:scale-110 transition-transform shadow-2xl shadow-white/20"
+                        className="w-14 h-14 rounded-full bg-white text-black flex items-center justify-center mb-4 cursor-pointer hover:scale-110 transition-transform shadow-lg"
                       >
-                        <Play className="h-6 w-6 fill-current" />
+                        <Play className="h-5 w-5 fill-current" />
                       </div>
-                      <p className="font-bold text-sm tracking-widest uppercase mb-1">Preview this course</p>
+                      <p className="font-semibold text-xs tracking-wider uppercase">Preview course</p>
                     </div>
                   </div>
 
-                  <div className="p-10">
-                    <div className="flex items-center justify-between mb-8">
+                  <div className="p-8">
+                    <div className="flex items-center justify-between mb-6">
                       <div>
-                        <p className="text-zinc-400 font-bold uppercase tracking-widest text-[10px] mb-1">Lifetime Access</p>
-                        <h3 className="text-[28px] font-black tracking-tighter text-zinc-900">₹{studentViewCourseDetails?.pricing}</h3>
+                        <p className="text-[#616161] font-semibold uppercase tracking-wider text-[10px] mb-1">Lifetime Access</p>
+                        <h3 className="text-3xl font-bold tracking-tight text-black">₹{studentViewCourseDetails?.pricing}</h3>
                       </div>
                       <Button
                         onClick={handleShare}
                         variant="ghost"
-                        className="rounded-full w-12 h-12 p-0 text-zinc-400 border border-zinc-100 hover:bg-zinc-50"
+                        className="rounded-sm w-10 h-10 p-0 text-[#616161] border border-[#e6e6e6] hover:bg-[#f2f2f2] transition-none"
                       >
-                        <Share2 className="h-5 w-5" />
+                        <Share2 className="h-4 w-4" />
                       </Button>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       {isCoursePurchased ? (
                         <Button
                           onClick={() => navigate(`/course-progress/${studentViewCourseDetails?._id}`)}
-                          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-[24px] h-16 text-xl font-bold shadow-xl shadow-emerald-100 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+                          className="w-full bg-[#0067b8] hover:bg-[#005a9e] text-white rounded-sm h-12 text-base font-semibold transition-none flex items-center justify-center gap-2"
                         >
-                          <PlayCircle className="w-6 h-6" />
-                          Continue Learning
+                          <PlayCircle className="w-5 h-5" />
+                          Start learning
                         </Button>
                       ) : (
                         <>
                           <Button
                             onClick={handleBuyNow}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-[24px] h-16 text-xl font-bold shadow-xl shadow-blue-100 transition-all hover:scale-105 active:scale-95"
+                            className="w-full bg-[#0067b8] hover:bg-[#005a9e] text-white rounded-sm h-12 text-base font-semibold transition-none"
                           >
-                            Buy Now
+                            Buy now
                           </Button>
                           <Button
                             variant="outline"
                             onClick={handleAddToCartLocal}
-                            className="w-full rounded-[24px] h-16 text-lg font-bold border-zinc-200 text-zinc-700 hover:bg-zinc-50"
+                            className="w-full rounded-sm h-12 text-base font-semibold border-[#e6e6e6] text-black hover:bg-[#f2f2f2] transition-none"
                           >
-                            {isCourseInCart ? "Go to Cart" : "Add to Cart"}
+                            {isCourseInCart ? "In cart" : "Add to cart"}
                           </Button>
                         </>
                       )}
                     </div>
 
-                    <div className="mt-8 pt-8 border-t border-zinc-100 flex items-center justify-center gap-2 text-zinc-400 font-medium text-xs">
+                    <div className="mt-6 pt-6 border-t border-[#e6e6e6] flex items-center justify-center gap-2 text-[#616161] font-normal text-xs">
                       <Lock className="h-3 w-3" />
                       30-Day Money-Back Guarantee
                     </div>
@@ -384,15 +359,14 @@ function StudentViewCourseDetailsPage() {
                 </CardContent>
               </Card>
 
-              <div className="mt-8 px-6 text-center text-zinc-400 text-sm font-medium">
-                Get full access to study materials, quizzes, and a certificate of completion.
+              <div className="mt-6 px-4 text-center text-[#616161] text-xs font-normal">
+                Join thousands of students and start your journey today.
               </div>
-            </motion.div>
+            </div>
           </aside>
         </div>
       </div>
 
-      {/* Free Preview Dialog */}
       <Dialog
         open={showFreePreviewDialog}
         onOpenChange={() => {
@@ -400,7 +374,7 @@ function StudentViewCourseDetailsPage() {
           setDisplayCurrentVideoFreePreview(null);
         }}
       >
-        <DialogContent className="max-w-[1000px] border-none bg-zinc-950 p-0 rounded-[40px] overflow-hidden text-white shadow-3xl">
+        <DialogContent className="max-w-[1000px] border-none bg-black p-0 rounded-sm overflow-hidden text-white shadow-2xl">
           <div className="flex flex-col lg:flex-row h-full">
             <div className="flex-1 bg-black aspect-video lg:aspect-auto">
               <VideoPlayer
@@ -410,36 +384,35 @@ function StudentViewCourseDetailsPage() {
               />
             </div>
 
-            <div className="w-full lg:w-[350px] p-8 bg-zinc-900 border-l border-white/5 flex flex-col">
-              <DialogHeader className="mb-8">
-                <DialogTitle className="text-2xl font-black tracking-tighter text-white">Course Preview.</DialogTitle>
-                <p className="text-zinc-500 font-medium">Watch free samples from the curriculum.</p>
+            <div className="w-full lg:w-[320px] p-6 bg-[#1a1a1a] border-l border-white/10 flex flex-col">
+              <DialogHeader className="mb-6">
+                <DialogTitle className="text-xl font-semibold tracking-tight text-white">Course Preview</DialogTitle>
+                <p className="text-[#a1a1a1] text-xs font-normal">Watch samples from the curriculum.</p>
               </DialogHeader>
 
-              <div className="flex-1 overflow-y-auto space-y-4 hide-scrollbar">
+              <div className="flex-1 overflow-y-auto space-y-2 hide-scrollbar">
                 {studentViewCourseDetails?.curriculum
                   ?.filter((item) => item.freePreview)
                   .map((filteredItem, idx) => (
-                    <motion.div
+                    <div
                       key={idx}
-                      whileHover={{ x: 4 }}
                       onClick={() => handleSetFreePreview(filteredItem)}
-                      className={`p-4 rounded-2xl cursor-pointer transition-all border ${displayCurrentVideoFreePreview === filteredItem.videoUrl ? "bg-blue-600 border-blue-500 shadow-lg shadow-blue-600/20" : "bg-white/5 border-white/5 hover:bg-white/10"}`}
+                      className={`p-3 rounded-sm cursor-pointer transition-colors border ${displayCurrentVideoFreePreview === filteredItem.videoUrl ? "bg-[#0067b8] border-[#0067b8]" : "bg-white/5 border-transparent hover:bg-white/10"}`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${displayCurrentVideoFreePreview === filteredItem.videoUrl ? "bg-white/20" : "bg-blue-600/20"}`}>
-                          <Play className={`h-4 w-4 ${displayCurrentVideoFreePreview === filteredItem.videoUrl ? "text-white" : "text-blue-500"} fill-current`} />
+                        <div className={`w-8 h-8 rounded-sm flex items-center justify-center ${displayCurrentVideoFreePreview === filteredItem.videoUrl ? "bg-white/20" : "bg-[#0067b8]/20"}`}>
+                          <Play className={`h-3.5 w-3.5 ${displayCurrentVideoFreePreview === filteredItem.videoUrl ? "text-white" : "text-[#0067b8]"} fill-current`} />
                         </div>
-                        <span className="font-bold text-sm tracking-tight line-clamp-1">{filteredItem?.title}</span>
+                        <span className="font-semibold text-sm tracking-tight line-clamp-1">{filteredItem?.title}</span>
                       </div>
-                    </motion.div>
+                    </div>
                   ))}
               </div>
 
-              <DialogFooter className="mt-8 pt-8 border-t border-white/5">
+              <DialogFooter className="mt-6 pt-6 border-t border-white/10">
                 <DialogClose asChild>
-                  <Button type="button" className="w-full bg-white/5 hover:bg-white/10 text-white rounded-2xl border-none">
-                    Close Preview
+                  <Button type="button" className="w-full bg-white/10 hover:bg-white/20 text-white rounded-sm h-10 transition-none border-none text-sm font-semibold">
+                    Close
                   </Button>
                 </DialogClose>
               </DialogFooter>

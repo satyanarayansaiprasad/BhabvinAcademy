@@ -94,7 +94,7 @@ function CheckoutPage() {
                         email: auth?.user?.userEmail,
                     },
                     theme: {
-                        color: "#09090b",
+                        color: "#0067b8",
                     },
                 };
 
@@ -120,92 +120,80 @@ function CheckoutPage() {
     }
 
     return (
-        <div className="bg-zinc-50 min-h-screen pt-20 xs:pt-24 md:pt-32 pb-16 xs:pb-20 relative">
-            {isProcessing && (
-                <div className="fixed inset-0 bg-white/80 backdrop-blur-sm z-[100] flex flex-col items-center justify-center p-6 text-center">
-                    <motion.div
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="flex flex-col items-center"
-                    >
-                        <Loader2 className="w-12 h-12 text-zinc-900 animate-spin mb-4" />
-                        <h2 className="text-2xl font-black tracking-tighter text-zinc-900 mb-2">Verifying your payment...</h2>
-                        <p className="text-zinc-500 font-medium">Please do not close or refresh this page.</p>
-                    </motion.div>
-                </div>
-            )}
-            <div className="container mx-auto px-4 xs:px-5 lg:px-8 max-w-6xl">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="grid grid-cols-1 lg:grid-cols-3 gap-6 xs:gap-8 md:gap-12"
-                >
-                    {/* Course List */}
-                    <div className="lg:col-span-2 space-y-4 xs:space-y-8">
-                        <h1 className="text-3xl xs:text-4xl font-black tracking-tighter text-zinc-900">Checkout.</h1>
-                        <div className="space-y-3 xs:space-y-4">
-                            {itemsToBuy.map((item, index) => (
-                                <Card key={index} className="rounded-2xl xs:rounded-3xl border-zinc-200/60 overflow-hidden">
-                                    <CardContent className="p-4 xs:p-6 flex flex-col xs:flex-row gap-4 xs:gap-6">
-                                        <img
-                                            src={item.courseImage || item.image}
-                                            className="w-full xs:w-24 h-36 xs:h-24 rounded-xl xs:rounded-2xl object-cover shrink-0"
-                                            alt={item.title}
-                                        />
-                                        <div className="flex-1">
-                                            <h3 className="font-bold text-zinc-900 text-base xs:text-lg mb-1">{item.title}</h3>
-                                            <p className="text-xs xs:text-sm text-zinc-500 font-medium mb-2">By {item.instructorName}</p>
-                                            <p className="text-lg xs:text-xl font-black text-zinc-900">₹{item.coursePricing || item.pricing}</p>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Summary */}
-                    <div className="space-y-6">
-                        <Card className="rounded-[32px] xs:rounded-[40px] border-zinc-200/60 shadow-xl overflow-hidden lg:sticky lg:top-32">
-                            <CardContent className="p-6 xs:p-8">
-                                <h2 className="text-lg xs:text-xl font-bold mb-4 xs:mb-6">Order Summary</h2>
-                                <div className="space-y-3 xs:space-y-4 mb-6 xs:mb-8">
-                                    <div className="flex justify-between text-zinc-500 font-medium text-sm xs:text-base">
-                                        <span>Subtotal</span><span>₹{totalAmount}</span>
-                                    </div>
-                                    <div className="flex justify-between text-zinc-500 font-medium text-sm xs:text-base">
-                                        <span>Tax</span><span>₹0.00</span>
-                                    </div>
-                                    <div className="pt-3 xs:pt-4 border-t border-zinc-100 flex justify-between items-end">
-                                        <span className="font-bold text-zinc-900">Total</span>
-                                        <span className="text-2xl xs:text-3xl font-black text-zinc-900">₹{totalAmount}</span>
-                                    </div>
-                                </div>
-                                <Button
-                                    onClick={handlePayment}
-                                    className="w-full bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl xs:rounded-2xl h-12 xs:h-14 text-base xs:text-lg font-bold shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 min-h-[44px]"
-                                >
-                                    {totalAmount === 0 ? (
-                                        <>
-                                            <ShieldCheck className="w-4 h-4 xs:w-5 xs:h-5" />
-                                            <span>Free Enroll</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <CreditCard className="w-4 h-4 xs:w-5 xs:h-5" />
-                                            <span>Pay with Razorpay</span>
-                                        </>
-                                    )}
-                                </Button>
-                                <div className="mt-4 xs:mt-6 flex items-center justify-center gap-2 text-zinc-400 font-medium text-xs">
-                                    <ShieldCheck className="w-3.5 h-3.5 xs:w-4 xs:h-4 text-emerald-500" />
-                                    Secure SSL Encrypted Payment
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </motion.div>
-            </div>
+    <div className="bg-[#f2f2f2] min-h-screen pt-20 xs:pt-24 md:pt-32 pb-16">
+      {isProcessing && (
+        <div className="fixed inset-0 bg-white/80 backdrop-blur-sm z-[100] flex flex-col items-center justify-center p-6 text-center">
+          <div className="flex flex-col items-center">
+            <Loader2 className="w-12 h-12 text-[#0067b8] animate-spin mb-4" />
+            <h2 className="text-2xl font-semibold tracking-tight text-black mb-2">Verifying your payment...</h2>
+            <p className="text-[#616161] font-normal">Please do not close or refresh this page.</p>
+          </div>
         </div>
+      )}
+      <div className="container mx-auto px-4 xs:px-6 max-w-6xl">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Course List */}
+          <div className="lg:col-span-2 space-y-8">
+            <h1 className="text-3xl xs:text-4xl font-semibold tracking-tight text-black">Checkout</h1>
+            <div className="space-y-4">
+              {itemsToBuy.map((item, index) => (
+                <div key={index} className="bg-white rounded-sm border border-[#e6e6e6] p-4 flex flex-col xs:flex-row gap-6 shadow-sm overflow-hidden">
+                  <img
+                    src={item.courseImage || item.image}
+                    className="w-full xs:w-32 h-20 rounded-sm object-cover shrink-0"
+                    alt={item.title}
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-black text-lg mb-1">{item.title}</h3>
+                    <p className="text-xs text-[#616161] font-normal mb-2">By <span className="text-black font-semibold">{item.instructorName}</span></p>
+                    <p className="text-xl font-bold text-black">₹{item.coursePricing || item.pricing}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Summary */}
+          <div className="space-y-6">
+            <div className="bg-white rounded-sm border border-[#e6e6e6] p-8 shadow-sm lg:sticky lg:top-32 overflow-hidden">
+              <h2 className="text-lg font-semibold text-black mb-6">Order Summary</h2>
+              <div className="space-y-4 mb-8">
+                <div className="flex justify-between text-[#616161] font-normal text-sm">
+                  <span>Subtotal</span><span>₹{totalAmount}</span>
+                </div>
+                <div className="flex justify-between text-[#616161] font-normal text-sm">
+                  <span>Tax</span><span>₹0.00</span>
+                </div>
+                <div className="pt-4 border-t border-[#f2f2f2] flex justify-between items-end">
+                  <span className="font-semibold text-black">Total</span>
+                  <span className="text-3xl font-bold text-black tracking-tight">₹{totalAmount}</span>
+                </div>
+              </div>
+              <Button
+                onClick={handlePayment}
+                className="w-full bg-[#0067b8] hover:bg-[#005a9e] text-white rounded-sm h-14 text-lg font-semibold transition-none flex items-center justify-center gap-2"
+              >
+                {totalAmount === 0 ? (
+                  <>
+                    <ShieldCheck className="w-5 h-5" />
+                    <span>Free Enroll</span>
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="w-5 h-5" />
+                    <span>Pay Now</span>
+                  </>
+                )}
+              </Button>
+              <div className="mt-6 flex items-center justify-center gap-2 text-[#616161] font-normal text-xs">
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                Secure Payment Shielded by SSL
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     );
 }
 

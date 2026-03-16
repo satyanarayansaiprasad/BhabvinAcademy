@@ -41,122 +41,110 @@ function StudentCoursesPage() {
   const fadeUp = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.6 } };
 
   return (
-    <div className="bg-slate-50 min-h-screen">
-      <div className="container mx-auto px-4 xs:px-5 lg:px-8 py-10 xs:py-16">
+    <div className="bg-[#f2f2f2] min-h-screen pt-20 xs:pt-24 md:pt-32 pb-16">
+      <div className="container mx-auto px-4 xs:px-6">
         {/* Header */}
-        <motion.div {...fadeUp} className="mb-8 xs:mb-12">
-          <h1 className="text-3xl xs:text-4xl md:text-[50px] font-black tracking-tighter text-zinc-900 mb-1 xs:mb-2">My Learning.</h1>
-          <p className="text-zinc-500 font-medium text-sm xs:text-base">Continue where you left off and master your skills.</p>
-        </motion.div>
+        <div className="mb-10">
+          <h1 className="text-3xl xs:text-4xl md:text-5xl font-semibold tracking-tight text-black mb-2">My Courses</h1>
+          <p className="text-[#616161] font-normal text-sm xs:text-base">Continue your learning journey and track your progress.</p>
+        </div>
 
         {/* Courses Grid */}
-        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 xs:gap-6 md:gap-8">
+        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {studentBoughtCoursesList && studentBoughtCoursesList.length > 0 ? (
             studentBoughtCoursesList.map((course, index) => (
-              <motion.div
+              <div
                 key={course.courseId}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -8 }}
                 onClick={() => navigate(`/course-progress/${course?.courseId}`)}
-                className="group cursor-pointer bg-white rounded-[28px] xs:rounded-[40px] border border-zinc-200/60 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden"
+                className="group cursor-pointer bg-white rounded-sm border border-[#e6e6e6] shadow-sm hover:border-[#0067b8]/40 transition-colors overflow-hidden"
               >
-                <div className="aspect-video relative overflow-hidden bg-zinc-100">
+                <div className="aspect-video relative overflow-hidden bg-[#f2f2f2]">
                   <img
                     src={course?.courseImage}
                     alt={course?.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                    <div className="w-10 h-10 xs:w-12 xs:h-12 rounded-full bg-white text-black flex items-center justify-center opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 shadow-xl">
-                      <PlayCircle className="h-5 w-5 xs:h-6 xs:w-6 fill-current" />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-sm bg-white text-black flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm">
+                      <PlayCircle className="h-5 w-5 fill-current" />
                     </div>
                   </div>
                 </div>
 
-                <div className="p-4 xs:p-6 md:p-8">
-                  <div className="flex items-center gap-2 mb-2 xs:mb-4">
-                    <span className="px-2 py-0.5 rounded-md bg-zinc-100 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                <div className="p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="px-2 py-0.5 rounded-sm bg-[#f2f2f2] text-[10px] font-semibold text-[#616161] uppercase tracking-wider">
                       {course?.instructorName}
                     </span>
                   </div>
-                  <h3 className="text-sm xs:text-lg font-bold text-zinc-900 leading-tight mb-3 xs:mb-6 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                  <h3 className="text-base font-semibold text-black leading-tight mb-6 line-clamp-2 group-hover:text-[#0067b8] transition-colors">
                     {course?.title}
                   </h3>
-                  <div className="flex items-center justify-between pt-3 xs:pt-6 border-t border-zinc-50">
-                    <div className="flex items-center gap-1.5 xs:gap-2 text-zinc-400 font-bold text-[10px] uppercase tracking-tighter">
-                      <BookOpen className="h-3 w-3 xs:h-4 xs:w-4" />
-                      <span className="hidden xs:inline">Continue Course</span>
-                      <span className="xs:hidden">Continue</span>
+                  <div className="flex items-center justify-between pt-4 border-t border-[#f2f2f2]">
+                    <div className="flex items-center gap-2 text-[#616161] font-semibold text-[10px] uppercase tracking-wider">
+                      <BookOpen className="h-3.5 w-3.5" />
+                      <span>Continue</span>
                     </div>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setDeletingCourseId(course.courseId);
                       }}
-                      className="p-2 rounded-full hover:bg-red-50 text-zinc-300 hover:text-red-500 transition-colors"
-                      title="Delete Course"
+                      className="p-1.5 rounded-sm hover:bg-red-50 text-[#d2d2d2] hover:text-red-600 transition-colors"
+                      title="Remove Course"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
-                  <span className="text-blue-600 font-black text-xs uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity block mt-2 mt-4 pt-4 border-t border-zinc-50">
-                    Resume →
-                  </span>
                 </div>
-              </motion.div>
+              </div>
             ))
           ) : (
-            <motion.div {...fadeUp} className="col-span-full flex flex-col items-center justify-center py-20 xs:py-32 text-center">
-              <div className="w-16 h-16 xs:w-24 xs:h-24 bg-white rounded-full flex items-center justify-center mb-5 xs:mb-8 shadow-sm">
-                <GraduationCap className="h-8 w-8 xs:h-10 xs:w-10 text-zinc-300" />
+            <div className="col-span-full flex flex-col items-center justify-center py-20 text-center">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm border border-[#e6e6e6]">
+                <GraduationCap className="h-8 w-8 text-[#d2d2d2]" />
               </div>
-              <h2 className="text-xl xs:text-2xl font-bold text-zinc-900 mb-2 xs:mb-4">You haven't enrolled in any courses yet.</h2>
-              <p className="text-sm xs:text-base text-zinc-500 font-medium mb-6 xs:mb-10 max-w-sm">Ready to start your learning journey? Explore our catalog and find your perfect course.</p>
+              <h2 className="text-xl font-semibold text-black mb-2">No courses found</h2>
+              <p className="text-sm text-[#616161] font-normal mb-8 max-w-sm">Ready to start your learning journey? Explore our catalog and find your perfect course.</p>
               <Button
                 onClick={() => navigate("/courses")}
-                className="bg-zinc-900 hover:bg-black text-white rounded-xl xs:rounded-2xl h-12 xs:h-14 px-6 xs:px-10 text-sm xs:text-base font-bold shadow-xl shadow-zinc-200 min-w-[44px]"
+                className="bg-black text-white rounded-sm h-12 px-8 text-sm font-semibold transition-none"
               >
                 Explore Catalog
               </Button>
-            </motion.div>
+            </div>
           )}
         </div>
       </div>
 
       {/* Confirmation Modal */}
       {deletingCourseId && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] flex items-center justify-center p-6">
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-[32px] p-8 xs:p-10 max-w-sm w-full shadow-2xl text-center"
-          >
-            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[110] flex items-center justify-center p-6">
+          <div className="bg-white rounded-sm p-10 max-w-sm w-full shadow-2xl text-center border border-[#e6e6e6]">
+            <div className="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <AlertCircle className="w-8 h-8" />
             </div>
-            <h2 className="text-2xl font-black tracking-tighter text-zinc-900 mb-3">Delete Course?</h2>
-            <p className="text-zinc-500 font-medium mb-8 text-center px-4">
-              You will lose access to this course immediately. To regain access, you'll need to purchase it again.
+            <h2 className="text-2xl font-semibold tracking-tight text-black mb-2">Remove Course?</h2>
+            <p className="text-[#616161] font-normal mb-8 text-sm px-4">
+              You will lose access to this course immediately. You'll need to purchase it again to regain access.
             </p>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2">
               <Button
                 onClick={() => handleDeleteCourse(deletingCourseId)}
                 disabled={isDeleting}
-                className="w-full bg-red-500 hover:bg-red-600 text-white rounded-2xl h-12 font-bold shadow-lg shadow-red-100 flex items-center justify-center gap-2"
+                className="w-full bg-red-600 hover:bg-red-700 text-white rounded-sm h-12 font-semibold flex items-center justify-center gap-2 transition-none"
               >
-                {isDeleting ? <RefreshCw className="h-4 w-4 animate-spin" /> : "Yes, Delete Permanently"}
+                {isDeleting ? <RefreshCw className="h-4 w-4 animate-spin" /> : "Remove Permanently"}
               </Button>
               <Button
                 variant="ghost"
                 onClick={() => setDeletingCourseId(null)}
-                className="w-full rounded-2xl h-12 text-zinc-500 font-bold hover:bg-zinc-100"
+                className="w-full rounded-sm h-12 text-[#616161] font-semibold hover:bg-[#f2f2f2] transition-none"
               >
                 Cancel
               </Button>
             </div>
-          </motion.div>
+          </div>
         </div>
       )}
     </div>
