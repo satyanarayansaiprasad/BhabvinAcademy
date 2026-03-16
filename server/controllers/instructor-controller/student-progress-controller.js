@@ -90,6 +90,6 @@ const getAllStudentsProgress = async (req, res) => {
   }
 };
 
-module.exports = { getAllStudentsProgress };
+module.exports = { getAllStudentsProgress, deleteStudent };
 
 
