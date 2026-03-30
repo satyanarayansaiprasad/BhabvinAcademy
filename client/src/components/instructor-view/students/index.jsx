@@ -3,8 +3,9 @@ import { motion } from "framer-motion";
 import { fetchAdminStudentProgressService, deleteAdminStudentService } from "@/services";
 import {
   Users, BookOpen, CheckCircle, Search, ChevronDown, ChevronUp,
-  RefreshCw, Mail, UserCircle, Award, ShieldCheck, ShieldX, Trash2, AlertCircle
+  RefreshCw, Mail, UserCircle, Award, ShieldCheck, ShieldX, Trash2, AlertCircle, Download
 } from "lucide-react";
+import { exportToCSV } from "@/utils/export";
 
 function InstructorStudentsData() {
   const [studentsData, setStudentsData] = useState([]);
@@ -30,6 +31,20 @@ function InstructorStudentsData() {
     if (response?.success) {
       setStudentsData((prev) => prev.filter((s) => s.studentId !== deletingStudent.studentId));
     }
+  }
+
+  function handleExportStudents() {
+    const exportData = filteredStudents.map(student => ({
+      "Name": student.userFullName || student.userName || "N/A",
+      "Email": student.userEmail,
+      "Status": student.status || "Active",
+      "Total Courses": student.courses?.length || 0,
+      "Avg Progress": student.courses?.length > 0
+        ? Math.round(student.courses.reduce((sum, c) => sum + c.completionPercentage, 0) / student.courses.length) + "%"
+        : "0%",
+      "Enrolled Courses": student.courses?.map(c => c.title).join("; ")
+    }));
+    exportToCSV(exportData, `students_list_${new Date().toLocaleDateString()}.csv`);
   }
 
   useEffect(() => { loadStudentsData(); }, []);
@@ -84,7 +99,16 @@ function InstructorStudentsData() {
         {/* Table Card */}
         <div className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
           <div className="p-5 border-b border-zinc-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <h2 className="text-lg font-bold text-zinc-900">Students ({filteredStudents.length})</h2>
+            <div className="flex items-center gap-4">
+              <h2 className="text-lg font-bold text-zinc-900">Students ({filteredStudents.length})</h2>
+              <button
+                onClick={handleExportStudents}
+                className="flex items-center gap-2 text-xs font-bold text-[#0067b8] hover:underline"
+              >
+                <Download className="h-3.5 w-3.5" />
+                Export List
+              </button>
+            </div>
             <div className="relative w-full sm:w-72">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
               <input

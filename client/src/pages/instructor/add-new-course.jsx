@@ -33,6 +33,8 @@ function AddNewCoursePage() {
   const navigate = useNavigate();
   const params = useParams();
 
+  const [activeTab, setActiveTab] = useState("curriculum");
+
   function isEmpty(value) {
     if (Array.isArray(value)) {
       return value.length === 0;
@@ -178,11 +180,15 @@ function AddNewCoursePage() {
                     { id: 'course-landing-page', label: 'Landing Page', icon: Layout },
                     { id: 'settings', label: 'Settings', icon: Settings }
                   ].map((item) => (
-                    <div key={item.id} className="flex items-center gap-3 p-3 rounded-xl transition-colors hover:bg-zinc-50 cursor-pointer group">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center group-hover:bg-zinc-900 group-hover:text-white transition-colors">
+                    <div
+                      key={item.id}
+                      onClick={() => setActiveTab(item.id)}
+                      className={`flex items-center gap-3 p-3 rounded-xl transition-colors cursor-pointer group ${activeTab === item.id ? 'bg-zinc-900 text-white' : 'hover:bg-zinc-50'}`}
+                    >
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${activeTab === item.id ? 'bg-white/20' : 'bg-zinc-100 group-hover:bg-zinc-900 group-hover:text-white'}`}>
                         <item.icon className="h-4 w-4" />
                       </div>
-                      <span className="font-bold text-sm tracking-tight text-zinc-600 group-hover:text-zinc-900 transition-colors">{item.label}</span>
+                      <span className="font-bold text-sm tracking-tight transition-colors">{item.label}</span>
                     </div>
                   ))}
                 </div>
@@ -203,7 +209,7 @@ function AddNewCoursePage() {
 
           {/* Main Content Area */}
           <div className="lg:col-span-3">
-            <Tabs defaultValue="curriculum" className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="bg-zinc-100/50 p-1.5 rounded-2xl h-14 mb-10 inline-flex">
                 <TabsTrigger value="curriculum" className="rounded-xl px-8 font-bold transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm">Curriculum</TabsTrigger>
                 <TabsTrigger value="course-landing-page" className="rounded-xl px-8 font-bold transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm">Course Page</TabsTrigger>

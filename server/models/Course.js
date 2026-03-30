@@ -30,6 +30,7 @@ const CourseSchema = new mongoose.Schema({
   category: String,
   level: String,
   primaryLanguage: String,
+  accessType: String,
   subtitle: String,
   description: String,
   image: String,

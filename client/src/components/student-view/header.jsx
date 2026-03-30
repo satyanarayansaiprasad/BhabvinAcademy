@@ -36,22 +36,22 @@ function StudentViewCommonHeader() {
               <div className="bg-[#0067b8] p-1 rounded-sm">
                 <GraduationCap className="h-5 w-5 text-white" />
               </div>
-              <span className="font-semibold text-lg tracking-tight">
+              <span className="font-bold text-xl lg:text-2xl tracking-tight">
                 Bhavin Academy
               </span>
             </Link>
-            <nav className="hidden md:flex items-center space-x-2">
+            <nav className="hidden md:flex items-center space-x-6 lg:space-x-10 ml-8 lg:ml-12">
               <Button
                 variant="ghost"
                 onClick={() => navigate("/courses")}
-                className="text-sm font-normal text-[#616161] hover:text-black hover:bg-[#f2f2f2] rounded-sm px-3 h-8"
+                className="text-base font-medium text-[#616161] hover:text-black hover:bg-[#f2f2f2] rounded-md px-4 h-9"
               >
                 Courses
               </Button>
               <Button
                 variant="ghost"
                 onClick={() => navigate("/about")}
-                className="text-sm font-normal text-[#616161] hover:text-black hover:bg-[#f2f2f2] rounded-sm px-3 h-8"
+                className="text-base font-medium text-[#616161] hover:text-black hover:bg-[#f2f2f2] rounded-md px-4 h-9"
               >
                 About
               </Button>

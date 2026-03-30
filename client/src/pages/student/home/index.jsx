@@ -98,7 +98,7 @@ function StudentHomePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Microsoft Style Hero Section */}
-      <section className="relative bg-white pt-20 pb-12 lg:pt-32 lg:pb-24 border-b border-[#e6e6e6]">
+      <section className="relative bg-white pt-2 pb-10 lg:pt-4 lg:pb-16 border-b border-[#e6e6e6]">
         <div className="container mx-auto px-4 lg:px-6 max-w-7xl">
           <div className="flex flex-col lg:flex-row items-center gap-12 xl:gap-20">
             {/* Left Column: Text */}
@@ -115,8 +115,8 @@ function StudentHomePage() {
                 variants={{ initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 } }}
                 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-black leading-[1.1] mb-6"
               >
-                Build your future with <br />
-                <span className="text-[#0067b8]">professional learning.</span>
+                Expand your boundaries. <br />
+                <span className="text-[#0067b8]">Embrace Growth.</span>
               </motion.h1>
               
               <motion.p 
@@ -133,14 +133,14 @@ function StudentHomePage() {
               >
                 <Button 
                   onClick={() => navigate("/courses")} 
-                  className="bg-[#0067b8] text-white rounded-sm px-10 h-12 text-sm font-semibold hover:bg-[#005a9e] transition-all shadow-md w-full sm:w-auto"
+                  className="bg-[#0067b8] text-white rounded-lg px-10 h-12 text-sm font-semibold hover:bg-[#005a9e] transition-all shadow-md w-full sm:w-auto"
                 >
                   Explore Documentation
                 </Button>
                 <Button 
                   variant="outline" 
                   onClick={() => navigate("/about")}
-                  className="bg-transparent text-black border-black border-[1.5px] rounded-sm px-10 h-12 text-sm font-semibold hover:bg-black/5 w-full sm:w-auto transition-all"
+                  className="bg-transparent text-black border-black border-[1.5px] rounded-lg px-10 h-12 text-sm font-semibold hover:bg-black/5 w-full sm:w-auto transition-all"
                 >
                   Learn how it works
                 </Button>
@@ -154,20 +154,20 @@ function StudentHomePage() {
               transition={{ duration: 1, ease: "easeOut" }}
               className="lg:w-1/2 relative w-full"
             >
-              <div className="relative rounded-sm overflow-hidden shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)] bg-[#f2f2f2]">
+              <div className="relative rounded-lg overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.1)] bg-[#f2f2f2] aspect-[16/11] lg:aspect-auto lg:max-h-[480px]">
                 <img 
-                  src="/learning_hero.png" 
+                  src="/new_learning_hero.png" 
                   alt="Comprehensive Learning Illustration" 
-                  className="w-full h-auto object-cover" 
+                  className="w-full h-full lg:h-auto object-cover" 
                 />
               </div>
               {/* Dynamic Overlay Label */}
-              <div className="absolute -bottom-6 -left-6 bg-white p-5 shadow-2xl rounded-sm border border-[#e6e6e6] hidden md:block">
+              <div className="absolute -bottom-6 -left-6 bg-white p-5 shadow-2xl rounded-lg border border-[#e6e6e6] hidden md:block">
                 <div className="flex items-center gap-3">
                   <div className="w-1.5 h-10 bg-[#0067b8] rounded-full" />
                   <div>
                     <p className="text-[10px] font-bold text-[#616161] uppercase tracking-widest">Enrollment Active</p>
-                    <p className="text-base font-semibold text-black">Join 10k+ Learners</p>
+                    <p className="text-base font-semibold text-black">500+ Trained</p>
                   </div>
                 </div>
               </div>
@@ -177,13 +177,13 @@ function StudentHomePage() {
       </section>
 
       {/* Infinite Scrolling Category Marquee (Reverted to Slider) */}
-      <section className="py-20 lg:py-24 bg-[#f2f2f2] overflow-hidden">
-        <div className="container mx-auto px-4 lg:px-6 max-w-7xl mb-12">
-          <div className="flex items-center gap-4">
-            <div className="w-2 h-10 bg-[#0067b8] rounded-full" />
+      <section className="py-6 lg:py-10 bg-[#f2f2f2] overflow-hidden">
+        <div className="container mx-auto px-4 lg:px-6 max-w-7xl mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-1.5 h-8 bg-[#0067b8] rounded-full" />
             <div>
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-black">Choose your learning path.</h2>
-              <p className="text-[#616161] text-base">Tailored experiences for every discipline.</p>
+              <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-black leading-tight">Choose your learning path.</h2>
+              <p className="text-[#616161] text-sm">Tailored experiences for every discipline.</p>
             </div>
           </div>
         </div>
@@ -222,13 +222,13 @@ function StudentHomePage() {
       </section>
 
       {/* Featured Courses Sections */}
-      <section className="py-24 lg:py-32 bg-white">
+      <section className="py-6 lg:py-10 bg-white">
         <div className="container mx-auto px-4 lg:px-6 max-w-7xl">
           {[
             { key: "trending", label: "Trending Now", title: "Popular paths.", desc: "The most sought-after skills in the industry right now." },
             { key: "recent", label: "Recently Added", title: "New releases.", desc: "Stay ahead of the curve with our latest course additions." },
           ].map(({ key, label, title, desc }) => (
-            <div key={key} className="mb-32 last:mb-0">
+            <div key={key} className="mb-8 last:mb-0">
               <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 border-b border-[#e6e6e6] pb-8 gap-6">
                 <div className="max-w-xl">
                   <span className="text-[#0067b8] font-bold text-xs uppercase tracking-[0.3em] block mb-3">{label}</span>
@@ -264,18 +264,18 @@ function StudentHomePage() {
         <div className="container mx-auto px-4 lg:px-6 max-w-5xl relative z-10">
           <div className="text-center">
             <h2 className="text-4xl md:text-6xl font-semibold tracking-tight mb-8 leading-tight">
-              Empowering every developer <br /> to achieve more.
+              Empowering individuals and professionals <br /> to achieve more.
             </h2>
-            <p className="text-gray-400 text-lg md:text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
-              Join Bhavin Academy today and gain access to premium curriculum, official documentation, 
-              and a community of professional learners.
+            <p className="text-gray-400 text-lg md:text-xl mb-12 max-w-3xl mx-auto leading-relaxed">
+              Step into Bhavin Academy and access a curriculum designed to strengthen both 
+              your skills and your inner foundation.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <Button
                 onClick={() => navigate("/auth")}
-                className="bg-white text-black hover:bg-gray-200 rounded-sm h-14 px-14 text-base font-bold transition-all w-full sm:w-auto"
+                className="bg-white text-black hover:bg-gray-200 rounded-lg h-14 px-14 text-base font-bold transition-all w-full sm:w-auto"
               >
-                Join for free
+                Signup for free
               </Button>
               <Button
                 onClick={() => navigate("/courses")}

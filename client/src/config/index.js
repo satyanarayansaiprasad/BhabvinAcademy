@@ -162,6 +162,19 @@ export const courseLandingPageFormControls = [
     options: languageOptions,
   },
   {
+    name: "accessType",
+    label: "Access Period",
+    componentType: "select",
+    type: "text",
+    placeholder: "",
+    options: [
+      { id: "Lifetime Access", label: "Lifetime Access" },
+      { id: "1 Year Access", label: "1 Year Access" },
+      { id: "2 Year Access", label: "2 Year Access" },
+      { id: "5 Year Access", label: "5 Year Access" },
+    ],
+  },
+  {
     name: "subtitle",
     label: "Subtitle",
     componentType: "input",
@@ -215,6 +228,7 @@ export const courseLandingInitialFormData = {
   objectives: "",
   welcomeMessage: "",
   image: "",
+  accessType: "Lifetime Access",
 };
 
 export const courseCurriculumInitialFormData = [
@@ -241,5 +255,4 @@ export const sortOptions = [
 export const filterOptions = {
   category: courseCategories,
   level: courseLevelOptions,
-  primaryLanguage: languageOptions,
 };

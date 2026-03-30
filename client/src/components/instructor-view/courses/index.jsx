@@ -13,7 +13,8 @@ import {
 } from "@/config";
 import { InstructorContext } from "@/context/instructor-context";
 import { deleteCourseService } from "@/services";
-import { Edit, Plus, Trash2, Users, DollarSign, Book } from "lucide-react";
+import { Edit, Plus, Trash2, Users, DollarSign, Book, Download } from "lucide-react";
+import { exportToCSV } from "@/utils/export";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -35,6 +36,17 @@ function InstructorCourses({ listOfCourses, fetchAllCourses }) {
     }
   }
 
+  function handleExportReport() {
+    if (!listOfCourses) return;
+    const exportData = listOfCourses.map(course => ({
+      "Course Name": course.title || "Untitled Course",
+      "Category": course.category || "N/A",
+      "Total Students": course.students?.length || 0,
+      "Total Revenue": `₹${course?.students?.reduce((acc, student) => acc + parseFloat(student.paidAmount || 0), 0)?.toFixed(2) || "0.00"}`
+    }));
+    exportToCSV(exportData, `course_status_report_${new Date().toLocaleDateString()}.csv`);
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.98 }}
@@ -46,18 +58,28 @@ function InstructorCourses({ listOfCourses, fetchAllCourses }) {
           <h2 className="text-3xl font-black tracking-tighter text-zinc-900 mb-1">All Courses.</h2>
           <p className="text-zinc-500 font-medium tracking-tight">Manage and track your educational content.</p>
         </div>
-        <Button
-          onClick={() => {
-            setCurrentEditedCourseId(null);
-            setCourseLandingFormData(courseLandingInitialFormData);
-            setCourseCurriculumFormData(courseCurriculumInitialFormData);
-            navigate("/instructor/create-new-course");
-          }}
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-2xl h-14 px-8 font-bold shadow-lg shadow-blue-100 transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
-        >
-          <Plus className="h-5 w-5" />
-          <span>Create New Course</span>
-        </Button>
+        <div className="flex items-center gap-4">
+          <Button
+            onClick={handleExportReport}
+            variant="outline"
+            className="rounded-2xl h-14 px-8 font-bold border-zinc-200 hover:bg-zinc-50 transition-all flex items-center gap-2"
+          >
+            <Download className="h-5 w-5" />
+            <span>Export Report</span>
+          </Button>
+          <Button
+            onClick={() => {
+              setCurrentEditedCourseId(null);
+              setCourseLandingFormData(courseLandingInitialFormData);
+              setCourseCurriculumFormData(courseCurriculumInitialFormData);
+              navigate("/instructor/create-new-course");
+            }}
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-2xl h-14 px-8 font-bold shadow-lg shadow-blue-100 transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+          >
+            <Plus className="h-5 w-5" />
+            <span>Create New Course</span>
+          </Button>
+        </div>
       </div>
 
       <div className="overflow-x-auto">

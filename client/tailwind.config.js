@@ -14,9 +14,9 @@ export default {
 		},
 		extend: {
 			borderRadius: {
-				lg: '4px',
-				md: '2px',
-				sm: '0px'
+				lg: '12px',
+				md: '8px',
+				sm: '4px'
 			},
 			colors: {
 				background: 'hsl(var(--background))',

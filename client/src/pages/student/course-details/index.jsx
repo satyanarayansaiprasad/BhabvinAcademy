@@ -164,10 +164,6 @@ function StudentViewCourseDetailsPage() {
               <span className="px-2 py-0.5 rounded-sm bg-[#0067b8] text-white text-[10px] font-semibold tracking-wider uppercase">
                 {studentViewCourseDetails?.category}
               </span>
-              <span className="flex items-center gap-1 text-black text-sm font-semibold">
-                <Star className="h-4 w-4 fill-current text-black" />
-                4.9 (1,240 reviews)
-              </span>
             </div>
 
             <h1 className="text-3xl md:text-5xl font-semibold tracking-tight text-black leading-tight mb-4">
@@ -193,10 +189,6 @@ function StudentViewCourseDetailsPage() {
                 <Globe className="h-4 w-4" />
                 <span>{studentViewCourseDetails?.primaryLanguage}</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <Users className="h-4 w-4" />
-                <span>{studentViewCourseDetails?.students?.length} enrolled</span>
-              </div>
             </div>
           </div>
         </div>
@@ -213,9 +205,10 @@ function StudentViewCourseDetailsPage() {
                 <Info className="h-6 w-6 text-[#0067b8]" />
                 What you'll learn.
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 {studentViewCourseDetails?.objectives
                   ?.split("\n")
+                  .filter(objective => objective && /[a-zA-Z0-9]/.test(objective))
                   .map((objective, index) => (
                     <div key={index} className="flex items-start gap-3">
                       <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-sm bg-[#0067b8]/5 flex items-center justify-center">
@@ -246,11 +239,11 @@ function StudentViewCourseDetailsPage() {
                       }
                     >
                       <div className="flex items-center gap-4">
-                        <div className={`w-10 h-10 rounded-sm flex items-center justify-center ${curriculumItem?.freePreview ? "bg-[#0067b8]/10 text-[#0067b8]" : "bg-[#f2f2f2] text-[#616161]"}`}>
+                        <div className={`w-14 h-14 rounded-sm flex items-center justify-center shrink-0 ${curriculumItem?.freePreview ? "bg-[#0067b8]/10 text-[#0067b8]" : "bg-[#f2f2f2] text-[#616161]"}`}>
                           {curriculumItem?.freePreview ? (
-                            <Play className="h-4 w-4 fill-current" />
+                            <Play className="h-6 w-6 fill-current" />
                           ) : (
-                            <Lock className="h-4 w-4" />
+                            <Lock className="h-6 w-6" />
                           )}
                         </div>
                         <div>
@@ -311,7 +304,7 @@ function StudentViewCourseDetailsPage() {
                   <div className="p-8">
                     <div className="flex items-center justify-between mb-6">
                       <div>
-                        <p className="text-[#616161] font-semibold uppercase tracking-wider text-[10px] mb-1">Lifetime Access</p>
+                        <p className="text-[#0067b8] font-bold uppercase tracking-wider text-[10px] mb-1">{studentViewCourseDetails?.accessType || "Lifetime Access"}</p>
                         <h3 className="text-3xl font-bold tracking-tight text-black">₹{studentViewCourseDetails?.pricing}</h3>
                       </div>
                       <Button
@@ -351,17 +344,15 @@ function StudentViewCourseDetailsPage() {
                       )}
                     </div>
 
-                    <div className="mt-6 pt-6 border-t border-[#e6e6e6] flex items-center justify-center gap-2 text-[#616161] font-normal text-xs">
+                    <div className="mt-6 pt-6 border-t border-[#e6e6e6] flex items-center justify-center gap-2 text-[#b08902] font-bold text-xs">
                       <Lock className="h-3 w-3" />
-                      30-Day Money-Back Guarantee
+                      7-Day Money-Back Guarantee
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <div className="mt-6 px-4 text-center text-[#616161] text-xs font-normal">
-                Join thousands of students and start your journey today.
-              </div>
+
             </div>
           </aside>
         </div>
@@ -374,9 +365,9 @@ function StudentViewCourseDetailsPage() {
           setDisplayCurrentVideoFreePreview(null);
         }}
       >
-        <DialogContent className="max-w-[1000px] border-none bg-black p-0 rounded-sm overflow-hidden text-white shadow-2xl">
-          <div className="flex flex-col lg:flex-row h-full">
-            <div className="flex-1 bg-black aspect-video lg:aspect-auto">
+        <DialogContent className="max-w-[1240px] w-[95vw] h-auto lg:h-[80vh] border-none bg-black p-0 rounded-sm overflow-hidden text-white shadow-2xl flex flex-col">
+          <div className="flex flex-col lg:flex-row h-full overflow-hidden">
+            <div className="flex-1 bg-black flex items-center justify-center min-h-[300px]">
               <VideoPlayer
                 url={displayCurrentVideoFreePreview}
                 width="100%"

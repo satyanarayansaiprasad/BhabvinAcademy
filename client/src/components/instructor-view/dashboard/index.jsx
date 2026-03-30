@@ -8,10 +8,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { DollarSign, Users, TrendingUp } from "lucide-react";
+import { DollarSign, Users, TrendingUp, Download } from "lucide-react";
 import { motion } from "framer-motion";
+import { exportToCSV } from "@/utils/export";
 
 function InstructorDashboard({ listOfCourses }) {
+  function handleExport() {
+    const stats = calculateTotalStudentsAndProfit();
+    const exportData = stats.studentList.map(s => ({
+      "Course Name": s.courseTitle,
+      "Student Name": s.studentName,
+      "Email Address": s.studentEmail,
+      "Purchased Date": s.purchasedDate ? new Date(s.purchasedDate).toLocaleDateString() : 'N/A'
+    }));
+    exportToCSV(exportData, `students_overview_${new Date().toLocaleDateString()}.csv`);
+  }
   function calculateTotalStudentsAndProfit() {
     if (!listOfCourses || !Array.isArray(listOfCourses)) {
       return {
@@ -115,7 +126,10 @@ function InstructorDashboard({ listOfCourses }) {
       >
         <div className="p-8 border-b border-zinc-100 flex items-center justify-between">
           <h2 className="text-xl font-bold tracking-tight text-zinc-900">Students Overview.</h2>
-          <Button variant="ghost" className="text-zinc-400 font-bold text-sm underline underline-offset-4">Export List</Button>
+          <Button onClick={handleExport} variant="ghost" className="text-zinc-400 font-bold text-sm underline underline-offset-4 flex items-center gap-2">
+            <Download className="h-4 w-4" />
+            Export List
+          </Button>
         </div>
         <div className="overflow-x-auto">
           <Table className="w-full">
