@@ -23,7 +23,7 @@ const getAllStudentsProgress = async (req, res) => {
   try {
     // Only fetch users with role "student" — excludes admins, sub-admins, instructors
     const students = await User.find({ role: "student" }).select(
-      "userName userFullName userEmail profileImage userHeadline userBio status _id"
+      "userName userFullName userEmail profileImage userHeadline userBio status createdAt _id"
     );
 
     if (!students || students.length === 0) {

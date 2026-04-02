@@ -12,6 +12,6 @@ const UserSchema = new mongoose.Schema({
   status: { type: String, default: "active" },
   googleId: String,
   microsoftId: String,
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model("User", UserSchema);

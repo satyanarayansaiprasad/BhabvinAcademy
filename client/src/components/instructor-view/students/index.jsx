@@ -6,6 +6,15 @@ import {
   RefreshCw, Mail, UserCircle, Award, ShieldCheck, ShieldX, Trash2, AlertCircle, Download
 } from "lucide-react";
 import { exportToCSV } from "@/utils/export";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 function InstructorStudentsData() {
   const [studentsData, setStudentsData] = useState([]);
@@ -14,6 +23,9 @@ function InstructorStudentsData() {
   const [expandedStudent, setExpandedStudent] = useState(null);
   const [deletingStudent, setDeletingStudent] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [period, setPeriod] = useState("all");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
   async function loadStudentsData() {
     setLoading(true);
@@ -35,8 +47,10 @@ function InstructorStudentsData() {
 
   function handleExportStudents() {
     const exportData = filteredStudents.map(student => ({
-      "Name": student.userFullName || student.userName || "N/A",
+      "Username": student.userName || "N/A",
+      "Full Name": student.userFullName || student.userName || "N/A",
       "Email": student.userEmail,
+      "Enrollment Date": student.createdAt ? new Date(student.createdAt).toLocaleDateString("en-IN") : "N/A",
       "Status": student.status || "Active",
       "Total Courses": student.courses?.length || 0,
       "Avg Progress": student.courses?.length > 0
@@ -49,15 +63,58 @@ function InstructorStudentsData() {
 
   useEffect(() => { loadStudentsData(); }, []);
 
-  const filteredStudents = studentsData.filter((s) =>
-    s.userName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    s.userEmail?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    s.userFullName?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredStudents = studentsData.filter((s) => {
+    const matchesSearch = s.userName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.userEmail?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.userFullName?.toLowerCase().includes(searchQuery.toLowerCase());
 
-  const totalEnrollments = studentsData.reduce((acc, s) => acc + (s.courses?.length || 0), 0);
-  const completedEnrollments = studentsData.reduce((acc, s) => acc + (s.courses?.filter((c) => c.isCompleted).length || 0), 0);
-  const activeStudents = studentsData.filter(s => s.status !== "blocked").length;
+    if (!matchesSearch) return false;
+
+    if (period === "all" && !fromDate && !toDate) return true;
+
+    const enrollmentDate = s.createdAt ? new Date(s.createdAt) : null;
+    if (!enrollmentDate) return period === "all";
+
+    const now = new Date();
+    let startDate = null;
+
+    if (period === "lastMonth") {
+      startDate = new Date();
+      startDate.setMonth(now.getMonth() - 1);
+    } else if (period === "last3Months") {
+      startDate = new Date();
+      startDate.setMonth(now.getMonth() - 3);
+    } else if (period === "last6Months") {
+      startDate = new Date();
+      startDate.setMonth(now.getMonth() - 6);
+    } else if (period === "lastYear") {
+      startDate = new Date();
+      startDate.setFullYear(now.getFullYear() - 1);
+    } else if (period === "custom") {
+      const customFrom = fromDate ? new Date(fromDate) : null;
+      const customTo = toDate ? new Date(toDate) : null;
+
+      if (customFrom) {
+        customFrom.setHours(0, 0, 0, 0);
+        if (enrollmentDate < customFrom) return false;
+      }
+      if (customTo) {
+        customTo.setHours(23, 59, 59, 999);
+        if (enrollmentDate > customTo) return false;
+      }
+      return true;
+    }
+
+    if (startDate) {
+      return enrollmentDate >= startDate;
+    }
+
+    return true;
+  });
+
+  const totalEnrollments = filteredStudents.reduce((acc, s) => acc + (s.courses?.length || 0), 0);
+  const completedEnrollments = filteredStudents.reduce((acc, s) => acc + (s.courses?.filter((c) => c.isCompleted).length || 0), 0);
+  const activeStudents = filteredStudents.filter(s => s.status !== "blocked").length;
 
   if (loading) {
     return (
@@ -99,25 +156,85 @@ function InstructorStudentsData() {
         {/* Table Card */}
         <div className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
           <div className="p-5 border-b border-zinc-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <h2 className="text-lg font-bold text-zinc-900">Students ({filteredStudents.length})</h2>
-              <button
-                onClick={handleExportStudents}
-                className="flex items-center gap-2 text-xs font-bold text-[#0067b8] hover:underline"
-              >
-                <Download className="h-3.5 w-3.5" />
-                Export List
-              </button>
-            </div>
-            <div className="relative w-full sm:w-72">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
-              <input
-                type="text"
-                placeholder="Search by name or email..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 rounded-lg border border-zinc-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#0067b8]/30 focus:border-[#0067b8]"
-              />
+            <div className="flex flex-col gap-4 w-full">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <h2 className="text-lg font-bold text-zinc-900">Students ({filteredStudents.length})</h2>
+                  <button
+                    onClick={handleExportStudents}
+                    className="flex items-center gap-2 text-xs font-bold text-[#0067b8] hover:underline"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    Export List
+                  </button>
+                </div>
+                <div className="relative w-full sm:w-72">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by name or email..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2 rounded-lg border border-zinc-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#0067b8]/30 focus:border-[#0067b8]"
+                  />
+                </div>
+              </div>
+
+              {/* Advanced Filters */}
+              <div className="flex flex-wrap items-end gap-4 p-4 bg-zinc-50 rounded-xl border border-zinc-100">
+                <div className="space-y-1.5 flex-1 min-w-[200px]">
+                  <Label className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 ml-1">Report Period</Label>
+                  <Select value={period} onValueChange={setPeriod}>
+                    <SelectTrigger className="bg-white border-zinc-200">
+                      <SelectValue placeholder="Select Period" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Lifetime (All)</SelectItem>
+                      <SelectItem value="lastMonth">Last Month</SelectItem>
+                      <SelectItem value="last3Months">Last 3 Months</SelectItem>
+                      <SelectItem value="last6Months">Last 6 Months</SelectItem>
+                      <SelectItem value="lastYear">Last Year</SelectItem>
+                      <SelectItem value="custom">Custom Range</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {period === "custom" && (
+                  <>
+                    <div className="space-y-1.5">
+                      <Label className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 ml-1">From</Label>
+                      <Input
+                        type="date"
+                        value={fromDate}
+                        onChange={(e) => setFromDate(e.target.value)}
+                        className="bg-white border-zinc-200 h-10"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 ml-1">To</Label>
+                      <Input
+                        type="date"
+                        value={toDate}
+                        onChange={(e) => setToDate(e.target.value)}
+                        className="bg-white border-zinc-200 h-10"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {(period !== "all" || fromDate || toDate) && (
+                  <button
+                    onClick={() => {
+                      setPeriod("all");
+                      setFromDate("");
+                      setToDate("");
+                    }}
+                    className="h-10 px-4 text-xs font-bold text-zinc-400 hover:text-zinc-900 transition-colors"
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 

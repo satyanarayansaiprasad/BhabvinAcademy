@@ -14,7 +14,7 @@ import {
   fetchInstructorCourseDetailsService,
   updateCourseByIdService,
 } from "@/services";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Save, Sparkles, Layout, Database, Settings } from "lucide-react";
