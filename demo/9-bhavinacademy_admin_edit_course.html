@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BhavinAcademy — Edit Course</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:#f5f5f7;color:#1d1d1f;overflow-x:hidden;}
+
+/* ── NAV ── */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,0.08);height:52px;display:flex;align-items:center;justify-content:center;}
+.nav-inner{max-width:100%;width:100%;display:flex;align-items:center;justify-content:space-between;padding:0 32px;}
+.nav-logo{font-size:18px;font-weight:700;letter-spacing:-0.5px;color:#1d1d1f;text-decoration:none;}
+.nav-logo span{color:#0071e3;}
+.nav-center{display:flex;align-items:center;gap:8px;font-size:13px;color:#86868b;}
+.nav-center .nav-sep{color:#d2d2d7;}
+.nav-center .nav-course-name{color:#1d1d1f;font-weight:500;}
+.nav-status{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:#6e6e73;}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#d2d2d7;}
+.status-dot.draft{background:#f5a623;}
+.status-dot.published{background:#34c759;}
+.nav-actions{display:flex;align-items:center;gap:10px;}
+.btn-ghost{background:transparent;color:#1d1d1f;border:1px solid #d2d2d7;padding:7px 16px;border-radius:980px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:border-color 0.2s,background 0.2s;}
+.btn-ghost:hover{border-color:#0071e3;color:#0071e3;}
+.btn-blue{background:#0071e3;color:#fff;border:none;padding:7px 18px;border-radius:980px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.2s;}
+.btn-blue:hover{background:#0077ed;}
+
+/* ── LAYOUT ── */
+.page-wrap{max-width:1160px;margin:0 auto;padding:32px 24px 80px;display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start;}
+
+/* ── SECTION CARD ── */
+.card{background:#fff;border-radius:18px;border:1px solid rgba(0,0,0,0.07);padding:28px;margin-bottom:16px;}
+.card-title{font-size:20px;font-weight:700;color:#1d1d1f;margin-bottom:4px;letter-spacing:-0.3px;}
+.card-sub{font-size:13px;color:#86868b;margin-bottom:22px;}
+.divider{border:none;border-top:1px solid #f0f0f0;margin:20px 0;}
+
+/* ── FORM ELEMENTS ── */
+.form-group{margin-bottom:18px;}
+.form-group:last-child{margin-bottom:0;}
+label{display:block;font-size:13px;font-weight:600;color:#1d1d1f;margin-bottom:6px;}
+.label-hint{font-size:11px;font-weight:400;color:#86868b;margin-left:6px;}
+input[type="text"],input[type="number"],input[type="url"],textarea,select{width:100%;padding:10px 14px;border:1px solid #d2d2d7;border-radius:10px;font-size:14px;font-family:'Inter',sans-serif;color:#1d1d1f;background:#fff;outline:none;transition:border-color 0.2s,box-shadow 0.2s;appearance:none;-webkit-appearance:none;}
+input[type="text"]:focus,input[type="number"]:focus,input[type="url"]:focus,textarea:focus,select:focus{border-color:#0071e3;box-shadow:0 0 0 3px rgba(0,113,227,0.1);}
+input[type="text"]::placeholder,textarea::placeholder{color:#b0b0b5;}
+textarea{resize:vertical;min-height:110px;line-height:1.6;}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2386868b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;cursor:pointer;}
+.char-count{font-size:11px;color:#86868b;text-align:right;margin-top:4px;}
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.input-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+
+/* ── THUMBNAIL UPLOADER ── */
+.thumb-uploader{border:2px dashed #d2d2d7;border-radius:14px;padding:32px;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s;background:#fafafa;position:relative;overflow:hidden;}
+.thumb-uploader:hover{border-color:#0071e3;background:#f0f6ff;}
+.thumb-preview{width:100%;height:160px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:64px;background:linear-gradient(135deg,#0078d4,#005a9e);margin-bottom:14px;}
+.thumb-upload-icon{font-size:32px;margin-bottom:8px;display:block;}
+.thumb-upload-label{font-size:14px;font-weight:600;color:#1d1d1f;margin-bottom:4px;}
+.thumb-upload-hint{font-size:12px;color:#86868b;}
+.thumb-change-btn{margin-top:14px;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:#0071e3;cursor:pointer;background:none;border:none;font-family:'Inter',sans-serif;}
+
+/* ── BANNER COLOR PICKER ── */
+.banner-picker{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.banner-swatch{width:36px;height:36px;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:border-color 0.2s,transform 0.15s;flex-shrink:0;}
+.banner-swatch:hover{transform:scale(1.1);}
+.banner-swatch.active{border-color:#1d1d1f;box-shadow:0 0 0 2px #fff inset;}
+.banner-ms{background:linear-gradient(135deg,#0078d4,#005a9e);}
+.banner-lx{background:linear-gradient(135deg,#e95420,#772953);}
+.banner-nw{background:linear-gradient(135deg,#1ba1e2,#0050ef);}
+.banner-az{background:linear-gradient(135deg,#0089d6,#00bcf2);}
+.banner-sec{background:linear-gradient(135deg,#107c10,#004b1c);}
+.banner-ad{background:linear-gradient(135deg,#5c2d91,#8764b8);}
+
+/* ── CURRICULUM BUILDER ── */
+.curriculum-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.section-count{font-size:12px;color:#86868b;font-weight:500;}
+.btn-add{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:980px;border:1px solid #0071e3;background:transparent;color:#0071e3;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.2s,color 0.2s;}
+.btn-add:hover{background:#0071e3;color:#fff;}
+
+.section-block{border:1px solid #e8e8ed;border-radius:14px;overflow:hidden;margin-bottom:12px;}
+.section-head{display:flex;align-items:center;gap:10px;padding:14px 16px;background:#f9f9fb;cursor:pointer;user-select:none;}
+.section-head:hover{background:#f0f0f5;}
+.drag-handle{color:#c7c7cc;font-size:14px;cursor:grab;flex-shrink:0;}
+.section-toggle{font-size:12px;color:#86868b;margin-left:auto;flex-shrink:0;transition:transform 0.2s;}
+.section-toggle.open{transform:rotate(180deg);}
+.section-title-input{flex:1;border:none;background:transparent;font-size:14px;font-weight:600;color:#1d1d1f;font-family:'Inter',sans-serif;outline:none;}
+.section-title-input::placeholder{color:#b0b0b5;}
+.section-meta-tag{font-size:11px;font-weight:500;color:#86868b;background:#ebebeb;padding:2px 8px;border-radius:980px;white-space:nowrap;flex-shrink:0;}
+
+.lesson-list{padding:8px 12px 12px;}
+.lesson-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:#fff;border:1px solid #f0f0f0;margin-bottom:6px;cursor:pointer;transition:border-color 0.15s,box-shadow 0.15s;}
+.lesson-item:hover{border-color:#d2d2d7;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+.lesson-drag{color:#d2d2d7;font-size:13px;cursor:grab;}
+.lesson-type-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.ltype-video{background:#e8f1fb;}
+.ltype-lab{background:#e6f4ea;}
+.ltype-quiz{background:#fff3cd;}
+.ltype-doc{background:#f5f5f7;}
+.lesson-info{flex:1;min-width:0;}
+.lesson-name{font-size:13px;font-weight:500;color:#1d1d1f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lesson-meta{font-size:11px;color:#86868b;margin-top:1px;}
+.lesson-actions{display:flex;gap:4px;flex-shrink:0;}
+.lesson-btn{width:26px;height:26px;border-radius:6px;border:none;background:transparent;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;color:#86868b;transition:background 0.15s,color 0.15s;}
+.lesson-btn:hover{background:#f0f0f5;color:#1d1d1f;}
+.lesson-btn.del:hover{background:#fff0f0;color:#d70015;}
+
+.add-lesson-row{display:flex;gap:8px;padding:4px 0 0;}
+.btn-add-lesson{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:#0071e3;background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;padding:6px 8px;border-radius:8px;transition:background 0.15s;}
+.btn-add-lesson:hover{background:#f0f6ff;}
+
+/* ── TAGS INPUT ── */
+.tags-wrap{display:flex;flex-wrap:wrap;gap:6px;padding:8px 10px;border:1px solid #d2d2d7;border-radius:10px;cursor:text;min-height:44px;align-items:center;transition:border-color 0.2s,box-shadow 0.2s;}
+.tags-wrap:focus-within{border-color:#0071e3;box-shadow:0 0 0 3px rgba(0,113,227,0.1);}
+.tag-pill{display:inline-flex;align-items:center;gap:4px;background:#e8f1fb;color:#0071e3;font-size:12px;font-weight:600;padding:3px 10px;border-radius:980px;}
+.tag-pill button{background:none;border:none;cursor:pointer;color:#0071e3;font-size:13px;line-height:1;padding:0;display:flex;align-items:center;}
+.tags-input{border:none;outline:none;font-size:13px;font-family:'Inter',sans-serif;color:#1d1d1f;flex:1;min-width:80px;background:transparent;}
+.tags-input::placeholder{color:#b0b0b5;}
+
+/* ── TOGGLE SWITCH ── */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;}
+.toggle-row+.toggle-row{border-top:1px solid #f0f0f0;}
+.toggle-label{font-size:14px;font-weight:500;color:#1d1d1f;}
+.toggle-desc{font-size:12px;color:#86868b;margin-top:2px;}
+.toggle{position:relative;width:44px;height:26px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;position:absolute;}
+.toggle-track{position:absolute;inset:0;background:#d2d2d7;border-radius:13px;cursor:pointer;transition:background 0.2s;}
+.toggle input:checked+.toggle-track{background:#0071e3;}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform 0.2s;pointer-events:none;box-shadow:0 1px 4px rgba(0,0,0,0.2);}
+.toggle input:checked~.toggle-thumb{transform:translateX(18px);}
+
+/* ── PRICING CARD ── */
+.price-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.price-opt{border:2px solid #d2d2d7;border-radius:12px;padding:14px 16px;cursor:pointer;transition:border-color 0.2s,background 0.2s;}
+.price-opt.selected{border-color:#0071e3;background:#f0f6ff;}
+.price-opt-label{font-size:13px;font-weight:600;color:#1d1d1f;margin-bottom:2px;}
+.price-opt-desc{font-size:11px;color:#86868b;}
+.price-opt input[type="radio"]{display:none;}
+
+/* ── SIDEBAR CARDS ── */
+.sidebar-sticky{position:sticky;top:68px;display:flex;flex-direction:column;gap:16px;}
+.sidebar-card{background:#fff;border-radius:18px;border:1px solid rgba(0,0,0,0.07);padding:22px;}
+.sidebar-card-title{font-size:14px;font-weight:700;color:#1d1d1f;margin-bottom:16px;}
+.course-preview-banner{width:100%;height:110px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:52px;background:linear-gradient(135deg,#0078d4,#005a9e);margin-bottom:14px;}
+.preview-meta{display:flex;flex-direction:column;gap:8px;}
+.preview-row{display:flex;align-items:center;gap:8px;font-size:13px;color:#86868b;}
+.preview-row strong{color:#1d1d1f;font-weight:600;}
+.preview-badge{display:inline-block;padding:2px 10px;border-radius:980px;font-size:11px;font-weight:600;background:#e8f1fb;color:#0071e3;}
+
+.publish-actions{display:flex;flex-direction:column;gap:8px;}
+.btn-publish{width:100%;padding:11px;border-radius:12px;background:#0071e3;color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.2s;}
+.btn-publish:hover{background:#0077ed;}
+.btn-save{width:100%;padding:11px;border-radius:12px;background:#f5f5f7;color:#1d1d1f;border:1px solid #d2d2d7;font-size:14px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.2s,border-color 0.2s;}
+.btn-save:hover{background:#ebebeb;}
+.btn-danger{width:100%;padding:11px;border-radius:12px;background:transparent;color:#d70015;border:1px solid #ffd0d0;font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.2s;}
+.btn-danger:hover{background:#fff5f5;}
+
+.checklist{display:flex;flex-direction:column;gap:8px;}
+.check-item{display:flex;align-items:center;gap:8px;font-size:13px;}
+.check-icon{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
+.check-done{background:#e6f4ea;color:#34c759;}
+.check-todo{background:#f5f5f7;color:#86868b;}
+.check-item span{color:#1d1d1f;}
+.check-item span.todo{color:#86868b;}
+
+.stat-mini-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.stat-mini{text-align:center;background:#f5f5f7;border-radius:12px;padding:14px 10px;}
+.stat-mini-val{font-size:22px;font-weight:800;letter-spacing:-0.5px;color:#1d1d1f;}
+.stat-mini-label{font-size:11px;color:#86868b;font-weight:500;margin-top:2px;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#1d1d1f;color:#f5f5f7;padding:12px 22px;border-radius:12px;font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:opacity 0.25s,transform 0.25s;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── PROGRESS BAR ── */
+.progress-bar{width:100%;height:5px;background:#f0f0f0;border-radius:4px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0071e3,#00d4ff);border-radius:4px;transition:width 0.5s ease;}
+.progress-label{display:flex;justify-content:space-between;margin-bottom:6px;}
+.progress-label span{font-size:12px;color:#86868b;font-weight:500;}
+.progress-label strong{font-size:12px;font-weight:700;color:#0071e3;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">Bhavin<span>Academy</span></a>
+    <div class="nav-center">
+      <span>Courses</span>
+      <span class="nav-sep">›</span>
+      <span class="nav-course-name">Windows Server Administration</span>
+      <span class="nav-sep">›</span>
+      <span>Edit</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;">
+      <div class="nav-status">
+        <div class="status-dot draft"></div>
+        Draft
+      </div>
+      <div class="nav-actions">
+        <button class="btn-ghost" onclick="showToast('Draft saved ✓')">Save Draft</button>
+        <button class="btn-blue" onclick="showToast('Course published! 🎉')">Publish Course</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE -->
+<div class="page-wrap">
+
+  <!-- ── MAIN COLUMN ── -->
+  <div class="main-col">
+
+    <!-- BASIC INFO -->
+    <div class="card">
+      <div class="card-title">Course Information</div>
+      <div class="card-sub">Set the core details that learners will see on the course page.</div>
+
+      <div class="form-group">
+        <label>Course Title <span class="label-hint">Required</span></label>
+        <input type="text" id="courseTitle" value="Windows Server Administration" oninput="updatePreview()" placeholder="e.g. Windows Server Administration">
+        <div class="char-count" id="titleCount">30 / 80</div>
+      </div>
+
+      <div class="form-group">
+        <label>Short Description <span class="label-hint">Shown in course cards</span></label>
+        <input type="text" placeholder="One-line summary of what learners will achieve" value="Master Windows Server from installation to enterprise-grade management.">
+      </div>
+
+      <div class="form-group">
+        <label>Full Description</label>
+        <textarea placeholder="Describe the course in detail — topics covered, prerequisites, outcomes…">This comprehensive course takes you from the basics of Windows Server installation all the way to advanced enterprise configurations including DHCP, DNS, Active Directory, and Group Policy. Ideal for IT professionals preparing for the MCSA certification.</textarea>
+      </div>
+
+      <div class="input-row">
+        <div class="form-group">
+          <label>Category</label>
+          <select>
+            <option>Microsoft</option>
+            <option>Linux</option>
+            <option>Networking</option>
+            <option>Cloud</option>
+            <option>Security</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Difficulty Level</label>
+          <select>
+            <option>Beginner</option>
+            <option selected>Intermediate</option>
+            <option>Advanced</option>
+            <option>All Levels</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-row-3">
+        <div class="form-group">
+          <label>Total Lessons</label>
+          <input type="number" value="56" min="1">
+        </div>
+        <div class="form-group">
+          <label>Estimated Hours</label>
+          <input type="number" value="28" min="1">
+        </div>
+        <div class="form-group">
+          <label>Language</label>
+          <select>
+            <option>English</option>
+            <option>Hindi</option>
+            <option>Gujarati</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Tags <span class="label-hint">Press Enter to add</span></label>
+        <div class="tags-wrap" onclick="document.getElementById('tagInput').focus()">
+          <span class="tag-pill">Windows Server <button onclick="removeTag(this)">×</button></span>
+          <span class="tag-pill">MCSA <button onclick="removeTag(this)">×</button></span>
+          <span class="tag-pill">Active Directory <button onclick="removeTag(this)">×</button></span>
+          <span class="tag-pill">Microsoft <button onclick="removeTag(this)">×</button></span>
+          <input class="tags-input" id="tagInput" placeholder="Add a tag…" onkeydown="handleTag(event)">
+        </div>
+      </div>
+    </div>
+
+    <!-- COURSE BANNER -->
+    <div class="card">
+      <div class="card-title">Course Banner</div>
+      <div class="card-sub">Choose a banner colour and icon that represents this course.</div>
+
+      <div class="course-preview-banner" id="bannerPreview">🪟</div>
+
+      <div class="form-group">
+        <label>Banner Icon <span class="label-hint">Emoji</span></label>
+        <input type="text" id="bannerIcon" value="🪟" maxlength="2" oninput="updateBannerIcon()" placeholder="Paste an emoji">
+      </div>
+
+      <div class="form-group">
+        <label>Banner Colour</label>
+        <div class="banner-picker">
+          <div class="banner-swatch banner-ms active" onclick="setBanner(this,'linear-gradient(135deg,#0078d4,#005a9e)')" title="Windows Blue"></div>
+          <div class="banner-swatch banner-lx" onclick="setBanner(this,'linear-gradient(135deg,#e95420,#772953)')" title="Linux Orange"></div>
+          <div class="banner-swatch banner-nw" onclick="setBanner(this,'linear-gradient(135deg,#1ba1e2,#0050ef)')" title="Networking Blue"></div>
+          <div class="banner-swatch banner-az" onclick="setBanner(this,'linear-gradient(135deg,#0089d6,#00bcf2)')" title="Azure Cyan"></div>
+          <div class="banner-swatch banner-sec" onclick="setBanner(this,'linear-gradient(135deg,#107c10,#004b1c)')" title="Security Green"></div>
+          <div class="banner-swatch banner-ad" onclick="setBanner(this,'linear-gradient(135deg,#5c2d91,#8764b8)')" title="Purple"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CURRICULUM BUILDER -->
+    <div class="card">
+      <div class="curriculum-header">
+        <div>
+          <div class="card-title">Curriculum</div>
+          <div class="card-sub" style="margin-bottom:0;">Organise lessons into sections. Drag to reorder.</div>
+        </div>
+        <button class="btn-add" onclick="addSection()">＋ Add Section</button>
+      </div>
+
+      <div id="sectionList">
+
+        <!-- Section 1 -->
+        <div class="section-block">
+          <div class="section-head" onclick="toggleSection(this)">
+            <span class="drag-handle">⠿</span>
+            <input class="section-title-input" type="text" value="Section 1 — Getting Started" onclick="event.stopPropagation()">
+            <span class="section-meta-tag">6 lessons</span>
+            <span class="section-toggle open">▾</span>
+          </div>
+          <div class="lesson-list">
+            <div class="lesson-item">
+              <span class="lesson-drag">⠿</span>
+              <div class="lesson-type-icon ltype-video">▶</div>
+              <div class="lesson-info">
+                <div class="lesson-name">Introduction to Windows Server</div>
+                <div class="lesson-meta">Video · 12 min</div>
+              </div>
+              <div class="lesson-actions">
+                <button class="lesson-btn" title="Edit">✏️</button>
+                <button class="lesson-btn del" title="Delete" onclick="removeLesson(this)">🗑</button>
+              </div>
+            </div>
+            <div class="lesson-item">
+              <span class="lesson-drag">⠿</span>
+              <div class="lesson-type-icon ltype-video">▶</div>
+              <div class="lesson-info">
+                <div class="lesson-name">Installation & Initial Setup</div>
+                <div class="lesson-meta">Video · 18 min</div>
+              </div>
+              <div class="lesson-actions">
+                <button class="lesson-btn">✏️</button>
+                <button class="lesson-btn del" onclick="removeLesson(this)">🗑</button>
+              </div>
+            </div>
+            <div class="lesson-item">
+              <span class="lesson-drag">⠿</span>
+              <div class="lesson-type-icon ltype-doc">📄</div>
+              <div class="lesson-info">
+                <div class="lesson-name">Server Roles Overview — Cheat Sheet</div>
+                <div class="lesson-meta">Document</div>
+              </div>
+              <div class="lesson-actions">
+                <button class="lesson-btn">✏️</button>
+                <button class="lesson-btn del" onclick="removeLesson(this)">🗑</button>
+              </div>
+            </div>
+
+            <div class="lesson-item">
+              <span class="lesson-drag">⠿</span>
+              <div class="lesson-type-icon ltype-quiz">❓</div>
+              <div class="lesson-info">
+                <div class="lesson-name">Section 1 Quiz</div>
+                <div class="lesson-meta">Quiz · 10 questions</div>
+              </div>
+              <div class="lesson-actions">
+                <button class="lesson-btn">✏️</button>
+                <button class="lesson-btn del" onclick="removeLesson(this)">🗑</button>
+              </div>
+            </div>
+            <div class="add-lesson-row">
+              <button class="btn-add-lesson" onclick="addLesson(this, 'video')">＋ Video</button>
+              <button class="btn-add-lesson" onclick="addLesson(this, 'quiz')">＋ Quiz</button>
+              <button class="btn-add-lesson" onclick="addLesson(this, 'doc')">＋ Document</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2 -->
+        <div class="section-block">
+          <div class="section-head" onclick="toggleSection(this)">
+            <span class="drag-handle">⠿</span>
+            <input class="section-title-input" type="text" value="Section 2 — Networking Services" onclick="event.stopPropagation()">
+            <span class="section-meta-tag">8 lessons</span>
+            <span class="section-toggle open">▾</span>
+          </div>
+          <div class="lesson-list">
+            <div class="lesson-item">
+              <span class="lesson-drag">⠿</span>
+              <div class="lesson-type-icon ltype-video">▶</div>
+              <div class="lesson-info">
+                <div class="lesson-name">DNS Server Configuration</div>
+                <div class="lesson-meta">Video · 22 min</div>
+              </div>
+              <div class="lesson-actions">
+                <button class="lesson-btn">✏️</button>
+                <button class="lesson-btn del" onclick="removeLesson(this)">🗑</button>
+              </div>
+            </div>
+            <div class="lesson-item">
+              <span class="lesson-drag">⠿</span>
+              <div class="lesson-type-icon ltype-video">▶</div>
+              <div class="lesson-info">
+                <div class="lesson-name">DHCP Setup & Scope Management</div>
+                <div class="lesson-meta">Video · 19 min</div>
+              </div>
+              <div class="lesson-actions">
+                <button class="lesson-btn">✏️</button>
+                <button class="lesson-btn del" onclick="removeLesson(this)">🗑</button>
+              </div>
+            </div>
+
+            <div class="add-lesson-row">
+              <button class="btn-add-lesson" onclick="addLesson(this, 'video')">＋ Video</button>
+              <button class="btn-add-lesson" onclick="addLesson(this, 'quiz')">＋ Quiz</button>
+              <button class="btn-add-lesson" onclick="addLesson(this, 'doc')">＋ Document</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3 collapsed -->
+        <div class="section-block">
+          <div class="section-head" onclick="toggleSection(this)">
+            <span class="drag-handle">⠿</span>
+            <input class="section-title-input" type="text" value="Section 3 — Active Directory" onclick="event.stopPropagation()">
+            <span class="section-meta-tag">10 lessons</span>
+            <span class="section-toggle">▾</span>
+          </div>
+          <div class="lesson-list" style="display:none;">
+            <div class="add-lesson-row">
+              <button class="btn-add-lesson" onclick="addLesson(this, 'video')">＋ Video</button>
+              <button class="btn-add-lesson" onclick="addLesson(this, 'quiz')">＋ Quiz</button>
+              <button class="btn-add-lesson" onclick="addLesson(this, 'doc')">＋ Document</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="card">
+      <div class="card-title">Pricing & Access</div>
+      <div class="card-sub">Control how learners access this course.</div>
+
+      <div class="price-options">
+        <label class="price-opt selected" onclick="selectPrice(this)">
+          <input type="radio" name="pricing" checked>
+          <div class="price-opt-label">📦 Included in Plan</div>
+          <div class="price-opt-desc">Available to all Pro subscribers</div>
+        </label>
+        <label class="price-opt" onclick="selectPrice(this)">
+          <input type="radio" name="pricing">
+          <div class="price-opt-label">💳 Standalone Purchase</div>
+          <div class="price-opt-desc">Set a one-time price below</div>
+        </label>
+      </div>
+
+      <div class="form-group" id="priceField" style="display:none;">
+        <label>Price (USD)</label>
+        <input type="number" placeholder="29.99" min="0" step="0.01">
+      </div>
+
+      <hr class="divider">
+      <div class="card-title" style="margin-bottom:18px;">Visibility & Features</div>
+
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Publicly Listed</div>
+          <div class="toggle-desc">Show this course in the course catalogue</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" checked>
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Certificate on Completion</div>
+          <div class="toggle-desc">Award a BhavinAcademy certificate to graduates</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" checked>
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Enable Discussion Forum</div>
+          <div class="toggle-desc">Let enrolled students post questions</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" checked>
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Downloadable Resources</div>
+          <div class="toggle-desc">Allow students to download attached files</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox">
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+    </div>
+
+    <!-- PREREQUISITES -->
+    <div class="card">
+      <div class="card-title">Prerequisites & Requirements</div>
+      <div class="card-sub">Tell learners what they need before starting.</div>
+      <div class="form-group">
+        <label>Prerequisites</label>
+        <textarea placeholder="e.g. Basic understanding of computer hardware, familiarity with Windows desktop…" style="min-height:80px;">Basic familiarity with Windows desktop OS. No server experience required.</textarea>
+      </div>
+      <div class="form-group">
+        <label>Learning Outcomes <span class="label-hint">One per line</span></label>
+        <textarea placeholder="After completing this course, learners will be able to…" style="min-height:100px;">Install and configure Windows Server 2022
+Manage DNS, DHCP, and file services
+Implement Active Directory and Group Policy
+Prepare for the MCSA certification exam</textarea>
+      </div>
+      <div class="form-group">
+        <label>Target Audience</label>
+        <input type="text" value="IT support staff, sysadmin beginners, MCSA candidates">
+      </div>
+    </div>
+
+  </div><!-- /main-col -->
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar-sticky">
+
+    <!-- PUBLISH CARD -->
+    <div class="sidebar-card">
+      <div class="sidebar-card-title">Publish Status</div>
+      <div class="progress-label">
+        <span>Completion</span>
+        <strong>78%</strong>
+      </div>
+      <div class="progress-bar" style="margin-bottom:18px;"><div class="progress-fill" style="width:78%"></div></div>
+
+      <div class="checklist" style="margin-bottom:20px;">
+        <div class="check-item"><div class="check-icon check-done">✓</div><span>Title & description</span></div>
+        <div class="check-item"><div class="check-icon check-done">✓</div><span>Banner image set</span></div>
+        <div class="check-item"><div class="check-icon check-done">✓</div><span>Category & tags</span></div>
+        <div class="check-item"><div class="check-icon check-done">✓</div><span>Curriculum added</span></div>
+        <div class="check-item"><div class="check-icon check-todo">○</div><span class="todo">Intro video missing</span></div>
+        <div class="check-item"><div class="check-icon check-todo">○</div><span class="todo">Pricing not confirmed</span></div>
+      </div>
+
+      <div class="publish-actions">
+        <button class="btn-publish" onclick="showToast('Course published! 🎉')">Publish Course</button>
+        <button class="btn-save" onclick="showToast('Draft saved ✓')">Save as Draft</button>
+        <button class="btn-ghost" style="width:100%;padding:11px;text-align:center;border-radius:12px;" onclick="showToast('Preview opened in new tab')">Preview →</button>
+      </div>
+    </div>
+
+    <!-- COURSE PREVIEW CARD -->
+    <div class="sidebar-card">
+      <div class="sidebar-card-title">Card Preview</div>
+      <div class="course-preview-banner" id="previewBanner">🪟</div>
+      <div class="preview-meta">
+        <div class="preview-row">🏷 <strong id="previewCategory">Microsoft</strong></div>
+        <div class="preview-row">📚 <strong id="previewTitle">Windows Server Administration</strong></div>
+        <div class="preview-row">⏱ <strong>28 hrs</strong> &nbsp;·&nbsp; <strong>56 lessons</strong></div>
+        <div style="margin-top:6px;"><span class="preview-badge">Intermediate</span></div>
+      </div>
+    </div>
+
+    <!-- STATS CARD -->
+    <div class="sidebar-card">
+      <div class="sidebar-card-title">Course Stats</div>
+      <div class="stat-mini-row" style="margin-bottom:12px;">
+        <div class="stat-mini">
+          <div class="stat-mini-val">847</div>
+          <div class="stat-mini-label">Enrolled</div>
+        </div>
+        <div class="stat-mini">
+          <div class="stat-mini-val">4.8</div>
+          <div class="stat-mini-label">Rating</div>
+        </div>
+      </div>
+      <div class="stat-mini-row">
+        <div class="stat-mini">
+          <div class="stat-mini-val">62%</div>
+          <div class="stat-mini-label">Completion</div>
+        </div>
+        <div class="stat-mini">
+          <div class="stat-mini-val">312</div>
+          <div class="stat-mini-label">Finished</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DANGER ZONE -->
+    <div class="sidebar-card">
+      <div class="sidebar-card-title" style="color:#d70015;">Danger Zone</div>
+      <button class="btn-danger" onclick="showToast('Course archived')">Archive Course</button>
+      <div style="margin-top:8px;">
+        <button class="btn-danger" style="border-color:#ffd0d0;" onclick="if(confirm('Delete this course? This cannot be undone.')) showToast('Course deleted')">Delete Course</button>
+      </div>
+    </div>
+
+  </aside>
+
+</div><!-- /page-wrap -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// Title char counter
+const titleEl = document.getElementById('courseTitle');
+const countEl = document.getElementById('titleCount');
+titleEl.addEventListener('input', () => {
+  const l = titleEl.value.length;
+  countEl.textContent = `${l} / 80`;
+  countEl.style.color = l > 70 ? '#d70015' : '#86868b';
+});
+
+// Update preview title
+function updatePreview() {
+  document.getElementById('previewTitle').textContent = titleEl.value || 'Course Title';
+}
+
+// Banner colour picker
+function setBanner(el, grad) {
+  document.querySelectorAll('.banner-swatch').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('bannerPreview').style.background = grad;
+  document.getElementById('previewBanner').style.background = grad;
+}
+
+// Banner icon update
+function updateBannerIcon() {
+  const icon = document.getElementById('bannerIcon').value;
+  document.getElementById('bannerPreview').textContent = icon;
+  document.getElementById('previewBanner').textContent = icon;
+}
+
+// Section toggle
+function toggleSection(head) {
+  const list = head.nextElementSibling;
+  const arrow = head.querySelector('.section-toggle');
+  const isOpen = list.style.display !== 'none';
+  list.style.display = isOpen ? 'none' : 'block';
+  arrow.classList.toggle('open', !isOpen);
+}
+
+// Add section
+let sectionCount = 4;
+function addSection() {
+  const list = document.getElementById('sectionList');
+  const block = document.createElement('div');
+  block.className = 'section-block';
+  block.innerHTML = `
+    <div class="section-head" onclick="toggleSection(this)">
+      <span class="drag-handle">⠿</span>
+      <input class="section-title-input" type="text" value="Section ${sectionCount} — New Section" onclick="event.stopPropagation()">
+      <span class="section-meta-tag">0 lessons</span>
+      <span class="section-toggle open">▾</span>
+    </div>
+    <div class="lesson-list">
+      <div class="add-lesson-row">
+        <button class="btn-add-lesson" onclick="addLesson(this,'video')">＋ Video</button>
+        <button class="btn-add-lesson" onclick="addLesson(this,'quiz')">＋ Quiz</button>
+        <button class="btn-add-lesson" onclick="addLesson(this,'doc')">＋ Document</button>
+      </div>
+    </div>`;
+  list.appendChild(block);
+  sectionCount++;
+  showToast('Section added');
+}
+
+// Add lesson
+const lessonConfig = {
+  video: { icon: '▶', cls: 'ltype-video', label: 'New Video Lesson', meta: 'Video · 0 min' },
+  quiz:  { icon: '❓', cls: 'ltype-quiz', label: 'New Quiz',         meta: 'Quiz · 0 questions' },
+  doc:   { icon: '📄', cls: 'ltype-doc',  label: 'New Document',     meta: 'Document' },
+};
+function addLesson(btn, type) {
+  const cfg = lessonConfig[type];
+  const row = btn.closest('.add-lesson-row');
+  const item = document.createElement('div');
+  item.className = 'lesson-item';
+  item.innerHTML = `
+    <span class="lesson-drag">⠿</span>
+    <div class="lesson-type-icon ${cfg.cls}">${cfg.icon}</div>
+    <div class="lesson-info">
+      <div class="lesson-name">${cfg.label}</div>
+      <div class="lesson-meta">${cfg.meta}</div>
+    </div>
+    <div class="lesson-actions">
+      <button class="lesson-btn">✏️</button>
+      <button class="lesson-btn del" onclick="removeLesson(this)">🗑</button>
+    </div>`;
+  row.parentNode.insertBefore(item, row);
+  showToast(`${type.charAt(0).toUpperCase()+type.slice(1)} lesson added`);
+}
+
+// Remove lesson
+function removeLesson(btn) {
+  btn.closest('.lesson-item').remove();
+  showToast('Lesson removed');
+}
+
+// Remove tag
+function removeTag(btn) {
+  btn.closest('.tag-pill').remove();
+}
+
+// Add tag on Enter
+function handleTag(e) {
+  if (e.key === 'Enter') {
+    const val = e.target.value.trim();
+    if (!val) return;
+    const pill = document.createElement('span');
+    pill.className = 'tag-pill';
+    pill.innerHTML = `${val} <button onclick="removeTag(this)">×</button>`;
+    e.target.parentNode.insertBefore(pill, e.target);
+    e.target.value = '';
+  }
+}
+
+// Pricing toggle
+function selectPrice(el) {
+  document.querySelectorAll('.price-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  const isStandalone = el.querySelectorAll('input')[0].nextElementSibling.textContent.includes('Standalone');
+  document.getElementById('priceField').style.display = isStandalone ? 'block' : 'none';
+}
+
+// Toast
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+</script>
+
+</body>
+</html>

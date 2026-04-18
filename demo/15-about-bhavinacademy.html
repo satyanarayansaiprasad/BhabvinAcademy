@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — BhavinAcademy</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:#fff;color:#1d1d1f;overflow-x:hidden;}
+
+/* ─── NAV ─────────────────────────────────────────────── */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,0.08);height:52px;display:flex;align-items:center;justify-content:center;padding:0 24px;}
+.nav-inner{max-width:1080px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-size:18px;font-weight:700;letter-spacing:-0.5px;color:#1d1d1f;text-decoration:none;}
+.nav-logo span{color:#0071e3;}
+.nav-links{display:flex;gap:20px;list-style:none;}
+.nav-links a{font-size:13px;color:#1d1d1f;text-decoration:none;font-weight:400;opacity:0.7;transition:opacity 0.2s;}
+.nav-links a:hover,.nav-links a.active{opacity:1;}
+.nav-links a.active{font-weight:600;}
+.nav-btn{background:#0071e3;color:#fff;border:none;padding:7px 16px;border-radius:980px;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s;}
+.nav-btn:hover{background:#0077ed;}
+
+/* ─── SHARED ──────────────────────────────────────────── */
+.section-label{font-size:13px;font-weight:600;color:#0071e3;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+.section-label-light{color:rgba(0,113,227,0.7);}
+
+/* ─── SCROLL REVEAL ───────────────────────────────────── */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity 0.65s ease,transform 0.65s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+.reveal-d1{transition-delay:0.1s;}
+.reveal-d2{transition-delay:0.2s;}
+.reveal-d3{transition-delay:0.3s;}
+.reveal-d4{transition-delay:0.4s;}
+
+/* ─── PAGE HERO ───────────────────────────────────────── */
+.page-hero{min-height:88vh;background:linear-gradient(160deg,#000 0%,#1a1a2e 50%,#000 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px;position:relative;overflow:hidden;}
+.hero-glow{position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(0,113,227,0.22) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+.hero-glow-2{position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.1) 0%,transparent 70%);bottom:15%;right:10%;pointer-events:none;}
+.hero-eyebrow{font-size:13px;font-weight:500;color:#0071e3;letter-spacing:0.06em;margin-bottom:18px;text-transform:uppercase;position:relative;}
+.page-hero h1{font-size:clamp(42px,6vw,82px);font-weight:800;line-height:1.04;letter-spacing:-2.5px;color:#f5f5f7;margin-bottom:22px;max-width:820px;position:relative;}
+.page-hero h1 em{font-style:normal;background:linear-gradient(90deg,#0071e3,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.page-hero-sub{font-size:clamp(16px,2vw,20px);color:#86868b;line-height:1.65;max-width:580px;font-weight:300;position:relative;}
+.hero-scroll-hint{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;opacity:0.35;}
+.hero-scroll-hint span{font-size:11px;color:#f5f5f7;letter-spacing:0.08em;text-transform:uppercase;}
+.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,rgba(245,245,247,0.4),transparent);}
+
+/* ─── STORY SECTION ───────────────────────────────────── */
+.story-sect{background:#fff;padding:100px 24px;}
+.story-inner{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1fr 380px;gap:72px;align-items:start;}
+.story-text{}
+.story-text h2{font-size:clamp(30px,4vw,48px);font-weight:800;letter-spacing:-1.5px;color:#1d1d1f;line-height:1.1;margin-bottom:28px;}
+.story-text h2 em{font-style:normal;color:#0071e3;}
+.story-text p{font-size:16px;color:#6e6e73;line-height:1.8;margin-bottom:18px;}
+.story-text p strong{color:#1d1d1f;font-weight:600;}
+.story-link{display:inline-flex;align-items:center;gap:6px;font-size:15px;font-weight:600;color:#0071e3;text-decoration:none;margin-top:10px;}
+.story-link::after{content:'›';font-size:18px;}
+
+/* Profile card */
+.profile-card{background:#000;border-radius:24px;padding:36px 32px;position:sticky;top:80px;}
+.profile-avatar{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#0071e3,#00d4ff);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;color:#fff;margin-bottom:20px;letter-spacing:-1px;}
+.profile-name{font-size:22px;font-weight:800;color:#f5f5f7;letter-spacing:-0.5px;margin-bottom:4px;}
+.profile-title{font-size:13px;color:#86868b;margin-bottom:24px;line-height:1.5;}
+.profile-divider{height:1px;background:rgba(255,255,255,0.08);margin-bottom:22px;}
+.profile-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.profile-row-icon{width:32px;height:32px;border-radius:8px;background:rgba(0,113,227,0.18);border:1px solid rgba(0,113,227,0.25);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.profile-row-text{font-size:13px;color:#c7c7cc;line-height:1.4;}
+.profile-row-text strong{color:#f5f5f7;font-weight:600;}
+.cert-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:22px;}
+.cert-pill{font-size:11px;font-weight:600;background:rgba(0,113,227,0.18);border:1px solid rgba(0,113,227,0.3);color:#40a9ff;padding:4px 11px;border-radius:980px;letter-spacing:0.02em;}
+
+/* ─── NUMBERS BAND ────────────────────────────────────── */
+.numbers-sect{background:#000;padding:80px 24px;}
+.numbers-inner{max-width:1080px;margin:0 auto;}
+.numbers-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,0.07);border-radius:20px;overflow:hidden;margin-top:48px;}
+.number-item{background:#000;padding:40px 32px;position:relative;overflow:hidden;}
+.number-item::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 80%,rgba(0,113,227,0.06) 0%,transparent 60%);}
+.number-val{font-size:clamp(42px,5vw,64px);font-weight:900;letter-spacing:-3px;color:#f5f5f7;line-height:1;margin-bottom:6px;position:relative;}
+.number-val span{font-size:0.55em;letter-spacing:-1px;color:#0071e3;}
+.number-label{font-size:13px;color:#86868b;font-weight:400;line-height:1.5;position:relative;}
+.number-accent{position:absolute;top:24px;right:24px;font-size:32px;opacity:0.1;}
+
+/* ─── MISSION / VALUES ────────────────────────────────── */
+.mission-sect{background:#f5f5f7;padding:100px 24px;}
+.mission-inner{max-width:1080px;margin:0 auto;}
+.mission-header{margin-bottom:48px;}
+.mission-header h2{font-size:clamp(28px,4vw,46px);font-weight:800;letter-spacing:-1.5px;color:#1d1d1f;line-height:1.1;margin-top:10px;}
+.values-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.value-card{background:#fff;border-radius:20px;padding:36px 30px;border:1px solid transparent;transition:border-color 0.2s,box-shadow 0.2s,transform 0.3s;}
+.value-card:hover{border-color:#0071e3;box-shadow:0 8px 32px rgba(0,113,227,0.1);transform:translateY(-4px);}
+.value-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:20px;}
+.value-icon-blue{background:linear-gradient(135deg,rgba(0,113,227,0.12),rgba(0,212,255,0.08));border:1px solid rgba(0,113,227,0.18);}
+.value-icon-dark{background:linear-gradient(135deg,rgba(29,29,31,0.08),rgba(29,29,31,0.04));border:1px solid rgba(0,0,0,0.08);}
+.value-icon-green{background:linear-gradient(135deg,rgba(26,58,42,0.1),rgba(48,209,88,0.06));border:1px solid rgba(48,209,88,0.15);}
+.value-num{font-size:12px;font-weight:700;color:#0071e3;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+.value-title{font-size:20px;font-weight:700;letter-spacing:-0.4px;color:#1d1d1f;margin-bottom:10px;}
+.value-desc{font-size:14px;color:#6e6e73;line-height:1.7;}
+
+/* ─── PHILOSOPHY ──────────────────────────────────────── */
+.philosophy-sect{background:#000;padding:110px 24px;text-align:center;position:relative;overflow:hidden;}
+.phil-glow{position:absolute;width:500px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(0,113,227,0.15) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+.philosophy-inner{max-width:800px;margin:0 auto;position:relative;}
+.phil-mark{font-size:120px;line-height:0.6;color:rgba(0,113,227,0.2);font-weight:900;margin-bottom:28px;display:block;font-family:Georgia,serif;}
+.phil-quote{font-size:clamp(20px,3vw,32px);font-weight:300;color:#f5f5f7;line-height:1.6;letter-spacing:-0.5px;margin-bottom:36px;}
+.phil-quote strong{font-weight:700;color:#fff;}
+.phil-author{font-size:14px;color:#86868b;letter-spacing:0.04em;}
+.phil-byline{font-size:12px;color:rgba(134,134,139,0.6);margin-top:6px;}
+
+/* ─── WHAT I TEACH ────────────────────────────────────── */
+.teach-sect{background:#fff;padding:100px 24px;}
+.teach-inner{max-width:1080px;margin:0 auto;}
+.teach-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px;}
+.teach-card{border-radius:20px;overflow:hidden;padding:36px 32px;min-height:200px;position:relative;cursor:pointer;transition:transform 0.3s,box-shadow 0.3s;}
+.teach-card:hover{transform:translateY(-4px);box-shadow:0 20px 48px rgba(0,0,0,0.12);}
+.tc-ms{background:linear-gradient(140deg,#001830,#003a6b);}
+.tc-lx{background:linear-gradient(140deg,#1a0e00,#3d2200);}
+.tc-nw{background:linear-gradient(140deg,#001a30,#003060);}
+.tc-cl{background:linear-gradient(140deg,#00131f,#002a40);}
+.tc-sec{background:linear-gradient(140deg,#001a0a,#003018);}
+.tc-dv{background:linear-gradient(140deg,#130020,#2a0040);}
+.teach-card-icon{font-size:40px;margin-bottom:18px;display:block;filter:drop-shadow(0 0 20px rgba(0,113,227,0.3));}
+.teach-card-title{font-size:18px;font-weight:700;color:#f5f5f7;letter-spacing:-0.3px;margin-bottom:8px;}
+.teach-card-desc{font-size:13px;color:rgba(245,245,247,0.5);line-height:1.6;}
+.teach-card-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px;}
+.teach-pill{font-size:10px;font-weight:600;background:rgba(255,255,255,0.09);color:rgba(245,245,247,0.65);padding:3px 10px;border-radius:980px;letter-spacing:0.02em;}
+
+/* ─── JOURNEY / TIMELINE ──────────────────────────────── */
+.journey-sect{background:#f5f5f7;padding:100px 24px;}
+.journey-inner{max-width:1080px;margin:0 auto;}
+.journey-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:48px;}
+.journey-card{background:#fff;border-radius:20px;padding:32px 28px;border:1px solid #d2d2d7;transition:border-color 0.2s,box-shadow 0.2s;}
+.journey-card:hover{border-color:#0071e3;box-shadow:0 6px 24px rgba(0,113,227,0.08);}
+.journey-year{font-size:13px;font-weight:700;color:#0071e3;margin-bottom:10px;letter-spacing:0.04em;}
+.journey-title{font-size:19px;font-weight:700;letter-spacing:-0.4px;color:#1d1d1f;margin-bottom:8px;}
+.journey-desc{font-size:14px;color:#6e6e73;line-height:1.7;}
+.journey-tag{display:inline-block;font-size:11px;font-weight:600;background:#e8f1fb;color:#0071e3;padding:3px 10px;border-radius:980px;margin-top:14px;}
+
+/* ─── TESTIMONIALS ────────────────────────────────────── */
+.testi-sect{background:#000;padding:100px 24px;}
+.testi-inner{max-width:1080px;margin:0 auto;}
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px;}
+.testi-card{background:#1d1d1f;border-radius:20px;padding:32px 28px;}
+.testi-stars{color:#ffd60a;font-size:14px;letter-spacing:2px;margin-bottom:16px;}
+.testi-text{font-size:15px;color:#c7c7cc;line-height:1.7;font-weight:300;margin-bottom:24px;}
+.testi-text strong{color:#f5f5f7;font-weight:600;}
+.testi-author{display:flex;align-items:center;gap:12px;}
+.testi-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+.testi-av-blue{background:linear-gradient(135deg,#0071e3,#00d4ff);}
+.testi-av-green{background:linear-gradient(135deg,#107c10,#30d158);}
+.testi-av-purple{background:linear-gradient(135deg,#5c2d91,#a76bde);}
+.testi-name{font-size:13px;font-weight:600;color:#f5f5f7;}
+.testi-meta{font-size:12px;color:#6e6e73;margin-top:2px;}
+
+/* ─── CTA BAND ────────────────────────────────────────── */
+.cta-band{background:#0071e3;padding:88px 24px;text-align:center;}
+.cta-band h2{font-size:clamp(28px,4vw,52px);font-weight:800;color:#fff;letter-spacing:-1.5px;margin-bottom:16px;}
+.cta-band p{font-size:17px;color:rgba(255,255,255,0.75);margin-bottom:36px;max-width:480px;margin-left:auto;margin-right:auto;}
+.btn-white{background:#fff;color:#0071e3;border:none;padding:14px 32px;border-radius:980px;font-size:16px;font-weight:600;cursor:pointer;transition:opacity 0.2s;}
+.btn-white:hover{opacity:0.9;}
+
+/* ─── FOOTER ──────────────────────────────────────────── */
+footer{background:#f5f5f7;border-top:1px solid #d2d2d7;padding:40px 24px 24px;}
+.footer-inner{max-width:1080px;margin:0 auto;}
+.footer-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;padding-bottom:32px;border-bottom:1px solid #d2d2d7;margin-bottom:24px;}
+.footer-col h4{font-size:13px;font-weight:600;color:#1d1d1f;margin-bottom:12px;}
+.footer-col ul{list-style:none;}
+.footer-col ul li{margin-bottom:8px;}
+.footer-col ul li a{font-size:13px;color:#6e6e73;text-decoration:none;transition:color 0.2s;}
+.footer-col ul li a:hover{color:#0071e3;}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;}
+.footer-copy{font-size:13px;color:#86868b;}
+.footer-logo{font-size:16px;font-weight:700;color:#1d1d1f;}
+.footer-logo span{color:#0071e3;}
+
+/* ─── RESPONSIVE ──────────────────────────────────────── */
+@media(max-width:960px){
+  .story-inner{grid-template-columns:1fr;gap:40px;}
+  .profile-card{position:static;}
+  .numbers-grid{grid-template-columns:repeat(2,1fr);}
+  .values-grid{grid-template-columns:1fr 1fr;}
+  .teach-grid{grid-template-columns:1fr 1fr;}
+  .journey-grid{grid-template-columns:1fr;}
+  .testi-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:640px){
+  .values-grid,.teach-grid,.testi-grid{grid-template-columns:1fr;}
+  .numbers-grid{grid-template-columns:1fr 1fr;}
+  .footer-cols{grid-template-columns:1fr 1fr;}
+  .nav-links{display:none;}
+  .story-inner{gap:28px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─────────────────────────────────────────── -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">Bhavin<span>Academy</span></a>
+    <ul class="nav-links">
+      <li><a href="#">Courses</a></li>
+      <li><a href="#">Paths</a></li>
+      <li><a href="#">Instructor</a></li>
+      <li><a href="#">Blog</a></li>
+      <li><a href="#" class="active">About</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+    <button class="nav-btn">Sign in</button>
+  </div>
+</nav>
+
+<!-- ─── PAGE HERO ─────────────────────────────────────── -->
+<section class="page-hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+  <p class="hero-eyebrow">About BhavinAcademy</p>
+  <h1>Built by a practitioner.<br><em>For practitioners.</em></h1>
+  <p class="page-hero-sub">BhavinAcademy is built on a fundamental: Master the depth, scale the width with applied knowledge.</p>
+  <div class="hero-scroll-hint">
+  </div>
+</section>
+
+<!-- ─── STORY ─────────────────────────────────────────── -->
+<section class="story-sect">
+  <div class="story-inner">
+
+    <!-- Left: story text -->
+    <div class="story-text reveal">
+      <p class="section-label">The Story</p>
+      <h2>Not just a teacher.<br>A career <em>witness</em>.</h2>
+      <p>I started my IT career the hard way. I was self-taught - studying late into the night after a full-time job, chasing technologies that felt impossibly distant, and implementing everything I learned. Every lab mistake, every exam I failed before I passed, and every concept that finally "clicked" is woven into the DNA of BhavinAcademy today.</p>
+      <p>After <strong>15+ years in enterprise IT</strong>; spanning Windows infrastructure, Active Directory, and Linux administration to networking and cloud security, I realized that most people in the industry strive for the right path through applied knowledge and a simplified learning methodology. Answering a long-standing calling to support this mission, I have dedicated myself to teaching the skills I’ve mastered to help others walk their path efficiently.</p>
+      <p>This platform is the result of my passion for IT, and Life Enhancement. Now, it’s your turn to put it to work for your career and growth.</p>
+    <p>Wish you a great journey ahead!</p>
+      <a class="story-link" href="#">Explore all courses</a>
+    </div>
+
+    <!-- Right: profile card -->
+    <div class="reveal reveal-d2">
+      <div class="profile-card">
+        <div class="profile-avatar">BK</div>
+        <div class="profile-name">Bhavin Khatri</div>
+        <div class="profile-title">Founder & Lead Instructor<br>BhavinAcademy</div>
+        <div class="profile-divider"></div>
+        <div class="profile-row">
+          <div class="profile-row-icon">🧑‍💻</div>
+          <div class="profile-row-text"><strong>15+ years</strong> in enterprise IT</div>
+        </div>
+        <div class="profile-row">
+          <div class="profile-row-icon">🏢</div>
+          <div class="profile-row-text"><strong>Worked in 7+ companies</strong></div>
+        </div>
+        <div class="profile-row">
+          <div class="profile-row-icon">🤝</div>
+          <div class="profile-row-text"><strong>Served 500+ customers</strong></div>
+        </div>
+        <div class="profile-row">
+          <div class="profile-row-icon">🎙️</div>
+          <div class="profile-row-text"><strong>Conducted 450+ training & events</strong></div>
+        </div>
+        <div class="profile-row">
+          <div class="profile-row-icon">🌍</div>
+          <div class="profile-row-text">Based in <strong>India</strong> · Teaching globally</div>
+        </div>
+        <div class="cert-pills">
+          <span class="cert-pill">MCSA</span>
+          <span class="cert-pill">AZ-104</span>
+          <span class="cert-pill">CCNA</span>
+          <span class="cert-pill">LPIC-1</span>
+          <span class="cert-pill">Security+</span>
+          <span class="cert-pill">Network+</span>
+          <span class="cert-pill">AZ-900</span>
+          <span class="cert-pill">MS-900</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── NUMBERS ────────────────────────────────────────── -->
+<section class="numbers-sect">
+  <div class="numbers-inner">
+    <p class="section-label section-label-light reveal">By the numbers</p>
+    <div class="numbers-grid">
+      <div class="number-item reveal">
+        <div class="number-accent">🧑‍💻</div>
+        <div class="number-val">15<span>+</span></div>
+        <div class="number-label">Years in<br>enterprise IT</div>
+      </div>
+      <div class="number-item reveal reveal-d1">
+        <div class="number-accent">🏢</div>
+        <div class="number-val">7<span>+</span></div>
+        <div class="number-label">Companies<br>worked in</div>
+      </div>
+      <div class="number-item reveal reveal-d2">
+        <div class="number-accent">🤝</div>
+        <div class="number-val">500<span>+</span></div>
+        <div class="number-label">Customers<br>served</div>
+      </div>
+      <div class="number-item reveal reveal-d3">
+        <div class="number-accent">🎙️</div>
+        <div class="number-val">450<span>+</span></div>
+        <div class="number-label">Training &amp; events<br>conducted</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── MISSION / VALUES ───────────────────────────────── -->
+<section class="mission-sect">
+  <div class="mission-inner">
+    <div class="mission-header reveal">
+      <p class="section-label">Our Mission</p>
+      <h2>Every principle that<br>guides how we teach.</h2>
+    </div>
+    <div class="values-grid">
+      <div class="value-card reveal">
+        <div class="value-icon value-icon-blue">🎯</div>
+        <div class="value-num">01</div>
+        <div class="value-title">Exam-ready, job-ready</div>
+        <div class="value-desc">Certifications open doors — but it's real-world competence that keeps them open. Every course is designed so that passing the exam and doing the job are the same outcome.</div>
+      </div>
+      <div class="value-card reveal reveal-d1">
+        <div class="value-icon value-icon-dark">🔬</div>
+        <div class="value-num">02</div>
+        <div class="value-title">Labs before lectures</div>
+        <div class="value-desc">You don't learn to drive by reading a manual. Every concept is reinforced with a hands-on lab, because muscle memory and mental models are built in the terminal, not in a PDF.</div>
+      </div>
+      <div class="value-card reveal reveal-d2">
+        <div class="value-icon value-icon-green">🌱</div>
+        <div class="value-num">03</div>
+        <div class="value-title">Fundamentals never expire</div>
+        <div class="value-desc">Cloud providers come and go. Vendors rebrand their products. But TCP/IP, Active Directory concepts, and Linux process management have been relevant for decades — and will be for decades more.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TEACHING PHILOSOPHY ────────────────────────────── -->
+<section class="philosophy-sect">
+  <div class="phil-glow"></div>
+  <div class="philosophy-inner">
+    <span class="phil-mark reveal">"</span>
+    <p class="phil-quote reveal">"While technology shifts with every decade, your value remains constant through two rules: <strong>Master the fundamentals</strong>, as they are timeless; and <strong>keep learning</strong>, for the world never stops turning."</p>
+    <div class="phil-author reveal">· Bhavin Khatri ·</div>
+    <div class="phil-byline reveal">Founder, BhavinAcademy</div>
+  </div>
+</section>
+
+<!-- ─── WHAT I TEACH ───────────────────────────────────── -->
+<section class="teach-sect">
+  <div class="teach-inner">
+    <div class="reveal">
+      <p class="section-label">What We Cover</p>
+      <h2 style="font-size:clamp(28px,4vw,46px);font-weight:800;letter-spacing:-1.5px;margin-top:10px;margin-bottom:0;">Six domains. One platform.</h2>
+    </div>
+    <div class="teach-grid">
+      <div class="teach-card tc-ms reveal">
+        <span class="teach-card-icon">🪟</span>
+        <div class="teach-card-title">Microsoft & Windows</div>
+        <div class="teach-card-desc">Windows Server, Active Directory, Group Policy, Microsoft 365, Intune, and Azure identity.</div>
+        <div class="teach-card-pills">
+          <span class="teach-pill">Windows Server</span>
+          <span class="teach-pill">AD DS</span>
+          <span class="teach-pill">Microsoft 365</span>
+          <span class="teach-pill">Intune</span>
+        </div>
+      </div>
+      <div class="teach-card tc-lx reveal reveal-d1">
+        <span class="teach-card-icon">🐧</span>
+        <div class="teach-card-title">Linux Administration</div>
+        <div class="teach-card-desc">System administration, Bash scripting, service management, and LPIC certification prep.</div>
+        <div class="teach-card-pills">
+          <span class="teach-pill">Ubuntu</span>
+          <span class="teach-pill">RHEL</span>
+          <span class="teach-pill">Bash</span>
+          <span class="teach-pill">LPIC-1</span>
+        </div>
+      </div>
+      <div class="teach-card tc-nw reveal reveal-d2">
+        <span class="teach-card-icon">🌐</span>
+        <div class="teach-card-title">Networking</div>
+        <div class="teach-card-desc">Routing, switching, subnetting, firewalls — built around CCNA and CompTIA Network+ objectives.</div>
+        <div class="teach-card-pills">
+          <span class="teach-pill">Cisco IOS</span>
+          <span class="teach-pill">TCP/IP</span>
+          <span class="teach-pill">VLANs</span>
+          <span class="teach-pill">CCNA</span>
+        </div>
+      </div>
+      <div class="teach-card tc-cl reveal">
+        <span class="teach-card-icon">☁️</span>
+        <div class="teach-card-title">Cloud & Azure</div>
+        <div class="teach-card-desc">Azure fundamentals through to administrator-level management of compute, storage, and networking.</div>
+        <div class="teach-card-pills">
+          <span class="teach-pill">AZ-900</span>
+          <span class="teach-pill">AZ-104</span>
+          <span class="teach-pill">ARM</span>
+          <span class="teach-pill">Azure AD</span>
+        </div>
+      </div>
+      <div class="teach-card tc-sec reveal reveal-d1">
+        <span class="teach-card-icon">🔒</span>
+        <div class="teach-card-title">Cybersecurity</div>
+        <div class="teach-card-desc">Threat landscape, access control, encryption, and CompTIA Security+ exam preparation.</div>
+        <div class="teach-card-pills">
+          <span class="teach-pill">Security+</span>
+          <span class="teach-pill">IAM</span>
+          <span class="teach-pill">PKI</span>
+          <span class="teach-pill">SIEM</span>
+        </div>
+      </div>
+      <div class="teach-card tc-dv reveal reveal-d2">
+        <span class="teach-card-icon">⚙️</span>
+        <div class="teach-card-title">DevOps & Automation</div>
+        <div class="teach-card-desc">Infrastructure as code, PowerShell automation, Ansible, and CI/CD pipelines for sysadmins.</div>
+        <div class="teach-card-pills">
+          <span class="teach-pill">PowerShell</span>
+          <span class="teach-pill">Ansible</span>
+          <span class="teach-pill">Terraform</span>
+          <span class="teach-pill">Git</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── JOURNEY / TIMELINE ─────────────────────────────── -->
+<section class="journey-sect">
+  <div class="journey-inner">
+    <div class="reveal">
+      <p class="section-label">The Journey</p>
+      <h2 style="font-size:clamp(28px,4vw,46px);font-weight:800;letter-spacing:-1.5px;margin-top:10px;margin-bottom:0;">Fifteen years in the making.</h2>
+    </div>
+    <div class="journey-grid">
+      <div class="journey-card reveal">
+        <div class="journey-year">2008 – 2012</div>
+        <div class="journey-title">Started on the helpdesk</div>
+        <div class="journey-desc">Like most IT careers, it began with password resets and printer jams. But nights and weekends were spent deep in home labs — building, breaking, and rebuilding Windows domains from scratch.</div>
+        <span class="journey-tag">🏁 The beginning</span>
+      </div>
+      <div class="journey-card reveal reveal-d1">
+        <div class="journey-year">2012 – 2016</div>
+        <div class="journey-title">Enterprise infrastructure engineer</div>
+        <div class="journey-desc">Moved into a large enterprise environment managing 2,000+ endpoint networks, Active Directory forests, and Windows Server infrastructure. First real exposure to what "production pressure" means.</div>
+        <span class="journey-tag">📈 Levelling up</span>
+      </div>
+      <div class="journey-card reveal">
+        <div class="journey-year">2016 – 2020</div>
+        <div class="journey-title">Cloud migration & Linux</div>
+        <div class="journey-desc">Led the Azure migration for a mid-size organisation — hybrid identity, virtual networking, policy management. Simultaneously deepened Linux expertise for mixed-environment management.</div>
+        <span class="journey-tag">☁️ Going cloud</span>
+      </div>
+      <div class="journey-card reveal reveal-d1">
+        <div class="journey-year">2020 – Present</div>
+        <div class="journey-title">Built BhavinAcademy</div>
+        <div class="journey-desc">Took everything from 12 years in the field and built a platform that teaches IT the way it's actually practised — hands-on, scenario-driven, and brutally practical. 5,000+ students later, the mission continues.</div>
+        <span class="journey-tag">🚀 The academy</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TESTIMONIALS ───────────────────────────────────── -->
+<section class="testi-sect">
+  <div class="testi-inner">
+    <div class="reveal">
+      <p class="section-label section-label-light">Student voices</p>
+      <h2 style="font-size:clamp(28px,4vw,44px);font-weight:800;letter-spacing:-1.5px;color:#f5f5f7;margin-top:10px;">Careers changed.<br>In their own words.</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card reveal">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"I came in with zero networking knowledge. After Bhavin's CCNA course I passed first attempt and landed a junior network engineer role within three months. The lab approach is <strong>genuinely different</strong> from anything else out there."</p>
+        <div class="testi-author">
+          <div class="testi-avatar testi-av-blue">RK</div>
+          <div>
+            <div class="testi-name">Rahul Kapoor</div>
+            <div class="testi-meta">Network Engineer · Pune, India</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal reveal-d1">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"The AZ-104 course is the most thorough I've seen — and I bought four others before this one. What stood out was how Bhavin explains the <strong>why</strong> behind everything, not just the steps. I feel confident in Azure now."</p>
+        <div class="testi-author">
+          <div class="testi-avatar testi-av-green">SA</div>
+          <div>
+            <div class="testi-name">Sara Al-Mansouri</div>
+            <div class="testi-meta">Cloud Administrator · Dubai, UAE</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal reveal-d2">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"I was a Windows-only admin terrified of Linux. The sysadmin course broke down every barrier. Six months later I'm managing a mixed environment daily. Bhavin explains it like <strong>a senior colleague, not a lecturer</strong>."</p>
+        <div class="testi-author">
+          <div class="testi-avatar testi-av-purple">MF</div>
+          <div>
+            <div class="testi-name">Marcus Fontaine</div>
+            <div class="testi-meta">Systems Administrator · Toronto, Canada</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA ───────────────────────────────────────────── -->
+<section class="cta-band">
+  <h2>Ready to start<br>your IT journey?</h2>
+  <button class="btn-white">Explore Courses</button>
+</section>
+
+<!-- ─── FOOTER ────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h4>Courses</h4>
+        <ul>
+          <li><a href="#">Microsoft Courses</a></li>
+          <li><a href="#">Linux Courses</a></li>
+          <li><a href="#">Networking</a></li>
+          <li><a href="#">Cloud & Azure</a></li>
+          <li><a href="#">Cybersecurity</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Learning Paths</h4>
+        <ul>
+          <li><a href="#">Microsoft Engineer</a></li>
+          <li><a href="#">Linux Administrator</a></li>
+          <li><a href="#">Network Engineer</a></li>
+          <li><a href="#">Cloud Architect</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="#">Virtual Labs</a></li>
+          <li><a href="#">Practice Exams</a></li>
+          <li><a href="#">Certifications</a></li>
+          <li><a href="#">Community</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-logo">Bhavin<span>Academy</span></div>
+      <div class="footer-copy">© 2026 Bhavin Academy. All rights reserved.</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ── SCROLL REVEAL ── */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* ── COUNTER ANIMATION ── */
+function animateCounter(el, target, suffix) {
+  let start = 0;
+  const duration = 1600;
+  const startTime = performance.now();
+  function step(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.floor(eased * target);
+    el.innerHTML = current + '<span>' + suffix + '</span>';
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+const counters = [
+  { selector: '.numbers-grid .number-item:nth-child(1) .number-val', val: 15, suffix: '+' },
+  { selector: '.numbers-grid .number-item:nth-child(2) .number-val', val: 7, suffix: '+' },
+  { selector: '.numbers-grid .number-item:nth-child(3) .number-val', val: 500, suffix: '+' },
+  { selector: '.numbers-grid .number-item:nth-child(4) .number-val', val: 450, suffix: '+' },
+];
+
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const idx = [...document.querySelectorAll('.numbers-grid .number-item')].indexOf(entry.target);
+      if (idx >= 0 && counters[idx]) {
+        const c = counters[idx];
+        const el = entry.target.querySelector('.number-val');
+        animateCounter(el, c.val, c.suffix);
+      }
+      counterObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.3 });
+
+document.querySelectorAll('.numbers-grid .number-item').forEach(el => counterObserver.observe(el));
+</script>
+
+</body>
+</html>

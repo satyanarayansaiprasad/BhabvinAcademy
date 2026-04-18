@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog — BhavinAcademy</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:#fff;color:#1d1d1f;overflow-x:hidden;}
+
+/* ─── NAV ─────────────────────────────────────────────── */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,0.08);height:52px;display:flex;align-items:center;justify-content:center;padding:0 24px;}
+.nav-inner{max-width:1080px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-size:20px;font-weight:700;letter-spacing:-0.5px;color:#1d1d1f;text-decoration:none;}
+.nav-logo span{color:#0071e3;}
+.nav-links{display:flex;gap:20px;list-style:none;}
+.nav-links a{font-size:13px;color:#1d1d1f;text-decoration:none;font-weight:400;opacity:0.7;transition:opacity 0.2s;}
+.nav-links a:hover,.nav-links a.active{opacity:1;}
+.nav-links a.active{font-weight:600;}
+.nav-btn{background:#0071e3;color:#fff;border:none;padding:7px 16px;border-radius:980px;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s;}
+.nav-btn:hover{background:#0077ed;}
+
+/* ─── PAGE HERO ───────────────────────────────────────── */
+.page-hero{background:linear-gradient(160deg,#000 0%,#1a1a2e 55%,#000 100%);padding:80px 24px 72px;text-align:center;position:relative;overflow:hidden;}
+.page-hero-glow{position:absolute;width:600px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(0,113,227,0.22) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+.hero-eyebrow{font-size:12px;font-weight:600;color:#0071e3;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px;position:relative;}
+.page-hero h1{font-size:clamp(34px,5.5vw,66px);font-weight:800;line-height:1.05;letter-spacing:-2px;color:#f5f5f7;margin-bottom:16px;position:relative;}
+.page-hero h1 em{font-style:normal;background:linear-gradient(90deg,#0071e3,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.page-hero-sub{font-size:clamp(15px,2vw,18px);color:#86868b;line-height:1.6;max-width:500px;margin:0 auto;font-weight:300;position:relative;}
+
+/* ─── SEARCH + FILTER ─────────────────────────────────── */
+.controls{background:#fff;border-bottom:1px solid #d2d2d7;padding:14px 24px;position:sticky;top:52px;z-index:90;}
+.controls-inner{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.search-wrap{position:relative;flex:1;min-width:180px;max-width:300px;}
+.search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#86868b;pointer-events:none;}
+.search-input{width:100%;padding:8px 12px 8px 34px;border:1px solid #d2d2d7;border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;color:#1d1d1f;background:#f5f5f7;outline:none;transition:border-color 0.2s,background 0.2s;}
+.search-input:focus{border-color:#0071e3;background:#fff;}
+.search-input::placeholder{color:#86868b;}
+.filter-tabs{display:flex;gap:6px;flex-wrap:wrap;}
+.ftab{padding:6px 15px;border-radius:980px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid #d2d2d7;background:#fff;color:#6e6e73;transition:all 0.2s;white-space:nowrap;}
+.ftab:hover{border-color:#0071e3;color:#0071e3;}
+.ftab.active{background:#0071e3;border-color:#0071e3;color:#fff;}
+.controls-right{margin-left:auto;font-size:13px;color:#86868b;white-space:nowrap;}
+
+/* ─── MAIN LAYOUT ─────────────────────────────────────── */
+.blog-main{background:#f5f5f7;padding:48px 24px 80px;}
+.blog-inner{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1fr 320px;gap:32px;align-items:start;}
+
+/* ─── FEATURED POST ───────────────────────────────────── */
+.section-label{font-size:13px;font-weight:600;color:#0071e3;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:16px;}
+.post-featured{background:#000;border-radius:20px;overflow:hidden;cursor:pointer;transition:transform 0.3s,box-shadow 0.3s;margin-bottom:20px;display:grid;grid-template-columns:1fr 1fr;min-height:320px;}
+.post-featured:hover{transform:translateY(-3px);box-shadow:0 24px 48px rgba(0,0,0,0.2);}
+.post-feat-img{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.post-feat-img-bg{position:absolute;inset:0;background:linear-gradient(135deg,#0a1628,#1e3a5f);}
+.post-feat-img-icon{font-size:80px;position:relative;z-index:1;filter:drop-shadow(0 0 32px rgba(0,113,227,0.5));}
+.post-feat-body{padding:40px 36px;display:flex;flex-direction:column;justify-content:space-between;}
+.post-feat-tag{display:inline-block;background:rgba(0,113,227,0.2);border:1px solid rgba(0,113,227,0.35);color:#40a9ff;padding:3px 12px;border-radius:980px;font-size:11px;font-weight:600;letter-spacing:0.04em;margin-bottom:16px;width:fit-content;}
+.post-feat-title{font-size:clamp(20px,2.5vw,28px);font-weight:800;letter-spacing:-0.6px;color:#f5f5f7;line-height:1.2;margin-bottom:12px;}
+.post-feat-excerpt{font-size:14px;color:#86868b;line-height:1.65;margin-bottom:24px;}
+.post-feat-meta{display:flex;align-items:center;gap:12px;}
+.post-feat-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#0071e3,#00d4ff);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+.post-feat-author{font-size:13px;color:#86868b;}
+.post-feat-author strong{color:#c7c7cc;font-weight:600;}
+.post-feat-read{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:600;color:#0071e3;margin-top:20px;}
+.post-feat-read::after{content:'›';font-size:17px;}
+
+/* ─── POSTS GRID ──────────────────────────────────────── */
+.posts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.post-card{background:#fff;border-radius:18px;overflow:hidden;cursor:pointer;transition:transform 0.3s,box-shadow 0.3s;display:flex;flex-direction:column;}
+.post-card:hover{transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,0.08);}
+.post-card-img{height:150px;display:flex;align-items:center;justify-content:center;font-size:52px;position:relative;overflow:hidden;}
+.pci-az{background:linear-gradient(135deg,#0a1628,#1e3a5f);}
+.pci-lx{background:linear-gradient(135deg,#1a1a0a,#3a3010);}
+.pci-sec{background:linear-gradient(135deg,#0a1a0a,#0f3020);}
+.pci-nw{background:linear-gradient(135deg,#0a1a28,#103050);}
+.pci-dv{background:linear-gradient(135deg,#1a0a28,#35155a);}
+.pci-ms{background:linear-gradient(135deg,#0a1628,#1a3060);}
+.pci-ai{background:linear-gradient(135deg,#0a0a1a,#181850);}
+.pci-cl{background:linear-gradient(135deg,#0a1e2e,#08305a);}
+.post-card-img-icon{position:relative;z-index:1;filter:drop-shadow(0 2px 12px rgba(0,0,0,0.4));}
+.post-card-tag{position:absolute;top:10px;left:12px;background:rgba(0,0,0,0.55);backdrop-filter:blur(8px);color:#c7c7cc;font-size:10px;font-weight:600;padding:3px 10px;border-radius:980px;letter-spacing:0.04em;}
+.post-card-body{padding:20px;flex:1;display:flex;flex-direction:column;}
+.post-card-title{font-size:15px;font-weight:700;letter-spacing:-0.3px;color:#1d1d1f;line-height:1.35;margin-bottom:8px;}
+.post-card-excerpt{font-size:13px;color:#6e6e73;line-height:1.6;flex:1;margin-bottom:16px;}
+.post-card-footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid #f5f5f7;padding-top:12px;}
+.post-card-date{font-size:12px;color:#86868b;}
+.post-card-read{font-size:12px;color:#86868b;}
+.post-card-link{font-size:12px;font-weight:600;color:#0071e3;}
+
+/* ─── LOAD MORE ───────────────────────────────────────── */
+.load-more-wrap{text-align:center;margin-top:36px;}
+.load-more-btn{background:#fff;color:#1d1d1f;border:1px solid #d2d2d7;padding:12px 32px;border-radius:980px;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;}
+.load-more-btn:hover{border-color:#0071e3;color:#0071e3;}
+
+/* ─── SIDEBAR ─────────────────────────────────────────── */
+.sidebar{display:flex;flex-direction:column;gap:20px;}
+.sidebar-card{background:#fff;border-radius:18px;padding:24px;}
+.sidebar-title{font-size:15px;font-weight:700;letter-spacing:-0.3px;color:#1d1d1f;margin-bottom:16px;}
+
+/* Newsletter */
+.newsletter-card{background:#000;border-radius:18px;padding:28px;}
+.newsletter-card .sidebar-title{color:#f5f5f7;}
+.newsletter-sub{font-size:13px;color:#86868b;line-height:1.55;margin-bottom:18px;}
+.newsletter-input{width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.07);color:#f5f5f7;font-size:13px;font-family:'Inter',sans-serif;outline:none;margin-bottom:10px;}
+.newsletter-input::placeholder{color:#6e6e73;}
+.newsletter-input:focus{border-color:#0071e3;}
+.newsletter-btn{width:100%;background:#0071e3;color:#fff;border:none;padding:10px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.2s;font-family:'Inter',sans-serif;}
+.newsletter-btn:hover{background:#0077ed;}
+
+/* Popular posts */
+.popular-list{display:flex;flex-direction:column;gap:16px;}
+.popular-item{display:flex;gap:12px;cursor:pointer;}
+.popular-item:hover .popular-title{color:#0071e3;}
+.popular-num{font-size:20px;font-weight:800;color:#d2d2d7;flex-shrink:0;line-height:1;margin-top:2px;}
+.popular-title{font-size:13px;font-weight:600;color:#1d1d1f;line-height:1.4;transition:color 0.2s;}
+.popular-meta{font-size:12px;color:#86868b;margin-top:3px;}
+
+/* Topics */
+.topics-list{display:flex;flex-wrap:wrap;gap:7px;}
+.topic-pill{padding:6px 14px;border-radius:980px;font-size:12px;font-weight:500;background:#f5f5f7;color:#1d1d1f;cursor:pointer;border:1px solid transparent;transition:all 0.2s;}
+.topic-pill:hover{border-color:#0071e3;color:#0071e3;background:#fff;}
+
+/* Latest video */
+.video-thumb{border-radius:12px;overflow:hidden;position:relative;cursor:pointer;margin-bottom:14px;}
+.video-thumb-bg{height:130px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0a1628,#1e3a5f);position:relative;}
+.play-btn{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.3);}
+.play-btn svg{fill:#fff;margin-left:3px;}
+.video-title{font-size:13px;font-weight:600;color:#1d1d1f;line-height:1.4;}
+.video-meta{font-size:12px;color:#86868b;margin-top:3px;}
+
+/* ─── QUOTE BAND ──────────────────────────────────────── */
+.quote-band{background:#000;padding:80px 24px;text-align:center;}
+.quote-inner{max-width:700px;margin:0 auto;}
+.quote-text{font-size:clamp(20px,3vw,34px);font-weight:300;color:#f5f5f7;line-height:1.55;letter-spacing:-0.5px;margin-bottom:24px;}
+.quote-text strong{font-weight:700;color:#fff;}
+.quote-author{font-size:14px;color:#86868b;}
+
+/* ─── CTA ─────────────────────────────────────────────── */
+.cta-band{background:#0071e3;padding:72px 24px;text-align:center;}
+.cta-band h2{font-size:clamp(26px,4vw,48px);font-weight:800;color:#fff;letter-spacing:-1.5px;margin-bottom:14px;}
+.cta-band p{font-size:16px;color:rgba(255,255,255,0.75);margin-bottom:32px;max-width:460px;margin-left:auto;margin-right:auto;}
+.btn-white{background:#fff;color:#0071e3;border:none;padding:13px 30px;border-radius:980px;font-size:15px;font-weight:600;cursor:pointer;transition:opacity 0.2s;font-family:'Inter',sans-serif;}
+.btn-white:hover{opacity:0.9;}
+
+/* ─── FOOTER ──────────────────────────────────────────── */
+footer{background:#f5f5f7;border-top:1px solid #d2d2d7;padding:40px 24px 24px;}
+.footer-inner{max-width:1080px;margin:0 auto;}
+.footer-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;padding-bottom:32px;border-bottom:1px solid #d2d2d7;margin-bottom:24px;}
+.footer-col h4{font-size:13px;font-weight:600;color:#1d1d1f;margin-bottom:12px;}
+.footer-col ul{list-style:none;}
+.footer-col ul li{margin-bottom:8px;}
+.footer-col ul li a{font-size:13px;color:#6e6e73;text-decoration:none;transition:color 0.2s;}
+.footer-col ul li a:hover{color:#0071e3;}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;}
+.footer-copy{font-size:13px;color:#86868b;}
+.footer-logo{font-size:16px;font-weight:700;color:#1d1d1f;}
+.footer-logo span{color:#0071e3;}
+
+/* ─── RESPONSIVE ──────────────────────────────────────── */
+@media(max-width:960px){
+  .blog-inner{grid-template-columns:1fr;}
+  .sidebar{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .post-featured{grid-template-columns:1fr;}
+  .post-feat-img{min-height:180px;}
+}
+@media(max-width:640px){
+  .posts-grid{grid-template-columns:1fr;}
+  .sidebar{grid-template-columns:1fr;}
+  .nav-links{display:none;}
+  .footer-cols{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">Bhavin<span>Academy</span></a>
+    <ul class="nav-links">
+      <li><a href="#">Courses</a></li>
+      <li><a href="#">Paths</a></li>
+      <li><a href="#">Instructor</a></li>
+      <li><a href="#" class="active">Blog</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+    <button class="nav-btn">Sign in</button>
+  </div>
+</nav>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="page-hero-glow"></div>
+  <p class="hero-eyebrow">The BhavinAcademy Blog</p>
+  <h1>IT insights.<br><em>Straight from the field.</em></h1>
+  <p class="page-hero-sub">Tutorials, exam tips, career advice, and deep-dives into Microsoft, Linux, Cloud & Security; written by practitioners, for practitioners.</p>
+</section>
+
+<!-- SEARCH + FILTERS -->
+<div class="controls">
+  <div class="controls-inner">
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="search-input" type="text" placeholder="Search articles…" oninput="filterPosts(this.value)">
+    </div>
+    <div class="filter-tabs">
+      <button class="ftab active" onclick="setTab(this,'all')">All</button>
+      <button class="ftab" onclick="setTab(this,'microsoft')">🪟 Microsoft</button>
+      <button class="ftab" onclick="setTab(this,'linux')">🐧 Linux</button>
+      <button class="ftab" onclick="setTab(this,'cloud')">☁️ Cloud</button>
+      <button class="ftab" onclick="setTab(this,'security')">🔒 Security</button>
+      <button class="ftab" onclick="setTab(this,'career')">🎯 Career</button>
+      <button class="ftab" onclick="setTab(this,'networking')">🌐 Networking</button>
+    </div>
+    <div class="controls-right" id="postCount">12 articles</div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="blog-main">
+  <div class="blog-inner">
+
+    <!-- LEFT COLUMN -->
+    <div>
+      <p class="section-label">Featured Article</p>
+
+      <!-- FEATURED POST -->
+      <div class="post-featured" data-cat="cloud">
+        <div class="post-feat-img">
+          <div class="post-feat-img-bg"></div>
+          <span class="post-feat-img-icon">☁️</span>
+        </div>
+        <div class="post-feat-body">
+          <div>
+            <span class="post-feat-tag">☁️ Cloud</span>
+            <div class="post-feat-title">Azure AZ-104 in 60 Days: The Study Plan That Actually Works</div>
+            <div class="post-feat-excerpt">Stop reading every book cover to cover. Here's the focused, exam-aligned 60-day plan that took dozens of BhavinAcademy students from zero to certified — with time to spare.</div>
+          </div>
+          <div>
+            <div class="post-feat-meta">
+              <div class="post-feat-avatar">B</div>
+              <div class="post-feat-author"><strong>Bhavin Khatri</strong> · Mar 28, 2026 · 8 min read</div>
+            </div>
+            <div class="post-feat-read">Read article</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- POSTS GRID -->
+      <div style="margin-top:8px;">
+        <p class="section-label">Latest Articles</p>
+        <div class="posts-grid" id="postsGrid">
+
+          <div class="post-card" data-cat="microsoft" data-title="windows server active directory">
+            <div class="post-card-img pci-ms">
+              <span class="post-card-tag">🪟 Microsoft</span>
+              <span class="post-card-img-icon">🪟</span>
+            </div>
+            <div class="post-card-body">
+              <div class="post-card-title">Active Directory in 2026: What's Changed and What Still Matters</div>
+              <div class="post-card-excerpt">A practical breakdown of what's new in AD, what deprecated features you can stop worrying about, and what fundamentals never go out of style.</div>
+              <div class="post-card-footer">
+                <span class="post-card-date">Mar 22, 2026</span>
+                <span class="post-card-read">6 min read</span>
+                <span class="post-card-link">Read →</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="post-card" data-cat="linux" data-title="linux bash scripting beginners">
+            <div class="post-card-img pci-lx">
+              <span class="post-card-tag">🐧 Linux</span>
+              <span class="post-card-img-icon">🐧</span>
+            </div>
+            <div class="post-card-body">
+              <div class="post-card-title">Bash Scripting for Beginners: Automate Your Way to Sysadmin Zen</div>
+              <div class="post-card-excerpt">You don't need to be a developer to write powerful shell scripts. This beginner-friendly guide walks you from "Hello World" to real automation tasks.</div>
+              <div class="post-card-footer">
+                <span class="post-card-date">Mar 18, 2026</span>
+                <span class="post-card-read">10 min read</span>
+                <span class="post-card-link">Read →</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="post-card" data-cat="security" data-title="comptia security plus exam tips">
+            <div class="post-card-img pci-sec">
+              <span class="post-card-tag">🔒 Security</span>
+              <span class="post-card-img-icon">🔒</span>
+            </div>
+            <div class="post-card-body">
+              <div class="post-card-title">CompTIA Security+: 10 Exam Tips Nobody Tells You</div>
+              <div class="post-card-excerpt">Beyond the study guide — the practical strategies, question-reading tricks, and mindset shifts that separate passing scores from failing ones.</div>
+              <div class="post-card-footer">
+                <span class="post-card-date">Mar 14, 2026</span>
+                <span class="post-card-read">7 min read</span>
+                <span class="post-card-link">Read →</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="post-card" data-cat="networking" data-title="ccna subnetting explained">
+            <div class="post-card-img pci-nw">
+              <span class="post-card-tag">🌐 Networking</span>
+              <span class="post-card-img-icon">🌐</span>
+            </div>
+            <div class="post-card-body">
+              <div class="post-card-title">Subnetting Explained: Finally Make It Click in Under 30 Minutes</div>
+              <div class="post-card-excerpt">Stop memorising subnet tables and start understanding the logic. This visual walkthrough will make subnetting intuitive for CCNA and beyond.</div>
+              <div class="post-card-footer">
+                <span class="post-card-date">Mar 9, 2026</span>
+                <span class="post-card-read">9 min read</span>
+                <span class="post-card-link">Read →</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="post-card" data-cat="career" data-title="it career roadmap 2026 salary">
+            <div class="post-card-img pci-ai">
+              <span class="post-card-tag">🎯 Career</span>
+              <span class="post-card-img-icon">🎯</span>
+            </div>
+            <div class="post-card-body">
+              <div class="post-card-title">IT Career Roadmap 2026: Which Certifications Pay the Most?</div>
+              <div class="post-card-excerpt">A data-driven look at which IT certifications are commanding the highest salaries right now — and which paths have the best ROI for time invested.</div>
+              <div class="post-card-footer">
+                <span class="post-card-date">Mar 5, 2026</span>
+                <span class="post-card-read">11 min read</span>
+                <span class="post-card-link">Read →</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="post-card" data-cat="microsoft" data-title="intune endpoint management microsoft 365">
+            <div class="post-card-img pci-ms">
+              <span class="post-card-tag">🪟 Microsoft</span>
+              <span class="post-card-img-icon">⚙️</span>
+            </div>
+            <div class="post-card-body">
+              <div class="post-card-title">Microsoft Intune: Managing 500 Devices Without Losing Your Mind</div>
+              <div class="post-card-excerpt">A practical guide to setting up Intune endpoint management at scale — policies, compliance rules, app deployment, and the gotchas that catch people out.</div>
+              <div class="post-card-footer">
+                <span class="post-card-date">Feb 28, 2026</span>
+                <span class="post-card-read">8 min read</span>
+                <span class="post-card-link">Read →</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="post-card" data-cat="cloud" data-title="azure cost optimisation savings">
+            <div class="post-card-img pci-cl">
+              <span class="post-card-tag">☁️ Cloud</span>
+              <span class="post-card-img-icon">💡</span>
+            </div>
+            <div class="post-card-body">
+              <div class="post-card-title">Cut Your Azure Bill by 40%: Cost Optimisation Strategies That Work</div>
+              <div class="post-card-excerpt">Right-sizing, reserved instances, auto-shutdown policies, and the Azure Cost Management dashboard — a no-fluff guide to spending smarter on cloud.</div>
+              <div class="post-card-footer">
+                <span class="post-card-date">Feb 21, 2026</span>
+                <span class="post-card-read">7 min read</span>
+                <span class="post-card-link">Read →</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="post-card" data-cat="linux" data-title="lpic 1 study guide linux certification">
+            <div class="post-card-img pci-lx">
+              <span class="post-card-tag">🐧 Linux</span>
+              <span class="post-card-img-icon">📋</span>
+            </div>
+            <div class="post-card-body">
+              <div class="post-card-title">LPIC-1 Study Guide: The Fastest Path to Linux Certification</div>
+              <div class="post-card-excerpt">A structured 8-week study plan covering both LPIC-1 exams (101 and 102) — with the topics to focus on, the ones to skim, and real practice questions.</div>
+              <div class="post-card-footer">
+                <span class="post-card-date">Feb 15, 2026</span>
+                <span class="post-card-read">12 min read</span>
+                <span class="post-card-link">Read →</span>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /posts-grid -->
+
+        <div class="load-more-wrap">
+          <button class="load-more-btn">Load more articles</button>
+        </div>
+      </div>
+    </div><!-- /left column -->
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+      <!-- Newsletter -->
+      <div class="newsletter-card">
+        <div class="sidebar-title">Stay in the loop 📬</div>
+        <div class="newsletter-sub">Get the latest IT tutorials, exam tips, and career insights delivered to your inbox every week. No spam, ever.</div>
+        <input class="newsletter-input" type="email" placeholder="your@email.com">
+        <button class="newsletter-btn">Subscribe — it's free</button>
+      </div>
+
+      <!-- Popular posts -->
+      <div class="sidebar-card">
+        <div class="sidebar-title">Most Read</div>
+        <div class="popular-list">
+          <div class="popular-item">
+            <div class="popular-num">01</div>
+            <div>
+              <div class="popular-title">Azure AZ-104 in 60 Days: The Study Plan That Actually Works</div>
+              <div class="popular-meta">☁️ Cloud · 8 min read</div>
+            </div>
+          </div>
+          <div class="popular-item">
+            <div class="popular-num">02</div>
+            <div>
+              <div class="popular-title">IT Career Roadmap 2026: Which Certifications Pay the Most?</div>
+              <div class="popular-meta">🎯 Career · 11 min read</div>
+            </div>
+          </div>
+          <div class="popular-item">
+            <div class="popular-num">03</div>
+            <div>
+              <div class="popular-title">Subnetting Explained: Finally Make It Click in Under 30 Minutes</div>
+              <div class="popular-meta">🌐 Networking · 9 min read</div>
+            </div>
+          </div>
+          <div class="popular-item">
+            <div class="popular-num">04</div>
+            <div>
+              <div class="popular-title">CompTIA Security+: 10 Exam Tips Nobody Tells You</div>
+              <div class="popular-meta">🔒 Security · 7 min read</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Browse by topic -->
+      <div class="sidebar-card">
+        <div class="sidebar-title">Browse by Topic</div>
+        <div class="topics-list">
+          <span class="topic-pill">🪟 Microsoft</span>
+          <span class="topic-pill">🐧 Linux</span>
+          <span class="topic-pill">☁️ Azure</span>
+          <span class="topic-pill">🔒 Security</span>
+          <span class="topic-pill">🌐 Networking</span>
+          <span class="topic-pill">⚙️ DevOps</span>
+          <span class="topic-pill">🎯 Career</span>
+          <span class="topic-pill">🤖 Automation</span>
+          <span class="topic-pill">📋 Exam Tips</span>
+          <span class="topic-pill">🏅 Certifications</span>
+        </div>
+      </div>
+
+      <!-- Latest video -->
+      <div class="sidebar-card">
+        <div class="sidebar-title">Latest Video</div>
+        <div class="video-thumb">
+          <div class="video-thumb-bg">
+            <div class="play-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="video-title">How I Passed AZ-104 on My First Attempt</div>
+        <div class="video-meta">☁️ Cloud · 22 min · YouTube</div>
+      </div>
+
+    </div><!-- /sidebar -->
+  </div><!-- /blog-inner -->
+</div><!-- /blog-main -->
+
+<!-- QUOTE BAND -->
+<section class="quote-band">
+  <div class="quote-inner">
+    <p class="quote-text">"While technology shifts with every decade, your value remains constant through two rules: <strong>Master the fundamentals</strong>, as they are timeless; and <strong>keep learning</strong>, for the world never stops turning."</p>
+    <div class="quote-author">· Bhavin Khatri ·</div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-band">
+  <h2>Ready to go deeper?</h2>
+  <p>Turn what you've read into real skills with structured courses and hands-on labs.</p>
+  <button class="btn-white">Explore Courses</button>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h4>Courses</h4>
+        <ul>
+          <li><a href="#">Microsoft Courses</a></li>
+          <li><a href="#">Linux Courses</a></li>
+          <li><a href="#">Networking</a></li>
+          <li><a href="#">Cloud & Azure</a></li>
+          <li><a href="#">Cybersecurity</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Learning Paths</h4>
+        <ul>
+          <li><a href="#">Microsoft Engineer</a></li>
+          <li><a href="#">Linux Administrator</a></li>
+          <li><a href="#">Network Engineer</a></li>
+          <li><a href="#">Cloud Architect</a></li>
+          <li><a href="#">Cybersecurity Analyst</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="#">Virtual Labs</a></li>
+          <li><a href="#">Practice Exams</a></li>
+          <li><a href="#">Certifications</a></li>
+          <li><a href="#">Community</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-logo">Bhavin<span>Academy</span></div>
+      <div class="footer-copy">© 2026 Bhavin Academy. All rights reserved.</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function setTab(el, cat) {
+  document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  filterByCategory(cat);
+}
+
+function filterByCategory(cat) {
+  const cards = document.querySelectorAll('#postsGrid .post-card');
+  let visible = 0;
+  cards.forEach(card => {
+    const match = cat === 'all' || card.dataset.cat === cat;
+    card.style.display = match ? 'flex' : 'none';
+    if (match) visible++;
+  });
+  document.getElementById('postCount').textContent = visible + ' article' + (visible !== 1 ? 's' : '');
+}
+
+function filterPosts(query) {
+  const cards = document.querySelectorAll('#postsGrid .post-card');
+  const q = query.toLowerCase();
+  let visible = 0;
+  cards.forEach(card => {
+    const title = card.dataset.title || '';
+    const match = !q || title.includes(q) || card.querySelector('.post-card-title').textContent.toLowerCase().includes(q);
+    card.style.display = match ? 'flex' : 'none';
+    if (match) visible++;
+  });
+  document.getElementById('postCount').textContent = visible + ' article' + (visible !== 1 ? 's' : '');
+}
+</script>
+</body>
+</html>

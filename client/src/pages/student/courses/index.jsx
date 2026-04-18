@@ -8,20 +8,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
-import { Skeleton } from "@/components/ui/skeleton";
 import { filterOptions, sortOptions } from "@/config";
 import { AuthContext } from "@/context/auth-context";
 import { StudentContext } from "@/context/student-context";
-import {
-  checkCoursePurchaseInfoService,
-  fetchStudentViewCourseListService,
-  getHomeConfigService,
-} from "@/services";
+import { fetchStudentViewCourseListService } from "@/services";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpDown, Filter, ShoppingCart, Layers, TvMinimalPlay, X, SlidersHorizontal } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Search, Grid, List, ChevronRight, Filter, X } from "lucide-react";
+import CourseCard from "@/components/student-view/course-card";
 
 function createSearchParamsHelper(filterParams) {
   const queryParams = [];
@@ -38,71 +32,39 @@ function StudentViewCoursesPage() {
   const [sort, setSort] = useState("price-lowtohigh");
   const [filters, setFilters] = useState({});
   const [searchParams, setSearchParams] = useSearchParams();
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [viewType, setViewType] = useState("grid"); // grid | list
+  const [searchTerm, setSearchTerm] = useState("");
+
   const {
     studentViewCoursesList,
     setStudentViewCoursesList,
     loadingState,
     setLoadingState,
-    cartItems,
-    handleAddToCart,
-    studentBoughtCoursesList,
   } = useContext(StudentContext);
-  const { toast } = useToast();
+  
   const navigate = useNavigate();
   const { auth } = useContext(AuthContext);
 
-  function handleFilterOnChange(getSectionId, getCurrentOption) {
+  function handleFilterOnChange(getSectionId, getCurrentOptionId) {
     let cpyFilters = { ...filters };
-    const indexOfCurrentSection = Object.keys(cpyFilters).indexOf(getSectionId);
-    if (indexOfCurrentSection === -1) {
-      cpyFilters[getSectionId] = [getCurrentOption.id];
+    if (!cpyFilters[getSectionId]) {
+      cpyFilters[getSectionId] = [getCurrentOptionId];
     } else {
-      const indexOfCurrentOption = cpyFilters[getSectionId].indexOf(getCurrentOption.id);
-      if (indexOfCurrentOption === -1)
-        cpyFilters[getSectionId] = [...cpyFilters[getSectionId], getCurrentOption.id];
-      else {
-        const updatedSection = [...cpyFilters[getSectionId]];
-        updatedSection.splice(indexOfCurrentOption, 1);
-        cpyFilters[getSectionId] = updatedSection;
-      }
+      const index = cpyFilters[getSectionId].indexOf(getCurrentOptionId);
+      if (index === -1) cpyFilters[getSectionId].push(getCurrentOptionId);
+      else cpyFilters[getSectionId].splice(index, 1);
     }
     setFilters(cpyFilters);
-    sessionStorage.setItem("filters", JSON.stringify(cpyFilters));
   }
 
-  async function fetchAllStudentViewCourses(filters, sort) {
+  async function fetchAllCourses(filters, sort) {
     setLoadingState(true);
-    try {
-      const buildQueryStringForFilters = createSearchParamsHelper(filters);
-      const query = new URLSearchParams(buildQueryStringForFilters);
-      if (sort) query.set("sortBy", sort);
-      const response = await fetchStudentViewCourseListService(query.toString());
-      if (response?.success) setStudentViewCoursesList(response?.data);
-    } catch (error) {
-      console.error(error);
-      toast({ title: "Error", description: "Failed to fetch courses.", variant: "destructive" });
-    } finally {
-      setLoadingState(false);
-    }
-  }
-
-  async function handleCourseNavigate(getCurrentCourseId) {
-    if (!auth?.authenticate) { navigate(`/course/details/${getCurrentCourseId}`); return; }
-    const response = await checkCoursePurchaseInfoService(getCurrentCourseId, auth?.user?._id);
-    if (response?.success) {
-      navigate(response?.data ? `/course-progress/${getCurrentCourseId}` : `/course/details/${getCurrentCourseId}`);
-    }
-  }
-
-  async function handleAddToCartLocal(courseId) {
-    if (!auth?.authenticate) {
-      toast({ title: "Please Sign In", description: "You need to be signed in to add courses to your cart.", variant: "destructive" });
-      navigate("/auth"); return;
-    }
-    if (cartItems.some(item => item.courseId === courseId)) { navigate("/cart"); return; }
-    const response = await handleAddToCart(courseId, auth?.user?._id);
-    if (response?.success) toast({ title: "Added to Cart", description: "The course has been added to your cart successfully." });
+    const buildQueryStringForFilters = createSearchParamsHelper(filters);
+    const query = new URLSearchParams(buildQueryStringForFilters);
+    if (sort) query.set("sortBy", sort);
+    const response = await fetchStudentViewCourseListService(query.toString());
+    if (response?.success) setStudentViewCoursesList(response?.data);
+    setLoadingState(false);
   }
 
   useEffect(() => {
@@ -118,100 +80,93 @@ function StudentViewCoursesPage() {
     for (const [key, value] of queryParams.entries()) {
       if (key !== "sortBy") initialFilters[key] = value.split(",");
     }
-    setFilters(Object.keys(initialFilters).length > 0 ? initialFilters : JSON.parse(sessionStorage.getItem("filters") || "{}"));
+    setFilters(initialFilters);
     setSort(queryParams.get("sortBy") || "price-lowtohigh");
   }, []);
 
-  useEffect(() => { if (filters !== null && sort !== null) fetchAllStudentViewCourses(filters, sort); }, [filters, sort]);
-  useEffect(() => { return () => { sessionStorage.removeItem("filters"); }; }, []);
+  useEffect(() => {
+    fetchAllCourses(filters, sort);
+  }, [filters, sort]);
 
-  const FilterSidebar = ({ onClose }) => (
-    <div className="bg-white rounded-sm border border-[#e6e6e6] p-6">
-      <div className="flex items-center justify-between mb-6 text-black">
-        <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4" />
-          <h2 className="font-semibold text-base">Filters</h2>
-        </div>
-        {onClose && (
-          <button onClick={onClose} className="p-2 rounded-sm hover:bg-[#f2f2f2] text-[#616161]">
-            <X className="h-4 w-4" />
-          </button>
-        )}
-      </div>
-      <div className="space-y-8">
-        {Object.keys(filterOptions).map((keyItem) => (
-          <div key={keyItem}>
-            <h3 className="text-[10px] font-semibold text-[#616161] uppercase tracking-wider mb-3">{keyItem}</h3>
-            <div className="grid gap-2">
-              {filterOptions[keyItem].map((option) => (
-                <Label key={option.id} className="flex items-center gap-2 cursor-pointer group">
-                  <Checkbox
-                    id={option.id}
-                    checked={filters[keyItem]?.indexOf(option.id) > -1}
-                    onCheckedChange={() => handleFilterOnChange(keyItem, option)}
-                    className="rounded-sm border-[#d2d2d2] data-[state=checked]:bg-[#0067b8] data-[state=checked]:border-[#0067b8] h-4 w-4 transition-none"
-                  />
-                  <span className={`text-sm font-normal transition-colors ${filters[keyItem]?.indexOf(option.id) > -1 ? "text-black font-semibold" : "text-[#616161] group-hover:text-black"}`}>
-                    {option.label}
-                  </span>
-                </Label>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-      <Button
-        variant="ghost"
-        className="w-full mt-8 text-[#616161] border border-[#e6e6e6] rounded-sm h-10 hover:bg-[#f2f2f2] font-semibold text-sm transition-none"
-        onClick={() => { setFilters({}); sessionStorage.removeItem("filters"); }}
-      >
-        Clear all filters
-      </Button>
-    </div>
-  );
+  // Derived filtered list for local search
+  const filteredCourses = studentViewCoursesList?.filter(course => 
+    course.title.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
 
   return (
-    <div className="bg-[#f2f2f2] min-h-screen">
-      <div className="container mx-auto px-4 xs:px-5 lg:px-6 py-12">
-        {/* Header */}
-        <div className="flex flex-col xs:flex-row xs:items-end justify-between mb-10 gap-4">
-          <div>
-            <h1 className="text-3xl xs:text-4xl md:text-5xl font-semibold tracking-tight text-black mb-2">Explore Courses</h1>
-            <p className="text-[#616161] font-normal text-sm xs:text-base">Browse our full catalog of specialized learning content.</p>
+    <div className="flex flex-col min-h-screen bg-white">
+      {/* PAGE HEADER */}
+      <section className="bg-[linear-gradient(160deg,#000_0%,#1a1a2e_50%,#000_100%)] p-[64px_24px_56px] text-center relative overflow-hidden">
+        <div className="absolute w-[500px] h-[300px] rounded-full bg-[radial-gradient(circle,rgba(0,113,227,0.22)_0%,transparent_70%)] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+        <p className="text-[12px] font-semibold text-[#0071e3] uppercase tracking-[0.08em] mb-3">Course Catalog</p>
+        <h1 className="text-[clamp(32px,5vw,58px)] font-extrabold tracking-[-1.5px] text-[#f5f5f7] mb-3">
+          All <span className="bg-[linear-gradient(90deg,#0071e3,#00d4ff)] bg-clip-text text-transparent italic">Courses</span>
+        </h1>
+        <p className="text-[16px] text-[#86868b] max-w-[480px] mx-auto leading-[1.6] font-light">
+          Expert-led IT training across Microsoft, Linux, Cloud, Networking and Security - to help you build your skillset.
+        </p>
+      </section>
+
+      {/* STATS ROW */}
+      <div className="bg-[#f5f5f7] border-b border-[#d2d2d7] py-5 px-6">
+        <div className="max-w-[1080px] mx-auto flex items-center gap-10 flex-wrap">
+          <div className="flex flex-col">
+            <span className="text-[22px] font-bold text-[#1d1d1f]">{studentViewCoursesList?.length || 0}</span>
+            <span className="text-[12px] text-[#86868b]">Courses</span>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-[10px] font-semibold text-[#616161] bg-white border border-[#e6e6e6] px-3 py-1 rounded-sm uppercase tracking-wider">
-              {studentViewCoursesList.length} Results
-            </span>
-            {/* Mobile Filter Button */}
-            <Button
-              variant="outline"
-              onClick={() => setIsFilterOpen(true)}
-              className="lg:hidden flex items-center gap-2 h-10 px-4 rounded-sm border-[#e6e6e6] bg-white font-semibold text-black text-sm transition-none"
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              Filters
-              {Object.values(filters).flat().length > 0 && (
-                <span className="bg-[#0067b8] text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center">
-                  {Object.values(filters).flat().length}
-                </span>
-              )}
-            </Button>
+          <div className="w-[1px] h-9 bg-[#d2d2d7] hidden sm:block"></div>
+          <div className="flex flex-col">
+            <span className="text-[22px] font-bold text-[#1d1d1f]">600+</span>
+            <span className="text-[12px] text-[#86868b]">Lessons</span>
+          </div>
+          <div className="w-[1px] h-9 bg-[#d2d2d7] hidden sm:block"></div>
+          <div className="flex flex-col">
+            <span className="text-[22px] font-bold text-[#1d1d1f]">5 Topics</span>
+            <span className="text-[12px] text-[#86868b]">Categories</span>
+          </div>
+        </div>
+      </div>
+
+      {/* CONTROLS BAR (Sticky) */}
+      <div className="sticky top-[52px] z-50 bg-white border-b border-[#d2d2d7] py-4 px-6 overflow-x-auto overflow-y-hidden">
+        <div className="max-w-[1080px] mx-auto flex items-center gap-4 min-w-max">
+          <div className="relative w-[340px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#86868b] w-4 h-4" />
+            <input 
+              type="text" 
+              placeholder="Search courses..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-[#f5f5f7] border border-[#d2d2d7] rounded-[10px] py-[9px] pl-9 pr-3 text-[14px] outline-none focus:border-[#0071e3] transition-colors"
+            />
+          </div>
+          <div className="flex gap-2">
+            {["all", "microsoft", "linux", "networking", "cloud", "security"].map((cat) => (
+              <button 
+                key={cat}
+                onClick={() => handleFilterOnChange("category", cat === "all" ? null : cat)}
+                className={`px-4 py-[7px] border rounded-[980px] text-[13px] font-medium transition-all ${
+                  (cat === "all" && !filters.category?.length) || filters.category?.includes(cat)
+                    ? "bg-[#0071e3] border-[#0071e3] text-white"
+                    : "bg-white border-[#d2d2d7] text-[#6e6e73] hover:border-[#0071e3] hover:text-[#0071e3]"
+                }`}
+              >
+                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+              </button>
+            ))}
+          </div>
+          <div className="ml-auto">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="flex items-center gap-2 h-10 px-4 rounded-sm border-[#e6e6e6] bg-white hover:bg-[#f2f2f2] transition-none font-semibold text-black text-sm"
-                >
-                  <ArrowUpDown className="h-4 w-4" />
-                  <span>Sort By</span>
+                <Button variant="outline" className="border-[#d2d2d7] rounded-[10px] text-[13px] h-auto py-2">
+                  Sort: {sortOptions.find(s => s.id === sort)?.label || "Featured"}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[180px] rounded-sm p-1 shadow-lg bg-white border-[#e6e6e6]">
-                <DropdownMenuRadioGroup value={sort} onValueChange={(value) => setSort(value)}>
-                  {sortOptions.map((sortItem) => (
-                    <DropdownMenuRadioItem value={sortItem.id} key={sortItem.id} className="rounded-sm cursor-pointer py-2 font-semibold text-xs hover:bg-[#f2f2f2] transition-none">
-                      {sortItem.label}
+              <DropdownMenuContent align="end" className="rounded-[10px] border-[#d2d2d7]">
+                <DropdownMenuRadioGroup value={sort} onValueChange={setSort}>
+                  {sortOptions.map((opt) => (
+                    <DropdownMenuRadioItem key={opt.id} value={opt.id} className="text-[13px]">
+                      {opt.label}
                     </DropdownMenuRadioItem>
                   ))}
                 </DropdownMenuRadioGroup>
@@ -219,118 +174,84 @@ function StudentViewCoursesPage() {
             </DropdownMenu>
           </div>
         </div>
+      </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Desktop Sidebar */}
-          <aside className="hidden lg:block w-72 shrink-0">
-            <div className="sticky top-28">
-              <FilterSidebar />
-            </div>
-          </aside>
-
-          {/* Mobile Filter Drawer */}
-          <AnimatePresence>
-            {isFilterOpen && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/40 z-[2000] lg:hidden"
-                onClick={() => setIsFilterOpen(false)}
-              >
-                <motion.div
-                  initial={{ x: "-100%" }}
-                  animate={{ x: 0 }}
-                  exit={{ x: "-100%" }}
-                  transition={{ type: "tween", duration: 0.3 }}
-                  className="absolute left-0 top-0 bottom-0 w-full max-w-xs bg-[#f2f2f2] overflow-y-auto p-6"
-                  onClick={e => e.stopPropagation()}
-                >
-                  <FilterSidebar onClose={() => setIsFilterOpen(false)} />
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Course List */}
-          <main className="flex-1">
-            <div className="space-y-4">
-              {loadingState ? (
-                <div className="space-y-4">
-                  {[...Array(4)].map((_, i) => (
-                    <Skeleton key={i} className="h-[180px] w-full rounded-sm" />
-                  ))}
-                </div>
-              ) : studentViewCoursesList && studentViewCoursesList.length > 0 ? (
-                <div className="space-y-4">
-                  {studentViewCoursesList.map((courseItem) => (
-                    <div
-                      key={courseItem?._id}
-                      onClick={() => handleCourseNavigate(courseItem?._id)}
-                      className="group cursor-pointer bg-white rounded-sm border border-[#e6e6e6] p-4 flex flex-col sm:flex-row gap-6 shadow-sm hover:border-[#0067b8]/40 transition-colors overflow-hidden"
+      {/* MAIN CONTENT */}
+      <div className="max-w-[1128px] mx-auto w-full px-6 py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-8">
+          {/* SIDEBAR */}
+          <aside className="hidden lg:block space-y-7">
+            {Object.keys(filterOptions).map((key) => (
+              <div key={key} className="flex flex-col">
+                <h3 className="text-[12px] font-bold text-[#86868b] uppercase tracking-[0.06em] mb-3">{key}</h3>
+                <div className="flex flex-col gap-2">
+                  {filterOptions[key].map((opt) => (
+                    <div 
+                      key={opt.id} 
+                      className="flex items-center justify-between group cursor-pointer py-1"
+                      onClick={() => handleFilterOnChange(key, opt.id)}
                     >
-                      <div className="w-full sm:w-60 h-36 rounded-sm overflow-hidden relative shrink-0">
-                        <img
-                          src={courseItem?.image}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      </div>
-
-                      <div className="flex-1 flex flex-col py-1">
-                        <div className="flex items-start justify-between gap-4 mb-2">
-                          <h3 className="text-lg font-semibold text-black group-hover:text-[#0067b8] transition-colors leading-tight line-clamp-2">
-                            {courseItem?.title}
-                          </h3>
+                      <div className="flex items-center gap-2 text-[13px] text-[#1d1d1f]">
+                        <div className={`w-4 h-4 border rounded-[4px] flex items-center justify-center transition-all ${
+                          filters[key]?.includes(opt.id) ? "bg-[#0071e3] border-[#0071e3]" : "border-[#d2d2d7] group-hover:border-[#0071e3]"
+                        }`}>
+                          {filters[key]?.includes(opt.id) && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
                         </div>
-                        <p className="text-xs font-normal text-[#616161] mb-4">
-                          By <span className="text-black font-semibold">{courseItem?.instructorName}</span>
-                        </p>
-                        <div className="flex flex-wrap items-center gap-3 mt-auto mb-4">
-                          <span className="flex items-center gap-1.5 px-2 py-0.5 bg-[#f2f2f2] rounded-sm text-[10px] font-semibold text-[#616161]">
-                            <Layers className="h-3 w-3" />
-                            {courseItem?.curriculum?.length} Lectures
-                          </span>
-                          <span className="px-2 py-0.5 bg-[#0067b8]/5 rounded-sm text-[10px] font-semibold text-[#0067b8] uppercase tracking-wider">
-                            {courseItem?.level}
-                          </span>
-                        </div>
-                        <div className="pt-4 border-t border-[#f2f2f2] flex items-center justify-between">
-                          <div className="flex flex-col">
-                            <div className="flex items-center gap-1 mb-1">
-                              <span className="text-black font-semibold text-sm">4.8</span>
-                              <div className="flex text-black text-xs">★★★★★</div>
-                            </div>
-                            <p className="text-xl font-bold text-black tracking-tight">₹{courseItem?.pricing}</p>
-                          </div>
-                          {studentBoughtCoursesList.some(item => item.courseId === courseItem?._id) ? (
-                            <Button
-                              onClick={(e) => { e.stopPropagation(); navigate(`/course-progress/${courseItem?._id}`); }}
-                              className="bg-[#0067b8] text-white hover:bg-[#005a9e] rounded-sm h-10 px-6 flex items-center gap-2 font-semibold transition-none text-xs"
-                            >
-                              <TvMinimalPlay className="w-4 h-4" />
-                              Continue
-                            </Button>
-                          ) : (
-                            <Button
-                              onClick={(e) => { e.stopPropagation(); handleAddToCartLocal(courseItem?._id); }}
-                              className="bg-black text-white hover:bg-zinc-800 rounded-sm h-10 px-6 flex items-center gap-2 font-semibold transition-none text-xs"
-                            >
-                              <ShoppingCart className="w-4 h-4" />
-                              {cartItems.some(item => item.courseId === courseItem?._id) ? "Go to Cart" : "Add to Cart"}
-                            </Button>
-                          )}
-                        </div>
+                        {opt.label}
                       </div>
                     </div>
                   ))}
                 </div>
+              </div>
+            ))}
+            <button 
+              onClick={() => setFilters({})} 
+              className="text-[12px] text-[#0071e3] font-medium hover:underline p-0"
+            >
+              Clear all filters
+            </button>
+          </aside>
+
+          {/* MAIN GRID */}
+          <main>
+            <div className="flex items-center justify-between mb-5">
+              <p className="text-[14px] text-[#6e6e73]">
+                <strong className="text-[#1d1d1f]">{filteredCourses.length}</strong> courses found
+              </p>
+              <div className="flex gap-1">
+                <button 
+                  onClick={() => setViewType("grid")}
+                  className={`p-1.5 rounded-[8px] border transition-all ${viewType === "grid" ? "bg-[#f5f5f7] border-[#b0b0b5]" : "bg-white border-[#d2d2d7] hover:bg-[#f5f5f7]"}`}
+                >
+                  <Grid className="w-4 h-4" />
+                </button>
+                <button 
+                   onClick={() => setViewType("list")}
+                   className={`p-1.5 rounded-[8px] border transition-all ${viewType === "list" ? "bg-[#f5f5f7] border-[#b0b0b5]" : "bg-white border-[#d2d2d7] hover:bg-[#f5f5f7]"}`}
+                >
+                  <List className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className={`grid gap-4 ${viewType === "grid" ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 md:grid-cols-2"}`}>
+              {loadingState ? (
+                [...Array(6)].map((_, i) => (
+                  <div key={i} className="h-[280px] bg-[#f5f5f7] rounded-[18px] animate-pulse" />
+                ))
+              ) : filteredCourses.length > 0 ? (
+                filteredCourses.map((course) => (
+                  <CourseCard 
+                    key={course._id} 
+                    course={course} 
+                    onClick={(id) => navigate(`/course/details/${id}`)}
+                  />
+                ))
               ) : (
-                <div className="flex flex-col items-center justify-center py-20 text-center">
-                  <div className="w-16 h-16 bg-[#f2f2f2] rounded-full flex items-center justify-center mb-6">
-                    <Filter className="h-8 w-8 text-[#d2d2d2]" />
-                  </div>
-                  <h2 className="text-xl font-semibold text-black mb-2">No Courses Found</h2>
-                  <p className="text-[#616161] font-normal text-sm">Try adjusting your filters to find what you're looking for.</p>
+                <div className="col-span-full py-20 text-center">
+                  <div className="text-[48px] mb-4">🔍</div>
+                  <h3 className="text-[20px] font-bold text-[#1d1d1f] mb-2">No courses found</h3>
+                  <p className="text-[#86868b] text-[15px]">Try adjusting your search or filters.</p>
                 </div>
               )}
             </div>
@@ -342,3 +263,4 @@ function StudentViewCoursesPage() {
 }
 
 export default StudentViewCoursesPage;
+

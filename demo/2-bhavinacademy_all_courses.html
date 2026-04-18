@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All Courses — BhavinAcademy</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:#fff;color:#1d1d1f;overflow-x:hidden;}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,0.08);height:52px;display:flex;align-items:center;justify-content:center;padding:0 24px;}
+.nav-inner{max-width:1080px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-size:20px;font-weight:700;letter-spacing:-0.5px;color:#1d1d1f;text-decoration:none;}
+.nav-logo span{color:#0071e3;}
+.nav-links{display:flex;gap:20px;list-style:none;}
+.nav-links a{font-size:13px;color:#1d1d1f;text-decoration:none;font-weight:400;opacity:0.7;transition:opacity 0.2s;}
+.nav-links a:hover,.nav-links a.active{opacity:1;}
+.nav-links a.active{font-weight:600;}
+.nav-btn{background:#0071e3;color:#fff;border:none;padding:7px 16px;border-radius:980px;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s;}
+.nav-btn:hover{background:#0077ed;}
+
+/* PAGE HEADER */
+.page-header{background:linear-gradient(160deg,#000 0%,#1a1a2e 50%,#000 100%);padding:64px 24px 56px;text-align:center;position:relative;overflow:hidden;}
+.page-header-glow{position:absolute;width:500px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(0,113,227,0.22) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+.page-header-eyebrow{font-size:12px;font-weight:600;color:#0071e3;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;}
+.page-header h1{font-size:clamp(32px,5vw,58px);font-weight:800;letter-spacing:-1.5px;color:#f5f5f7;margin-bottom:14px;}
+.page-header h1 em{font-style:normal;background:linear-gradient(90deg,#0071e3,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.page-header p{font-size:16px;color:#86868b;max-width:480px;margin:0 auto;line-height:1.6;font-weight:300;}
+
+/* STATS ROW */
+.stats-row{background:#f5f5f7;border-bottom:1px solid #d2d2d7;padding:20px 24px;}
+.stats-inner{max-width:1080px;margin:0 auto;display:flex;gap:40px;align-items:center;}
+.stat{display:flex;flex-direction:column;}
+.stat-val{font-size:22px;font-weight:700;letter-spacing:-0.5px;color:#1d1d1f;}
+.stat-lbl{font-size:12px;color:#86868b;margin-top:1px;}
+.stats-divider{width:1px;height:36px;background:#d2d2d7;}
+
+/* CONTROLS */
+.controls{background:#fff;border-bottom:1px solid #d2d2d7;padding:16px 24px;position:sticky;top:52px;z-index:90;}
+.controls-inner{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+
+/* Search */
+.search-wrap{position:relative;flex:1;min-width:200px;max-width:340px;}
+.search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#86868b;pointer-events:none;}
+.search-input{width:100%;padding:9px 12px 9px 36px;border:1px solid #d2d2d7;border-radius:10px;font-size:14px;font-family:'Inter',sans-serif;color:#1d1d1f;background:#f5f5f7;outline:none;transition:border-color 0.2s,background 0.2s;}
+.search-input:focus{border-color:#0071e3;background:#fff;}
+.search-input::placeholder{color:#86868b;}
+
+/* Filter tabs */
+.filter-tabs{display:flex;gap:6px;flex-wrap:wrap;}
+.ftab{padding:7px 16px;border-radius:980px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid #d2d2d7;background:#fff;color:#6e6e73;transition:all 0.2s;white-space:nowrap;}
+.ftab:hover{border-color:#0071e3;color:#0071e3;}
+.ftab.active{background:#0071e3;border-color:#0071e3;color:#fff;}
+
+/* Sort */
+.sort-wrap{margin-left:auto;}
+.sort-select{padding:8px 12px;border:1px solid #d2d2d7;border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;color:#1d1d1f;background:#fff;outline:none;cursor:pointer;}
+
+/* COURSES LAYOUT */
+.courses-wrap{padding:40px 24px 80px;}
+.courses-layout{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:220px 1fr;gap:32px;align-items:start;}
+
+/* SIDEBAR */
+.sidebar{position:sticky;top:116px;}
+.sb-section{margin-bottom:28px;}
+.sb-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#86868b;margin-bottom:12px;}
+.sb-item{display:flex;align-items:center;justify-content:space-between;padding:7px 0;cursor:pointer;border-bottom:1px solid #f5f5f7;}
+.sb-item:last-child{border-bottom:none;}
+.sb-item-left{display:flex;align-items:center;gap:8px;font-size:13px;color:#1d1d1f;}
+.sb-check{width:16px;height:16px;border-radius:4px;border:1.5px solid #d2d2d7;display:flex;align-items:center;justify-content:center;transition:all 0.15s;flex-shrink:0;}
+.sb-check.checked{background:#0071e3;border-color:#0071e3;}
+.sb-check.checked::after{content:'✓';font-size:10px;color:#fff;font-weight:700;}
+.sb-count{font-size:12px;color:#86868b;background:#f5f5f7;padding:2px 7px;border-radius:980px;}
+.sb-clear{font-size:12px;color:#0071e3;cursor:pointer;border:none;background:none;padding:0;font-family:'Inter',sans-serif;margin-top:6px;}
+.sb-clear:hover{text-decoration:underline;}
+
+/* COURSES GRID */
+.courses-main{}
+.results-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.results-count{font-size:14px;color:#6e6e73;}
+.results-count strong{color:#1d1d1f;}
+.view-toggle{display:flex;gap:4px;}
+.vbtn{width:32px;height:32px;border-radius:8px;border:1px solid #d2d2d7;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.vbtn.active,.vbtn:hover{background:#f5f5f7;border-color:#b0b0b5;}
+
+.c-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.c-grid.two-col{grid-template-columns:repeat(2,1fr);}
+
+/* COURSE CARD */
+.c-card{background:#fff;border:1px solid #e8e8ed;border-radius:18px;overflow:hidden;transition:transform 0.25s,box-shadow 0.25s;cursor:pointer;display:flex;flex-direction:column;}
+.c-card:hover{transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,0.1);border-color:transparent;}
+.c-img{height:150px;display:flex;align-items:center;justify-content:center;font-size:56px;position:relative;}
+.c-img-badge{position:absolute;top:10px;right:10px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:980px;text-transform:uppercase;letter-spacing:0.04em;}
+.badge-new{background:#0071e3;color:#fff;}
+.badge-popular{background:#ff9f0a;color:#fff;}
+.badge-hot{background:#ff3b30;color:#fff;}
+
+.c-img-ms{background:linear-gradient(135deg,#0078d4,#005a9e);}
+.c-img-lx{background:linear-gradient(135deg,#e95420,#772953);}
+.c-img-nw{background:linear-gradient(135deg,#1ba1e2,#0050ef);}
+.c-img-az{background:linear-gradient(135deg,#0089d6,#00bcf2);}
+.c-img-sec{background:linear-gradient(135deg,#107c10,#004b1c);}
+.c-img-ad{background:linear-gradient(135deg,#5c2d91,#8764b8);}
+.c-img-py{background:linear-gradient(135deg,#3776ab,#ffd43b);}
+.c-img-ws{background:linear-gradient(135deg,#ff6b35,#f7c59f);}
+.c-img-dc{background:linear-gradient(135deg,#1a1a2e,#16213e);}
+.c-img-po{background:linear-gradient(135deg,#0a3d62,#60a3bc);}
+.c-img-vm{background:linear-gradient(135deg,#6a0572,#ab83a1);}
+.c-img-aw{background:linear-gradient(135deg,#ff9900,#232f3e);}
+
+.c-body{padding:18px;flex:1;display:flex;flex-direction:column;}
+.c-tag{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#0071e3;margin-bottom:5px;}
+.c-name{font-size:15px;font-weight:600;color:#1d1d1f;margin-bottom:6px;line-height:1.3;flex:1;}
+.c-desc{font-size:12px;color:#86868b;line-height:1.5;margin-bottom:10px;}
+.c-meta{font-size:12px;color:#86868b;display:flex;gap:10px;align-items:center;margin-bottom:10px;}
+.c-meta-dot{width:3px;height:3px;border-radius:50%;background:#d2d2d7;}
+.c-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto;}
+.c-badge{display:inline-block;padding:3px 10px;border-radius:980px;font-size:11px;font-weight:600;}
+.badge-beginner{background:#e8f5e9;color:#1b7a34;}
+.badge-intermediate{background:#fff3e0;color:#b25000;}
+.badge-advanced{background:#fce4ec;color:#b71c1c;}
+.badge-all{background:#e8f1fb;color:#0071e3;}
+.c-enroll{font-size:12px;font-weight:600;color:#0071e3;background:none;border:none;cursor:pointer;padding:0;font-family:'Inter',sans-serif;}
+.c-enroll:hover{text-decoration:underline;}
+
+/* RATING */
+.c-rating{display:flex;align-items:center;gap:4px;font-size:12px;color:#86868b;margin-bottom:8px;}
+.stars{color:#ff9f0a;letter-spacing:1px;font-size:11px;}
+
+/* LOAD MORE */
+.load-more-wrap{text-align:center;margin-top:40px;}
+.btn-load{background:#f5f5f7;color:#1d1d1f;border:1px solid #d2d2d7;padding:12px 32px;border-radius:980px;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;}
+.btn-load:hover{background:#e8e8ed;}
+
+/* PROMO BAND */
+.promo-band{background:linear-gradient(135deg,#1d1d1f 0%,#1a1a2e 100%);margin:0 24px 24px;border-radius:20px;padding:36px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px;max-width:1080px;margin-left:auto;margin-right:auto;position:relative;overflow:hidden;}
+.promo-glow{position:absolute;right:-60px;top:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(0,113,227,0.3) 0%,transparent 70%);}
+.promo-text h3{font-size:22px;font-weight:700;color:#f5f5f7;letter-spacing:-0.5px;margin-bottom:6px;}
+.promo-text p{font-size:14px;color:#86868b;line-height:1.5;}
+.btn-blue{background:#0071e3;color:#fff;border:none;padding:12px 24px;border-radius:980px;font-size:14px;font-weight:500;cursor:pointer;transition:background 0.2s;white-space:nowrap;font-family:'Inter',sans-serif;}
+.btn-blue:hover{background:#0077ed;}
+
+/* CTA BAND */
+.cta-band{background:#0071e3;padding:80px 24px;text-align:center;}
+.cta-band h2{font-size:clamp(28px,4vw,52px);font-weight:800;color:#fff;letter-spacing:-1.5px;margin-bottom:16px;}
+.cta-band p{font-size:17px;color:rgba(255,255,255,0.75);margin-bottom:36px;max-width:480px;margin-left:auto;margin-right:auto;}
+.btn-white{background:#fff;color:#0071e3;border:none;padding:14px 32px;border-radius:980px;font-size:16px;font-weight:600;cursor:pointer;transition:opacity 0.2s;font-family:'Inter',sans-serif;}
+.btn-white:hover{opacity:0.9;}
+
+/* FOOTER */
+footer{background:#f5f5f7;border-top:1px solid #d2d2d7;padding:40px 24px 24px;}
+.footer-inner{max-width:1080px;margin:0 auto;}
+.footer-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;padding-bottom:32px;border-bottom:1px solid #d2d2d7;margin-bottom:24px;}
+.footer-col h4{font-size:13px;font-weight:600;color:#1d1d1f;margin-bottom:12px;}
+.footer-col ul{list-style:none;}
+.footer-col ul li{margin-bottom:8px;}
+.footer-col ul li a{font-size:13px;color:#6e6e73;text-decoration:none;}
+.footer-col ul li a:hover{color:#0071e3;}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;}
+.footer-copy{font-size:13px;color:#86868b;}
+.footer-logo{font-size:16px;font-weight:700;color:#1d1d1f;}
+.footer-logo span{color:#0071e3;}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:80px 24px;display:none;}
+.empty-state.visible{display:block;}
+.empty-icon{font-size:48px;margin-bottom:16px;}
+.empty-state h3{font-size:20px;font-weight:600;color:#1d1d1f;margin-bottom:8px;}
+.empty-state p{font-size:14px;color:#86868b;}
+
+/* Fade in animation */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.c-card{animation:fadeUp 0.4s ease both;}
+.c-card:nth-child(1){animation-delay:0.05s;}
+.c-card:nth-child(2){animation-delay:0.1s;}
+.c-card:nth-child(3){animation-delay:0.15s;}
+.c-card:nth-child(4){animation-delay:0.2s;}
+.c-card:nth-child(5){animation-delay:0.25s;}
+.c-card:nth-child(6){animation-delay:0.3s;}
+.c-card:nth-child(7){animation-delay:0.35s;}
+.c-card:nth-child(8){animation-delay:0.4s;}
+.c-card:nth-child(9){animation-delay:0.45s;}
+.c-card:nth-child(10){animation-delay:0.5s;}
+.c-card:nth-child(11){animation-delay:0.55s;}
+.c-card:nth-child(12){animation-delay:0.6s;}
+
+/* HIDDEN for filter */
+.c-card.hidden{display:none;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="1-bhavinacademy_homepage.html" class="nav-logo">Bhavin<span>Academy</span></a>
+    <ul class="nav-links">
+      <li><a href="#" class="active">Courses</a></li>
+      <li><a href="#">Paths</a></li>
+      <li><a href="#">Instructor</a></li>
+      <li><a href="#">Blog</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+    <button class="nav-btn">Sign in</button>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<section class="page-header">
+  <div class="page-header-glow"></div>
+  <p class="page-header-eyebrow">Course Catalog</p>
+  <h1>All <em>Courses</em></h1>
+  <p>Expert-led IT training across Microsoft, Linux, Cloud, Networking and Security - to help you build your skillset. </p>
+</section>
+
+<!-- STATS ROW -->
+<div class="stats-row">
+  <div class="stats-inner">
+    <div class="stat">
+      <span class="stat-val">12</span>
+      <span class="stat-lbl">Courses</span>
+    </div>
+    <div class="stats-divider"></div>
+    <div class="stat">
+      <span class="stat-val">600+</span>
+      <span class="stat-lbl">Video Lessons</span>
+    </div>
+    <div class="stats-divider"></div>
+    <div class="stat">
+      <span class="stat-val">280 hrs</span>
+      <span class="stat-lbl">Total Content</span>
+    </div>
+    <div class="stats-divider"></div>
+    <div class="stat">
+      <span class="stat-val">5 Topics</span>
+      <span class="stat-lbl">Categories</span>
+    </div>
+  </div>
+</div>
+
+<!-- CONTROLS BAR -->
+<div class="controls">
+  <div class="controls-inner">
+    <!-- Search -->
+    <div class="search-wrap">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="Search courses…">
+    </div>
+    <!-- Filter tabs -->
+    <div class="filter-tabs" id="filterTabs">
+      <button class="ftab active" data-filter="all">All</button>
+      <button class="ftab" data-filter="microsoft">Microsoft</button>
+      <button class="ftab" data-filter="linux">Linux</button>
+      <button class="ftab" data-filter="networking">Networking</button>
+      <button class="ftab" data-filter="cloud">Cloud</button>
+      <button class="ftab" data-filter="security">Security</button>
+    </div>
+    <!-- Sort -->
+    <div class="sort-wrap">
+      <select class="sort-select" id="sortSelect">
+        <option value="default">Sort: Featured</option>
+        <option value="newest">Newest First</option>
+        <option value="lessons-high">Most Lessons</option>
+        <option value="hours-high">Longest</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="courses-wrap">
+  <div class="courses-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <div class="sb-section">
+        <div class="sb-title">Level</div>
+        <div class="sb-item" data-level="Beginner" onclick="toggleSbFilter(this,'level')">
+          <div class="sb-item-left"><div class="sb-check"></div>Beginner</div>
+          <span class="sb-count">4</span>
+        </div>
+        <div class="sb-item" data-level="Intermediate" onclick="toggleSbFilter(this,'level')">
+          <div class="sb-item-left"><div class="sb-check"></div>Intermediate</div>
+          <span class="sb-count">4</span>
+        </div>
+        <div class="sb-item" data-level="Advanced" onclick="toggleSbFilter(this,'level')">
+          <div class="sb-item-left"><div class="sb-check"></div>Advanced</div>
+          <span class="sb-count">2</span>
+        </div>
+        <div class="sb-item" data-level="All Levels" onclick="toggleSbFilter(this,'level')">
+          <div class="sb-item-left"><div class="sb-check"></div>All Levels</div>
+          <span class="sb-count">2</span>
+        </div>
+        <button class="sb-clear" onclick="clearSbFilter('level')">Clear</button>
+      </div>
+
+      <div class="sb-section">
+        <div class="sb-title">Duration</div>
+        <div class="sb-item" data-dur="short" onclick="toggleSbFilter(this,'dur')">
+          <div class="sb-item-left"><div class="sb-check"></div>Under 20 hrs</div>
+          <span class="sb-count">3</span>
+        </div>
+        <div class="sb-item" data-dur="medium" onclick="toggleSbFilter(this,'dur')">
+          <div class="sb-item-left"><div class="sb-check"></div>20 – 30 hrs</div>
+          <span class="sb-count">6</span>
+        </div>
+        <div class="sb-item" data-dur="long" onclick="toggleSbFilter(this,'dur')">
+          <div class="sb-item-left"><div class="sb-check"></div>30 hrs+</div>
+          <span class="sb-count">3</span>
+        </div>
+        <button class="sb-clear" onclick="clearSbFilter('dur')">Clear</button>
+      </div>
+
+      <div class="sb-section">
+        <div class="sb-title">Certification</div>
+        <div class="sb-item">
+          <div class="sb-item-left"><div class="sb-check"></div>Microsoft (MCP)</div>
+          <span class="sb-count">4</span>
+        </div>
+        <div class="sb-item">
+          <div class="sb-item-left"><div class="sb-check"></div>CompTIA</div>
+          <span class="sb-count">3</span>
+        </div>
+        <div class="sb-item">
+          <div class="sb-item-left"><div class="sb-check"></div>Cisco (CCNA)</div>
+          <span class="sb-count">2</span>
+        </div>
+        <div class="sb-item">
+          <div class="sb-item-left"><div class="sb-check"></div>Linux (LPIC)</div>
+          <span class="sb-count">2</span>
+        </div>
+        <div class="sb-item">
+          <div class="sb-item-left"><div class="sb-check"></div>AWS / Azure</div>
+          <span class="sb-count">2</span>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- COURSES MAIN -->
+    <div class="courses-main">
+      <div class="results-meta">
+        <p class="results-count"><strong id="countDisplay">12</strong> courses found</p>
+        <div class="view-toggle">
+          <button class="vbtn active" id="gridBtn" title="Grid view" onclick="setView('grid')">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          </button>
+          <button class="vbtn" id="listBtn" title="2-column view" onclick="setView('list')">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="4" rx="1"/><rect x="3" y="10" width="18" height="4" rx="1"/><rect x="3" y="17" width="18" height="4" rx="1"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="c-grid" id="courseGrid">
+
+        <!-- Card 1 -->
+        <div class="c-card" data-cat="microsoft" data-level="Intermediate" data-hours="24" data-lessons="48" data-name="Windows Server Administration">
+          <div class="c-img c-img-ms">
+            🪟
+            <span class="c-img-badge badge-popular">Popular</span>
+          </div>
+          <div class="c-body">
+            <div class="c-tag">Microsoft</div>
+            <div class="c-name">Windows Server Administration</div>
+            <div class="c-desc">Deploy, manage and troubleshoot Windows Server environments end-to-end.</div>
+            <div class="c-rating"><span class="stars">★★★★★</span> 4.9 <span>(312 ratings)</span></div>
+            <div class="c-meta"><span>48 lessons</span><span class="c-meta-dot"></span><span>24 hrs</span></div>
+            <div class="c-footer">
+              <span class="c-badge badge-intermediate">Intermediate</span>
+              <button class="c-enroll">Enroll →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="c-card" data-cat="linux" data-level="All Levels" data-hours="30" data-lessons="62" data-name="Linux System Administration">
+          <div class="c-img c-img-lx">
+            🐧
+            <span class="c-img-badge badge-popular">Popular</span>
+          </div>
+          <div class="c-body">
+            <div class="c-tag">Linux</div>
+            <div class="c-name">Linux System Administration</div>
+            <div class="c-desc">From CLI basics to system services, users and advanced configurations.</div>
+            <div class="c-rating"><span class="stars">★★★★★</span> 4.8 <span>(278 ratings)</span></div>
+            <div class="c-meta"><span>62 lessons</span><span class="c-meta-dot"></span><span>30 hrs</span></div>
+            <div class="c-footer">
+              <span class="c-badge badge-all">All Levels</span>
+              <button class="c-enroll">Enroll →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="c-card" data-cat="networking" data-level="Beginner" data-hours="36" data-lessons="74" data-name="Cisco CCNA Bootcamp">
+          <div class="c-img c-img-nw">
+            🌐
+            <span class="c-img-badge badge-hot">Hot</span>
+          </div>
+          <div class="c-body">
+            <div class="c-tag">Networking</div>
+            <div class="c-name">Cisco CCNA Bootcamp</div>
+            <div class="c-desc">Routing, switching, subnetting and full CCNA 200-301 exam prep.</div>
+            <div class="c-rating"><span class="stars">★★★★★</span> 4.9 <span>(441 ratings)</span></div>
+            <div class="c-meta"><span>74 lessons</span><span class="c-meta-dot"></span><span>36 hrs</span></div>
+            <div class="c-footer">
+              <span class="c-badge badge-beginner">Beginner</span>
+              <button class="c-enroll">Enroll →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="c-card" data-cat="cloud" data-level="Beginner" data-hours="18" data-lessons="38" data-name="Azure Fundamentals AZ-900">
+          <div class="c-img c-img-az">☁️</div>
+          <div class="c-body">
+            <div class="c-tag">Cloud</div>
+            <div class="c-name">Azure Fundamentals AZ-900</div>
+            <div class="c-desc">Get cloud-certified with Microsoft Azure's entry-level exam prep.</div>
+            <div class="c-rating"><span class="stars">★★★★☆</span> 4.7 <span>(189 ratings)</span></div>
+            <div class="c-meta"><span>38 lessons</span><span class="c-meta-dot"></span><span>18 hrs</span></div>
+            <div class="c-footer">
+              <span class="c-badge badge-beginner">Beginner</span>
+              <button class="c-enroll">Enroll →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="c-card" data-cat="security" data-level="Advanced" data-hours="26" data-lessons="55" data-name="CompTIA Security+ Prep">
+          <div class="c-img c-img-sec">🔒</div>
+          <div class="c-body">
+            <div class="c-tag">Security</div>
+            <div class="c-name">CompTIA Security+ Prep</div>
+            <div class="c-desc">Threat analysis, cryptography, identity management and SY0-701 exam mastery.</div>
+            <div class="c-rating"><span class="stars">★★★★★</span> 4.9 <span>(367 ratings)</span></div>
+            <div class="c-meta"><span>55 lessons</span><span class="c-meta-dot"></span><span>26 hrs</span></div>
+            <div class="c-footer">
+              <span class="c-badge badge-advanced">Advanced</span>
+              <button class="c-enroll">Enroll →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="c-card" data-cat="microsoft" data-level="Intermediate" data-hours="20" data-lessons="44" data-name="Active Directory Mastery">
+          <div class="c-img c-img-ad">⚙️</div>
+          <div class="c-body">
+            <div class="c-tag">Microsoft</div>
+            <div class="c-name">Active Directory Mastery</div>
+            <div class="c-desc">Users, groups, GPOs, DNS integration and enterprise AD management.</div>
+            <div class="c-rating"><span class="stars">★★★★★</span> 4.8 <span>(203 ratings)</span></div>
+            <div class="c-meta"><span>44 lessons</span><span class="c-meta-dot"></span><span>20 hrs</span></div>
+            <div class="c-footer">
+              <span class="c-badge badge-intermediate">Intermediate</span>
+              <button class="c-enroll">Enroll →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 7 -->
+        <div class="c-card" data-cat="linux" data-level="Intermediate" data-hours="22" data-lessons="46" data-name="Bash Scripting & Automation">
+          <div class="c-img c-img-lx">
+            🖥️
+            <span class="c-img-badge badge-new">New</span>
+          </div>
+          <div class="c-body">
+            <div class="c-tag">Linux</div>
+            <div class="c-name">Bash Scripting & Automation</div>
+            <div class="c-desc">Write powerful shell scripts to automate tasks, manage files and schedule jobs.</div>
+            <div class="c-rating"><span class="stars">★★★★☆</span> 4.6 <span>(98 ratings)</span></div>
+            <div class="c-meta"><span>46 lessons</span><span class="c-meta-dot"></span><span>22 hrs</span></div>
+            <div class="c-footer">
+              <span class="c-badge badge-intermediate">Intermediate</span>
+              <button class="c-enroll">Enroll →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 8 -->
+        <div class="c-card" data-cat="cloud" data-level="Advanced" data-hours="32" data-lessons="68" data-name="AWS Solutions Architect">
+          <div class="c-img c-img-aw">
+            ☁️
+            <span class="c-img-badge badge-new">New</span>
+          </div>
+          <div class="c-body">
+            <div class="c-tag">Cloud</div>
+            <div class="c-name">AWS Solutions Architect</div>
+            <div class="c-desc">Design resilient, cost-efficient AWS architectures for the SAA-C03 exam.</div>
+            <div class="c-rating"><span class="stars">★★★★★</span> 4.9 <span>(134 ratings)</span></div>
+            <div class="c-meta"><span>68 lessons</span><span class="c-meta-dot"></span><span>32 hrs</span></div>
+            <div class="c-footer">
+              <span class="c-badge badge-advanced">Advanced</span>
+              <button class="c-enroll">Enroll →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 9 -->
+        <div class="c-card" data-cat="networking" data-level="Beginner" data-hours="20" data-lessons="40" data-name="CompTIA Network+ N10-009">
+          <div class="c-img c-img-po">🔌</div>
+          <div class="c-body">
+            <div class="c-tag">Networking</div>
+            <div class="c-name">CompTIA Network+ N10-009</div>
+            <div class="c-desc">Network architecture, protocols, troubleshooting and full N+ exam prep.</div>
+            <div class="c-rating"><span class="stars">★★★★☆</span> 4.7 <span>(156 ratings)</span></div>
+            <div class="c-meta"><span>40 lessons</span><span class="c-meta-dot"></span><span>20 hrs</span></div>
+            <div class="c-footer">
+              <span class="c-badge badge-beginner">Beginner</span>
+              <button class="c-enroll">Enroll →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 10 -->
+        <div class="c-card" data-cat="microsoft" data-level="Beginner" data-hours="16" data-lessons="32" data-name="Microsoft 365 Administration">
+          <div class="c-img c-img-ms">📧</div>
+          <div class="c-body">
+            <div class="c-tag">Microsoft</div>
+            <div class="c-name">Microsoft 365 Administration</div>
+            <div class="c-desc">Manage Exchange Online, Teams, SharePoint and MS-102 certification prep.</div>
+            <div class="c-rating"><span class="stars">★★★★☆</span> 4.6 <span>(112 ratings)</span></div>
+            <div class="c-meta"><span>32 lessons</span><span class="c-meta-dot"></span><span>16 hrs</span></div>
+            <div class="c-footer">
+              <span class="c-badge badge-beginner">Beginner</span>
+              <button class="c-enroll">Enroll →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 11 -->
+        <div class="c-card" data-cat="security" data-level="Intermediate" data-hours="28" data-lessons="58" data-name="Ethical Hacking & Penetration Testing">
+          <div class="c-img c-img-sec">
+            🛡️
+            <span class="c-img-badge badge-hot">Hot</span>
+          </div>
+          <div class="c-body">
+            <div class="c-tag">Security</div>
+            <div class="c-name">Ethical Hacking & Pen Testing</div>
+            <div class="c-desc">Reconnaissance, exploitation, post-exploitation and CEH exam alignment.</div>
+            <div class="c-rating"><span class="stars">★★★★★</span> 4.9 <span>(289 ratings)</span></div>
+            <div class="c-meta"><span>58 lessons</span><span class="c-meta-dot"></span><span>28 hrs</span></div>
+            <div class="c-footer">
+              <span class="c-badge badge-intermediate">Intermediate</span>
+              <button class="c-enroll">Enroll →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 12 -->
+        <div class="c-card" data-cat="microsoft" data-level="All Levels" data-hours="24" data-lessons="50" data-name="Hyper-V & Virtualization">
+          <div class="c-img c-img-vm">
+            🖥️
+            <span class="c-img-badge badge-new">New</span>
+          </div>
+          <div class="c-body">
+            <div class="c-tag">Microsoft</div>
+            <div class="c-name">Hyper-V & Virtualization</div>
+            <div class="c-desc">Build, manage and snapshot virtual machines with Microsoft Hyper-V.</div>
+            <div class="c-rating"><span class="stars">★★★★☆</span> 4.5 <span>(74 ratings)</span></div>
+            <div class="c-meta"><span>50 lessons</span><span class="c-meta-dot"></span><span>24 hrs</span></div>
+            <div class="c-footer">
+              <span class="c-badge badge-all">All Levels</span>
+              <button class="c-enroll">Enroll →</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end c-grid -->
+
+      <!-- Empty state -->
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">🔍</div>
+        <h3>No courses found</h3>
+        <p>Try adjusting your search or filters.</p>
+      </div>
+
+    </div><!-- end courses-main -->
+  </div><!-- end courses-layout -->
+</div>
+
+<!-- PROMO BAND -->
+<div style="padding:0 24px 48px;">
+  <div class="promo-band" style="max-width:1080px;margin:0 auto;">
+    <div class="promo-glow"></div>
+    <div class="promo-text">
+      <h3>🎓 Not sure where to start?</h3>
+      <p>Take our 2-minute quiz and we'll recommend the perfect learning path for your goals and experience level.</p>
+    </div>
+    <button class="btn-blue">Find My Path →</button>
+  </div>
+</div>
+
+<!-- CTA -->
+<section class="cta-band">
+  <h2>Ready to start<br>your IT journey?</h2>
+  <p>Learn from industry experts and immerse yourself in an ocean of knowledge.</p>
+  <button class="btn-white">Get Started</button>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h4>Courses</h4>
+        <ul>
+          <li><a href="#">Microsoft Courses</a></li>
+          <li><a href="#">Linux Courses</a></li>
+          <li><a href="#">Networking</a></li>
+          <li><a href="#">Cloud & Azure</a></li>
+          <li><a href="#">Cybersecurity</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Learning Paths</h4>
+        <ul>
+          <li><a href="#">Microsoft Engineer</a></li>
+          <li><a href="#">Linux Administrator</a></li>
+          <li><a href="#">Network Engineer</a></li>
+          <li><a href="#">Cloud Architect</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="#">Virtual Labs</a></li>
+          <li><a href="#">Practice Exams</a></li>
+          <li><a href="#">Certifications</a></li>
+          <li><a href="#">Community</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-logo">Bhavin<span>Academy</span></div>
+      <div class="footer-copy">© 2026 Bhavin Academy. All rights reserved.</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // --- State ---
+  let activeCategory = 'all';
+  let activeLevels = new Set();
+  let activeDurs = new Set();
+  let searchQuery = '';
+  let gridView = 'grid'; // 'grid' | 'list'
+
+  const cards = Array.from(document.querySelectorAll('.c-card'));
+  const countEl = document.getElementById('countDisplay');
+  const emptyState = document.getElementById('emptyState');
+  const grid = document.getElementById('courseGrid');
+
+  // --- Filter tabs ---
+  document.getElementById('filterTabs').addEventListener('click', e => {
+    const tab = e.target.closest('.ftab');
+    if (!tab) return;
+    document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    activeCategory = tab.dataset.filter;
+    applyFilters();
+  });
+
+  // --- Search ---
+  document.getElementById('searchInput').addEventListener('input', e => {
+    searchQuery = e.target.value.toLowerCase().trim();
+    applyFilters();
+  });
+
+  // --- Sort ---
+  document.getElementById('sortSelect').addEventListener('change', e => {
+    sortCards(e.target.value);
+    applyFilters();
+  });
+
+  function sortCards(val) {
+    const sorted = [...cards];
+    if (val === 'lessons-high') sorted.sort((a,b) => +b.dataset.lessons - +a.dataset.lessons);
+    else if (val === 'hours-high') sorted.sort((a,b) => +b.dataset.hours - +a.dataset.hours);
+    else if (val === 'newest') sorted.sort((a,b) => {
+      const aNew = a.querySelector('.badge-new') ? 1 : 0;
+      const bNew = b.querySelector('.badge-new') ? 1 : 0;
+      return bNew - aNew;
+    });
+    sorted.forEach(c => grid.appendChild(c));
+  }
+
+  // --- Sidebar filters ---
+  function toggleSbFilter(item, type) {
+    const val = item.dataset[type];
+    const check = item.querySelector('.sb-check');
+    if (type === 'level') {
+      if (activeLevels.has(val)) { activeLevels.delete(val); check.classList.remove('checked'); }
+      else { activeLevels.add(val); check.classList.add('checked'); }
+    } else {
+      if (activeDurs.has(val)) { activeDurs.delete(val); check.classList.remove('checked'); }
+      else { activeDurs.add(val); check.classList.add('checked'); }
+    }
+    applyFilters();
+  }
+
+  function clearSbFilter(type) {
+    if (type === 'level') {
+      activeLevels.clear();
+      document.querySelectorAll('[data-level] .sb-check').forEach(c => c.classList.remove('checked'));
+    } else {
+      activeDurs.clear();
+      document.querySelectorAll('[data-dur] .sb-check').forEach(c => c.classList.remove('checked'));
+    }
+    applyFilters();
+  }
+
+  function durMatch(hours) {
+    if (activeDurs.size === 0) return true;
+    if (activeDurs.has('short') && hours < 20) return true;
+    if (activeDurs.has('medium') && hours >= 20 && hours <= 30) return true;
+    if (activeDurs.has('long') && hours > 30) return true;
+    return false;
+  }
+
+  // --- Main filter ---
+  function applyFilters() {
+    let count = 0;
+    cards.forEach(card => {
+      const catMatch = activeCategory === 'all' || card.dataset.cat === activeCategory;
+      const levelMatch = activeLevels.size === 0 || activeLevels.has(card.dataset.level);
+      const durMatchVal = durMatch(+card.dataset.hours);
+      const nameMatch = !searchQuery || card.dataset.name.toLowerCase().includes(searchQuery);
+      const visible = catMatch && levelMatch && durMatchVal && nameMatch;
+      card.classList.toggle('hidden', !visible);
+      if (visible) count++;
+    });
+    countEl.textContent = count;
+    emptyState.classList.toggle('visible', count === 0);
+  }
+
+  // --- View toggle ---
+  function setView(v) {
+    gridView = v;
+    if (v === 'list') {
+      grid.classList.add('two-col');
+      document.getElementById('gridBtn').classList.remove('active');
+      document.getElementById('listBtn').classList.add('active');
+    } else {
+      grid.classList.remove('two-col');
+      document.getElementById('gridBtn').classList.add('active');
+      document.getElementById('listBtn').classList.remove('active');
+    }
+  }
+</script>
+</body>
+</html>

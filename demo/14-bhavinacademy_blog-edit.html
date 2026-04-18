@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit Post — BhavinAcademy</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:#f5f5f7;color:#1d1d1f;overflow-x:hidden;}
+
+/* ─── NAV ─────────────────────────────────────────────── */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,0.08);height:52px;display:flex;align-items:center;justify-content:center;padding:0 24px;}
+.nav-inner{max-width:1400px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-size:18px;font-weight:700;letter-spacing:-0.5px;color:#1d1d1f;text-decoration:none;}
+.nav-logo span{color:#0071e3;}
+.nav-links{display:flex;gap:20px;list-style:none;}
+.nav-links a{font-size:13px;color:#1d1d1f;text-decoration:none;font-weight:400;opacity:0.7;transition:opacity 0.2s;}
+.nav-links a:hover,.nav-links a.active{opacity:1;}
+.nav-links a.active{font-weight:600;}
+.nav-btn{background:#0071e3;color:#fff;border:none;padding:7px 16px;border-radius:980px;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s;}
+.nav-btn:hover{background:#0077ed;}
+
+/* ─── ADMIN TOPBAR ────────────────────────────────────── */
+.admin-bar{background:#fff;border-bottom:1px solid #d2d2d7;padding:0 24px;height:48px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:52px;z-index:90;}
+.admin-bar-inner{max-width:1400px;width:100%;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;color:#86868b;}
+.breadcrumb a{color:#0071e3;text-decoration:none;font-weight:500;}
+.breadcrumb a:hover{text-decoration:underline;}
+.breadcrumb-sep{color:#d2d2d7;}
+.breadcrumb-current{color:#1d1d1f;font-weight:500;}
+.admin-bar-actions{display:flex;align-items:center;gap:10px;}
+.status-pill{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#6e6e73;background:#f5f5f7;border:1px solid #d2d2d7;padding:5px 12px;border-radius:980px;}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#ffd60a;flex-shrink:0;}
+.status-dot.published{background:#30d158;}
+.btn-ghost{background:transparent;color:#1d1d1f;border:1px solid #d2d2d7;padding:7px 16px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;}
+.btn-ghost:hover{border-color:#1d1d1f;background:#f5f5f7;}
+.btn-preview{background:transparent;color:#0071e3;border:1px solid rgba(0,113,227,0.3);padding:7px 16px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;}
+.btn-preview:hover{background:rgba(0,113,227,0.06);border-color:#0071e3;}
+.btn-publish{background:#0071e3;color:#fff;border:none;padding:7px 18px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.2s;}
+.btn-publish:hover{background:#0077ed;}
+
+/* ─── EDITOR LAYOUT ───────────────────────────────────── */
+.editor-wrap{max-width:1400px;margin:0 auto;padding:28px 24px 80px;display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start;}
+
+/* ─── MAIN EDITOR COLUMN ──────────────────────────────── */
+.editor-main{display:flex;flex-direction:column;gap:16px;}
+
+/* Cover Image Upload */
+.cover-upload{background:#fff;border-radius:18px;overflow:hidden;border:2px dashed #d2d2d7;min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:border-color 0.2s,background 0.2s;position:relative;}
+.cover-upload:hover{border-color:#0071e3;background:rgba(0,113,227,0.02);}
+.cover-upload.has-image{border-style:solid;border-color:transparent;padding:0;}
+.cover-preview{width:100%;height:220px;object-fit:cover;display:none;border-radius:16px;}
+.cover-upload.has-image .cover-preview{display:block;}
+.cover-upload.has-image .cover-placeholder{display:none;}
+.cover-placeholder{display:flex;flex-direction:column;align-items:center;gap:10px;padding:40px;}
+.cover-icon{width:44px;height:44px;border-radius:12px;background:#f5f5f7;border:1px solid #d2d2d7;display:flex;align-items:center;justify-content:center;}
+.cover-icon svg{opacity:0.4;}
+.cover-text{font-size:14px;font-weight:500;color:#6e6e73;}
+.cover-subtext{font-size:12px;color:#86868b;}
+.cover-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.45);border-radius:16px;display:none;align-items:center;justify-content:center;gap:10px;}
+.cover-upload.has-image:hover .cover-overlay{display:flex;}
+.cover-overlay-btn{background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:8px 16px;border-radius:980px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;}
+
+/* Post Meta Card */
+.meta-card{background:#fff;border-radius:18px;padding:32px 36px;}
+.post-title-input{width:100%;font-family:'Inter',sans-serif;font-size:32px;font-weight:800;letter-spacing:-1px;color:#1d1d1f;border:none;outline:none;resize:none;line-height:1.2;background:transparent;min-height:44px;}
+.post-title-input::placeholder{color:#d2d2d7;}
+.meta-divider{height:1px;background:#f5f5f7;margin:20px 0;}
+.meta-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.meta-row:last-child{margin-bottom:0;}
+.meta-label{font-size:12px;font-weight:600;color:#86868b;text-transform:uppercase;letter-spacing:0.05em;min-width:72px;flex-shrink:0;}
+.meta-input{flex:1;font-family:'Inter',sans-serif;font-size:13px;color:#1d1d1f;border:1px solid #d2d2d7;border-radius:8px;padding:7px 11px;outline:none;background:#f5f5f7;transition:border-color 0.2s,background 0.2s;}
+.meta-input:focus{border-color:#0071e3;background:#fff;}
+.meta-input::placeholder{color:#b0b0b5;}
+.slug-prefix{font-size:13px;color:#86868b;white-space:nowrap;flex-shrink:0;}
+.slug-input{flex:1;font-family:'Inter',sans-serif;font-size:13px;color:#0071e3;border:1px solid #d2d2d7;border-radius:8px;padding:7px 11px;outline:none;background:#f5f5f7;transition:border-color 0.2s,background 0.2s;}
+.slug-input:focus{border-color:#0071e3;background:#fff;}
+.excerpt-input{flex:1;font-family:'Inter',sans-serif;font-size:13px;color:#1d1d1f;border:1px solid #d2d2d7;border-radius:8px;padding:8px 11px;outline:none;background:#f5f5f7;transition:border-color 0.2s,background 0.2s;resize:vertical;min-height:72px;line-height:1.6;}
+.excerpt-input:focus{border-color:#0071e3;background:#fff;}
+.excerpt-input::placeholder{color:#b0b0b5;}
+.char-count{font-size:11px;color:#86868b;margin-left:auto;flex-shrink:0;}
+
+/* Toolbar */
+.editor-card{background:#fff;border-radius:18px;overflow:hidden;}
+.toolbar{display:flex;align-items:center;gap:2px;padding:10px 14px;border-bottom:1px solid #f5f5f7;flex-wrap:wrap;gap:3px;}
+.toolbar-group{display:flex;align-items:center;gap:1px;padding:0 4px;border-right:1px solid #e8e8ed;}
+.toolbar-group:last-child{border-right:none;}
+.tb-btn{width:30px;height:30px;border-radius:7px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#6e6e73;transition:background 0.15s,color 0.15s;flex-shrink:0;}
+.tb-btn:hover{background:#f5f5f7;color:#1d1d1f;}
+.tb-btn.active{background:#e8f1fb;color:#0071e3;}
+.tb-btn svg{width:14px;height:14px;}
+.tb-select{font-family:'Inter',sans-serif;font-size:12px;font-weight:500;color:#6e6e73;border:1px solid #e8e8ed;border-radius:7px;padding:4px 8px;background:#fff;cursor:pointer;outline:none;}
+.tb-select:hover{border-color:#0071e3;}
+.toolbar-spacer{flex:1;}
+.word-count{font-size:11px;color:#86868b;white-space:nowrap;}
+
+/* Editor area */
+.editor-body{padding:32px 36px;min-height:420px;outline:none;font-size:15px;line-height:1.75;color:#1d1d1f;caret-color:#0071e3;}
+.editor-body:focus{outline:none;}
+.editor-body p{margin-bottom:1em;}
+.editor-body h2{font-size:24px;font-weight:700;letter-spacing:-0.5px;color:#1d1d1f;margin-bottom:0.5em;margin-top:1.4em;}
+.editor-body h3{font-size:19px;font-weight:600;letter-spacing:-0.3px;color:#1d1d1f;margin-bottom:0.4em;margin-top:1.2em;}
+.editor-body strong{font-weight:700;}
+.editor-body em{font-style:italic;}
+.editor-body ul{padding-left:22px;margin-bottom:1em;}
+.editor-body li{margin-bottom:0.3em;line-height:1.65;}
+.editor-body blockquote{border-left:3px solid #0071e3;padding:12px 20px;margin:1.5em 0;background:#f5f5f7;border-radius:0 10px 10px 0;font-size:14px;color:#6e6e73;font-style:italic;}
+.editor-body code{background:#f5f5f7;border:1px solid #e8e8ed;border-radius:5px;padding:1px 6px;font-family:monospace;font-size:13px;color:#1d1d1f;}
+.editor-body pre{background:#1d1d1f;border-radius:12px;padding:20px 24px;margin:1.2em 0;overflow-x:auto;}
+.editor-body pre code{background:transparent;border:none;color:#c7c7cc;font-size:13px;padding:0;}
+.editor-placeholder{color:#b0b0b5;pointer-events:none;}
+
+/* ─── SIDEBAR ─────────────────────────────────────────── */
+.editor-sidebar{display:flex;flex-direction:column;gap:16px;}
+.side-card{background:#fff;border-radius:18px;padding:20px;}
+.side-card-title{font-size:13px;font-weight:700;color:#1d1d1f;letter-spacing:-0.2px;margin-bottom:16px;display:flex;align-items:center;gap:7px;}
+.side-card-title svg{color:#0071e3;}
+
+/* Publish card */
+.publish-card{background:#fff;border-radius:18px;padding:20px;border:1.5px solid #d2d2d7;}
+.publish-main-btn{width:100%;background:#0071e3;color:#fff;border:none;padding:11px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.2s;margin-bottom:10px;}
+.publish-main-btn:hover{background:#0077ed;}
+.save-draft-btn{width:100%;background:transparent;color:#1d1d1f;border:1px solid #d2d2d7;padding:9px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;margin-bottom:16px;}
+.save-draft-btn:hover{border-color:#1d1d1f;background:#f5f5f7;}
+.pub-divider{height:1px;background:#f5f5f7;margin:4px 0 16px;}
+.pub-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.pub-row:last-child{margin-bottom:0;}
+.pub-row-label{font-size:12px;font-weight:600;color:#86868b;text-transform:uppercase;letter-spacing:0.04em;}
+.pub-row-val{font-size:13px;font-weight:500;color:#1d1d1f;}
+.pub-row-link{font-size:12px;color:#0071e3;cursor:pointer;font-weight:500;}
+.pub-select{font-family:'Inter',sans-serif;font-size:13px;color:#1d1d1f;border:1px solid #d2d2d7;border-radius:8px;padding:6px 10px;background:#f5f5f7;outline:none;cursor:pointer;transition:border-color 0.2s;}
+.pub-select:focus{border-color:#0071e3;background:#fff;}
+.schedule-input{font-family:'Inter',sans-serif;font-size:13px;color:#1d1d1f;border:1px solid #d2d2d7;border-radius:8px;padding:6px 10px;background:#f5f5f7;outline:none;transition:border-color 0.2s;width:100%;margin-top:8px;}
+.schedule-input:focus{border-color:#0071e3;background:#fff;}
+
+/* Toggle */
+.toggle-wrap{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.toggle-label{font-size:13px;color:#1d1d1f;font-weight:500;}
+.toggle{position:relative;width:38px;height:22px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:#d2d2d7;border-radius:980px;cursor:pointer;transition:background 0.2s;}
+.toggle-slider:before{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+.toggle input:checked + .toggle-slider{background:#0071e3;}
+.toggle input:checked + .toggle-slider:before{transform:translateX(16px);}
+
+/* Category & Tags */
+.cat-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+.cat-item{display:flex;align-items:center;gap:9px;cursor:pointer;}
+.cat-cb{width:15px;height:15px;border-radius:4px;border:1.5px solid #d2d2d7;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.cat-cb.checked{background:#0071e3;border-color:#0071e3;}
+.cat-cb.checked svg{display:block;}
+.cat-cb svg{display:none;width:9px;height:9px;color:#fff;}
+.cat-name{font-size:13px;color:#1d1d1f;font-weight:500;}
+.cat-count{font-size:11px;color:#86868b;margin-left:auto;}
+.tags-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.tag-pill{display:flex;align-items:center;gap:5px;background:#f5f5f7;border:1px solid #e8e8ed;color:#1d1d1f;font-size:12px;font-weight:500;padding:4px 10px;border-radius:980px;}
+.tag-remove{cursor:pointer;color:#86868b;line-height:1;font-size:14px;transition:color 0.15s;}
+.tag-remove:hover{color:#ff3b30;}
+.tag-add-input{width:100%;font-family:'Inter',sans-serif;font-size:13px;color:#1d1d1f;border:1px solid #d2d2d7;border-radius:8px;padding:7px 11px;outline:none;background:#f5f5f7;transition:border-color 0.2s,background 0.2s;}
+.tag-add-input:focus{border-color:#0071e3;background:#fff;}
+.tag-add-input::placeholder{color:#b0b0b5;}
+
+/* SEO Preview */
+.seo-preview{border:1px solid #d2d2d7;border-radius:12px;padding:16px;background:#fafafa;margin-bottom:14px;}
+.seo-site{font-size:11px;color:#1a6c2a;margin-bottom:2px;}
+.seo-title{font-size:14px;color:#1a0dab;font-weight:500;line-height:1.4;margin-bottom:3px;}
+.seo-title:hover{text-decoration:underline;cursor:pointer;}
+.seo-desc{font-size:12px;color:#4d5156;line-height:1.5;}
+.seo-label{font-size:12px;font-weight:600;color:#86868b;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;}
+.seo-score{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.seo-score-bar{flex:1;height:5px;background:#f5f5f7;border-radius:980px;overflow:hidden;}
+.seo-score-fill{height:100%;background:linear-gradient(90deg,#ffd60a,#30d158);border-radius:980px;width:72%;}
+.seo-score-val{font-size:12px;font-weight:700;color:#30d158;}
+.seo-checks{display:flex;flex-direction:column;gap:7px;}
+.seo-check{display:flex;align-items:center;gap:8px;font-size:12px;color:#6e6e73;}
+.seo-check-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.seo-check-dot.good{background:#30d158;}
+.seo-check-dot.warn{background:#ffd60a;}
+.seo-check-dot.bad{background:#ff3b30;}
+
+/* Featured image in sidebar */
+.feat-img-thumb{width:100%;height:110px;border-radius:12px;background:linear-gradient(135deg,#0a1628,#1e3a5f);display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:10px;cursor:pointer;position:relative;overflow:hidden;}
+.feat-img-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.4);display:none;align-items:center;justify-content:center;}
+.feat-img-thumb:hover .feat-img-overlay{display:flex;}
+.feat-img-overlay-text{font-size:12px;font-weight:600;color:#fff;letter-spacing:0.03em;}
+.feat-img-actions{display:flex;gap:8px;}
+.feat-img-btn{flex:1;background:#f5f5f7;color:#1d1d1f;border:1px solid #d2d2d7;padding:7px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;text-align:center;}
+.feat-img-btn:hover{border-color:#0071e3;color:#0071e3;background:#fff;}
+
+/* Last saved */
+.last-saved{display:flex;align-items:center;gap:6px;font-size:12px;color:#86868b;padding:0 2px;}
+.last-saved-dot{width:6px;height:6px;border-radius:50%;background:#30d158;flex-shrink:0;}
+
+/* ─── UNSAVED INDICATOR ───────────────────────────────── */
+.unsaved-badge{display:none;align-items:center;gap:5px;font-size:12px;font-weight:500;color:#ff9f0a;background:rgba(255,159,10,0.1);border:1px solid rgba(255,159,10,0.25);padding:4px 10px;border-radius:980px;}
+.unsaved-badge.visible{display:flex;}
+
+/* ─── FOCUS MODE BUTTON ───────────────────────────────── */
+.focus-btn{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:#6e6e73;background:transparent;border:1px solid #d2d2d7;padding:5px 12px;border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;}
+.focus-btn:hover{border-color:#0071e3;color:#0071e3;}
+
+/* ─── RESPONSIVE ──────────────────────────────────────── */
+@media(max-width:1024px){
+  .editor-wrap{grid-template-columns:1fr 280px;gap:16px;}
+  .meta-card{padding:24px;}
+  .editor-body{padding:24px;}
+}
+@media(max-width:768px){
+  .editor-wrap{grid-template-columns:1fr;padding:16px 16px 60px;}
+  .editor-sidebar{order:3;}
+  .nav-links{display:none;}
+  .admin-bar-actions .btn-ghost{display:none;}
+}
+
+/* ─── AUTOSAVE ANIMATION ──────────────────────────────── */
+@keyframes pulse-save{0%,100%{opacity:1;}50%{opacity:0.5;}}
+.saving .last-saved-dot{animation:pulse-save 0.8s ease-in-out infinite;background:#ffd60a;}
+
+/* ─── LINK INSERT POPOVER ─────────────────────────────── */
+.insert-popover{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1d1d1f;border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,0.2);z-index:200;opacity:0;pointer-events:none;transition:opacity 0.2s,transform 0.2s;transform:translateX(-50%) translateY(10px);}
+.insert-popover.visible{opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0);}
+.insert-popover input{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:#f5f5f7;border-radius:8px;padding:7px 12px;font-size:13px;font-family:'Inter',sans-serif;outline:none;width:260px;}
+.insert-popover input::placeholder{color:#6e6e73;}
+.insert-popover input:focus{border-color:#0071e3;}
+.insert-popover-btn{background:#0071e3;color:#fff;border:none;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;}
+.insert-popover-close{color:#6e6e73;cursor:pointer;font-size:18px;line-height:1;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">Bhavin<span>Academy</span></a>
+    <ul class="nav-links">
+      <li><a href="#">Courses</a></li>
+      <li><a href="#">Paths</a></li>
+      <li><a href="#">Instructor</a></li>
+      <li><a href="#" class="active">Blog</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+    <button class="nav-btn">Sign in</button>
+  </div>
+</nav>
+
+<!-- ADMIN BAR -->
+<div class="admin-bar">
+  <div class="admin-bar-inner">
+    <div class="breadcrumb">
+      <a href="#">Dashboard</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="#">Blog Posts</a>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-current">Edit Post</span>
+    </div>
+    <div class="admin-bar-actions">
+      <div class="unsaved-badge" id="unsavedBadge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        Unsaved changes
+      </div>
+      <div class="last-saved" id="lastSaved">
+        <div class="last-saved-dot" id="saveDot"></div>
+        Saved just now
+      </div>
+      <button class="focus-btn" onclick="toggleFocus()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        Focus mode
+      </button>
+      <button class="btn-ghost" onclick="saveDraft()">Save draft</button>
+      <button class="btn-preview">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-1px;margin-right:4px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Preview
+      </button>
+      <button class="btn-publish" onclick="publishPost()">Publish</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDITOR -->
+<div class="editor-wrap" id="editorWrap">
+
+  <!-- MAIN COLUMN -->
+  <div class="editor-main">
+
+    <!-- Cover Image -->
+    <div class="cover-upload" id="coverUpload" onclick="triggerCoverUpload()">
+      <img class="cover-preview" id="coverPreview" alt="Cover">
+      <div class="cover-placeholder">
+        <div class="cover-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+        </div>
+        <div class="cover-text">Add a cover image</div>
+        <div class="cover-subtext">Drag & drop or click to upload · Recommended 1200×630px</div>
+      </div>
+      <div class="cover-overlay">
+        <button class="cover-overlay-btn" onclick="event.stopPropagation();triggerCoverUpload()">Replace image</button>
+        <button class="cover-overlay-btn" onclick="event.stopPropagation();removeCover()">Remove</button>
+      </div>
+    </div>
+    <input type="file" id="coverFileInput" accept="image/*" style="display:none" onchange="handleCoverUpload(event)">
+
+    <!-- Title + Meta -->
+    <div class="meta-card">
+      <textarea
+        class="post-title-input"
+        id="postTitle"
+        placeholder="Post title…"
+        rows="1"
+        oninput="autoResize(this);updateSlug();markUnsaved()"
+      >Azure AZ-104 in 60 Days: The Study Plan That Actually Works</textarea>
+
+      <div class="meta-divider"></div>
+
+      <div class="meta-row">
+        <span class="meta-label">Slug</span>
+        <span class="slug-prefix">bhavinacademy.com/blog/</span>
+        <input class="slug-input" id="postSlug" type="text" value="azure-az-104-60-day-study-plan" oninput="markUnsaved()">
+      </div>
+
+      <div class="meta-row" style="align-items:flex-start;">
+        <span class="meta-label" style="margin-top:9px;">Excerpt</span>
+        <textarea
+          class="excerpt-input"
+          id="postExcerpt"
+          placeholder="Write a short excerpt shown on the blog listing page…"
+          oninput="updateCharCount(this,'excerptCount',160);markUnsaved()"
+        >Stop reading every book cover to cover. Here's the focused, exam-aligned 60-day plan that took dozens of BhavinAcademy students from zero to certified — with time to spare.</textarea>
+        <span class="char-count" id="excerptCount">160</span>
+      </div>
+
+      <div class="meta-row">
+        <span class="meta-label">Author</span>
+        <select class="meta-input" style="max-width:200px;" onchange="markUnsaved()">
+          <option selected>Bhavin Khatri</option>
+          <option>Guest Author</option>
+        </select>
+      </div>
+
+      <div class="meta-row">
+        <span class="meta-label">Read time</span>
+        <input class="meta-input" type="text" value="8 min read" style="max-width:120px;" oninput="markUnsaved()" placeholder="e.g. 8 min read">
+        <span style="font-size:12px;color:#86868b;margin-left:8px;">Auto-calculated: <strong id="calcReadTime">8 min</strong></span>
+      </div>
+    </div>
+
+    <!-- Rich Text Editor -->
+    <div class="editor-card">
+
+      <!-- Toolbar -->
+      <div class="toolbar" id="toolbar">
+
+        <select class="tb-select" onchange="execCmd('formatBlock',this.value)">
+          <option value="p">Paragraph</option>
+          <option value="h2">Heading 2</option>
+          <option value="h3">Heading 3</option>
+          <option value="h4">Heading 4</option>
+          <option value="pre">Code Block</option>
+        </select>
+
+        <div class="toolbar-group">
+          <button class="tb-btn" title="Bold" onclick="execCmd('bold')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg></button>
+          <button class="tb-btn" title="Italic" onclick="execCmd('italic')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg></button>
+          <button class="tb-btn" title="Underline" onclick="execCmd('underline')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"/><line x1="4" y1="21" x2="20" y2="21"/></svg></button>
+          <button class="tb-btn" title="Strikethrough" onclick="execCmd('strikeThrough')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="4" y1="12" x2="20" y2="12"/><path d="M17.5 5C17.5 5 16 3 12 3s-5.5 2-5.5 4.5c0 3 2 4 5.5 5.5"/><path d="M6.5 19c0 0 1.5 2 5.5 2s5.5-2 5.5-4.5"/></svg></button>
+        </div>
+
+        <div class="toolbar-group">
+          <button class="tb-btn" title="Bullet list" onclick="execCmd('insertUnorderedList')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1" fill="currentColor" stroke="none"/></svg></button>
+          <button class="tb-btn" title="Numbered list" onclick="execCmd('insertOrderedList')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></button>
+          <button class="tb-btn" title="Blockquote" onclick="execCmd('formatBlock','blockquote')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg></button>
+        </div>
+
+        <div class="toolbar-group">
+          <button class="tb-btn" title="Insert link" onclick="showLinkPopover()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+          <button class="tb-btn" title="Insert image" onclick="insertImage()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg></button>
+          <button class="tb-btn" title="Inline code" onclick="execCmd('insertHTML','<code>code</code>')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></button>
+          <button class="tb-btn" title="Horizontal rule" onclick="execCmd('insertHorizontalRule')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="4" y1="12" x2="20" y2="12"/></svg></button>
+        </div>
+
+        <div class="toolbar-group">
+          <button class="tb-btn" title="Align left" onclick="execCmd('justifyLeft')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg></button>
+          <button class="tb-btn" title="Align center" onclick="execCmd('justifyCenter')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="5" y1="18" x2="19" y2="18"/></svg></button>
+        </div>
+
+        <div class="toolbar-group">
+          <button class="tb-btn" title="Undo" onclick="document.execCommand('undo')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg></button>
+          <button class="tb-btn" title="Redo" onclick="document.execCommand('redo')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/></svg></button>
+        </div>
+
+        <span class="toolbar-spacer"></span>
+        <span class="word-count" id="wordCount">0 words</span>
+      </div>
+
+      <!-- Content Area -->
+      <div
+        class="editor-body"
+        id="editorBody"
+        contenteditable="true"
+        oninput="updateWordCount();markUnsaved();updateReadTime()"
+        onkeydown="handleEditorKey(event)"
+      >
+        <h2>Why Most AZ-104 Study Plans Fail</h2>
+        <p>The most common mistake candidates make is treating the AZ-104 like a textbook exam. They buy every recommended book, try to read cover to cover, and end up overwhelmed six weeks in with half the syllabus still untouched.</p>
+        <p>This plan takes a different approach. It's <strong>exam-aligned, not book-aligned</strong> — built around the official Microsoft skills outline, weighted by the percentage each domain actually contributes to your score.</p>
+        <blockquote>The goal is not to know everything about Azure. The goal is to know what matters for the exam — and to know it cold.</blockquote>
+        <h2>The 60-Day Framework</h2>
+        <p>Here's how we split the time across the five core domains:</p>
+        <ul>
+          <li><strong>Days 1–10:</strong> Manage Azure Identities and Governance (15–20%)</li>
+          <li><strong>Days 11–22:</strong> Implement and Manage Storage (15–20%)</li>
+          <li><strong>Days 23–38:</strong> Deploy and Manage Azure Compute Resources (20–25%)</li>
+          <li><strong>Days 39–50:</strong> Implement and Manage Virtual Networking (15–20%)</li>
+          <li><strong>Days 51–58:</strong> Monitor and Maintain Azure Resources (10–15%)</li>
+          <li><strong>Days 59–60:</strong> Full mock exam + review weak areas</li>
+        </ul>
+        <h3>The Golden Rule: Hands-On First</h3>
+        <p>Every topic should be followed by a lab. Don't just read about creating a virtual network — create one. Deploy a VM. Set up a storage account. The Azure free tier gives you enough credits to run all of these labs without paying a penny.</p>
+      </div>
+    </div>
+
+  </div><!-- /editor-main -->
+
+  <!-- SIDEBAR -->
+  <div class="editor-sidebar" id="editorSidebar">
+
+    <!-- Publish -->
+    <div class="publish-card">
+      <div class="side-card-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Publish
+      </div>
+      <button class="publish-main-btn" onclick="publishPost()">Publish now</button>
+      <button class="save-draft-btn" onclick="saveDraft()">Save as draft</button>
+      <div class="pub-divider"></div>
+
+      <div class="pub-row">
+        <span class="pub-row-label">Status</span>
+        <select class="pub-select" onchange="markUnsaved()">
+          <option value="draft" selected>Draft</option>
+          <option value="published">Published</option>
+          <option value="scheduled">Scheduled</option>
+        </select>
+      </div>
+      <div class="pub-row">
+        <span class="pub-row-label">Visibility</span>
+        <select class="pub-select" onchange="markUnsaved()">
+          <option value="public" selected>Public</option>
+          <option value="members">Members only</option>
+          <option value="private">Private</option>
+        </select>
+      </div>
+      <div class="pub-row">
+        <span class="pub-row-label">Schedule</span>
+        <input class="schedule-input" type="datetime-local" value="2026-04-10T09:00" onchange="markUnsaved()">
+      </div>
+
+      <div class="pub-divider" style="margin-top:16px;"></div>
+      <div class="toggle-wrap">
+        <span class="toggle-label">Featured post</span>
+        <label class="toggle"><input type="checkbox" checked onchange="markUnsaved()"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-wrap">
+        <span class="toggle-label">Allow comments</span>
+        <label class="toggle"><input type="checkbox" checked onchange="markUnsaved()"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-wrap" style="margin-bottom:0;">
+        <span class="toggle-label">Index in search</span>
+        <label class="toggle"><input type="checkbox" checked onchange="markUnsaved()"><span class="toggle-slider"></span></label>
+      </div>
+    </div>
+
+    <!-- Featured Image -->
+    <div class="side-card">
+      <div class="side-card-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+        Featured Image
+      </div>
+      <div class="feat-img-thumb" onclick="triggerCoverUpload()">
+        <div style="font-size:36px;position:relative;z-index:1;">☁️</div>
+        <div class="feat-img-overlay"><span class="feat-img-overlay-text">Change</span></div>
+      </div>
+      <div class="feat-img-actions">
+        <button class="feat-img-btn" onclick="triggerCoverUpload()">Replace</button>
+        <button class="feat-img-btn" onclick="removeCover()">Remove</button>
+      </div>
+    </div>
+
+    <!-- Categories & Tags -->
+    <div class="side-card">
+      <div class="side-card-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        Categories
+      </div>
+      <div class="cat-list">
+        <div class="cat-item" onclick="toggleCat(this)">
+          <div class="cat-cb checked"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span class="cat-name">☁️ Cloud</span>
+          <span class="cat-count">14</span>
+        </div>
+        <div class="cat-item" onclick="toggleCat(this)">
+          <div class="cat-cb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span class="cat-name">🪟 Microsoft</span>
+          <span class="cat-count">22</span>
+        </div>
+        <div class="cat-item" onclick="toggleCat(this)">
+          <div class="cat-cb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span class="cat-name">🎯 Career</span>
+          <span class="cat-count">9</span>
+        </div>
+        <div class="cat-item" onclick="toggleCat(this)">
+          <div class="cat-cb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span class="cat-name">📋 Exam Tips</span>
+          <span class="cat-count">11</span>
+        </div>
+        <div class="cat-item" onclick="toggleCat(this)">
+          <div class="cat-cb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span class="cat-name">🔒 Security</span>
+          <span class="cat-count">8</span>
+        </div>
+      </div>
+
+      <div class="side-card-title" style="margin-top:16px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/></svg>
+        Tags
+      </div>
+      <div class="tags-wrap" id="tagsWrap">
+        <span class="tag-pill">AZ-104 <span class="tag-remove" onclick="removeTag(this)">×</span></span>
+        <span class="tag-pill">Azure <span class="tag-remove" onclick="removeTag(this)">×</span></span>
+        <span class="tag-pill">Study Plan <span class="tag-remove" onclick="removeTag(this)">×</span></span>
+        <span class="tag-pill">Certification <span class="tag-remove" onclick="removeTag(this)">×</span></span>
+      </div>
+      <input class="tag-add-input" type="text" placeholder="Add tag… press Enter" onkeydown="addTag(event,this)">
+    </div>
+
+    <!-- SEO -->
+    <div class="side-card">
+      <div class="side-card-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        SEO Preview
+      </div>
+
+      <div class="seo-score">
+        <div class="seo-score-bar"><div class="seo-score-fill" id="seoBar"></div></div>
+        <span class="seo-score-val" id="seoScore">72</span>
+      </div>
+
+      <div class="seo-preview">
+        <div class="seo-site">bhavinacademy.com › blog › <span id="seoSlug">azure-az-104-60-day-study-plan</span></div>
+        <div class="seo-title" id="seoTitle">Azure AZ-104 in 60 Days: The Study Plan That Actually Works</div>
+        <div class="seo-desc" id="seoDesc">Stop reading every book cover to cover. Here's the focused, exam-aligned 60-day plan that took dozens of BhavinAcademy students from zero to certified…</div>
+      </div>
+
+      <div class="seo-label" style="margin-bottom:6px;">SEO Checks</div>
+      <div class="seo-checks">
+        <div class="seo-check"><div class="seo-check-dot good"></div>Title length is optimal (58 chars)</div>
+        <div class="seo-check"><div class="seo-check-dot good"></div>Focus keyword in title</div>
+        <div class="seo-check"><div class="seo-check-dot good"></div>Excerpt under 160 characters</div>
+        <div class="seo-check"><div class="seo-check-dot warn"></div>Alt text missing on 1 image</div>
+        <div class="seo-check"><div class="seo-check-dot good"></div>Slug is short and readable</div>
+        <div class="seo-check"><div class="seo-check-dot warn"></div>Add at least one internal link</div>
+      </div>
+
+      <div class="meta-divider" style="margin:16px 0;"></div>
+      <div class="seo-label">Focus Keyword</div>
+      <input class="meta-input" type="text" value="AZ-104 study plan" style="margin-top:6px;width:100%;" oninput="markUnsaved()">
+    </div>
+
+  </div><!-- /sidebar -->
+</div><!-- /editor-wrap -->
+
+<!-- LINK INSERT POPOVER -->
+<div class="insert-popover" id="linkPopover">
+  <input type="text" id="linkInput" placeholder="Paste or type a URL…">
+  <button class="insert-popover-btn" onclick="applyLink()">Insert</button>
+  <span class="insert-popover-close" onclick="hideLinkPopover()">×</span>
+</div>
+
+<script>
+/* ── AUTO-RESIZE TEXTAREA ── */
+function autoResize(el){el.style.height='auto';el.style.height=el.scrollHeight+'px';}
+window.addEventListener('DOMContentLoaded',()=>{
+  const t=document.getElementById('postTitle');
+  if(t){autoResize(t);}
+  updateWordCount();
+  updateCharCount(document.getElementById('postExcerpt'),'excerptCount',160);
+});
+
+/* ── SLUG GENERATION ── */
+function updateSlug(){
+  const title=document.getElementById('postTitle').value;
+  const slug=title.toLowerCase().replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').replace(/-+/g,'-');
+  document.getElementById('postSlug').value=slug;
+  document.getElementById('seoSlug').textContent=slug||'post-slug';
+  document.getElementById('seoTitle').textContent=title||'Post Title';
+}
+
+/* ── CHAR COUNT ── */
+function updateCharCount(el,countId,max){
+  const remaining=max-el.value.length;
+  const el2=document.getElementById(countId);
+  el2.textContent=remaining;
+  el2.style.color=remaining<20?'#ff3b30':remaining<40?'#ff9f0a':'#86868b';
+  document.getElementById('seoDesc').textContent=el.value.substring(0,150)+(el.value.length>150?'…':'');
+}
+
+/* ── WORD COUNT ── */
+function updateWordCount(){
+  const text=document.getElementById('editorBody').innerText||'';
+  const words=text.trim().split(/\s+/).filter(Boolean).length;
+  document.getElementById('wordCount').textContent=words+' word'+(words!==1?'s':'');
+  updateReadTime(words);
+}
+function updateReadTime(words){
+  if(!words){words=(document.getElementById('editorBody').innerText||'').trim().split(/\s+/).filter(Boolean).length;}
+  const mins=Math.max(1,Math.round(words/200));
+  document.getElementById('calcReadTime').textContent=mins+' min';
+}
+
+/* ── EXEC COMMAND WRAPPER ── */
+function execCmd(cmd,val){document.getElementById('editorBody').focus();document.execCommand(cmd,false,val||null);}
+
+/* ── EDITOR KEY HANDLER ── */
+function handleEditorKey(e){
+  if(e.key==='Tab'){e.preventDefault();document.execCommand('insertHTML',false,'&nbsp;&nbsp;&nbsp;&nbsp;');}
+}
+
+/* ── UNSAVED STATE ── */
+let unsavedTimeout;
+function markUnsaved(){
+  document.getElementById('unsavedBadge').classList.add('visible');
+  document.getElementById('lastSaved').style.display='none';
+  clearTimeout(unsavedTimeout);
+  unsavedTimeout=setTimeout(autoSave,2500);
+}
+function autoSave(){
+  const dot=document.getElementById('saveDot');
+  const ls=document.getElementById('lastSaved');
+  document.getElementById('unsavedBadge').classList.remove('visible');
+  ls.style.display='flex';
+  ls.classList.add('saving');
+  dot.style.background='#ffd60a';
+  setTimeout(()=>{
+    ls.classList.remove('saving');
+    dot.style.background='#30d158';
+    ls.querySelector('span') && (ls.lastChild.textContent=' Saved just now');
+    ls.innerHTML='<div class="last-saved-dot" id="saveDot" style="background:#30d158"></div> Saved just now';
+  },900);
+}
+
+/* ── SAVE DRAFT ── */
+function saveDraft(){
+  autoSave();
+  showToast('Draft saved ✓');
+}
+
+/* ── PUBLISH ── */
+function publishPost(){
+  const badge=document.querySelector('.status-pill .status-dot');
+  if(badge){badge.className='status-dot published';}
+  document.querySelector('.status-pill').innerHTML='<div class="status-dot published"></div> Published';
+  showToast('Post published successfully 🎉');
+}
+
+/* ── TOAST ── */
+function showToast(msg){
+  let t=document.getElementById('toast');
+  if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;bottom:28px;right:24px;background:#1d1d1f;color:#f5f5f7;font-size:13px;font-weight:500;padding:10px 18px;border-radius:10px;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,0.2);transition:opacity 0.3s,transform 0.3s;';document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';t.style.transform='translateY(0)';
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)';},2500);
+}
+
+/* ── FOCUS MODE ── */
+let focusMode=false;
+function toggleFocus(){
+  focusMode=!focusMode;
+  document.getElementById('editorSidebar').style.display=focusMode?'none':'flex';
+  document.getElementById('editorWrap').style.gridTemplateColumns=focusMode?'1fr':'1fr 300px';
+  document.querySelector('.focus-btn').textContent=focusMode?'⊞ Exit focus':'⊡ Focus mode';
+  showToast(focusMode?'Focus mode on — sidebar hidden':'Focus mode off');
+}
+
+/* ── COVER IMAGE ── */
+function triggerCoverUpload(){document.getElementById('coverFileInput').click();}
+function handleCoverUpload(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const url=URL.createObjectURL(file);
+  const upload=document.getElementById('coverUpload');
+  const preview=document.getElementById('coverPreview');
+  preview.src=url;
+  upload.classList.add('has-image');
+  markUnsaved();
+}
+function removeCover(){
+  document.getElementById('coverPreview').src='';
+  document.getElementById('coverUpload').classList.remove('has-image');
+  document.getElementById('coverFileInput').value='';
+  markUnsaved();
+}
+
+/* ── CATEGORY TOGGLE ── */
+function toggleCat(item){
+  const cb=item.querySelector('.cat-cb');
+  cb.classList.toggle('checked');
+  markUnsaved();
+}
+
+/* ── TAG MANAGEMENT ── */
+function removeTag(btn){btn.parentElement.remove();markUnsaved();}
+function addTag(e,input){
+  if(e.key==='Enter'&&input.value.trim()){
+    e.preventDefault();
+    const tag=document.createElement('span');
+    tag.className='tag-pill';
+    tag.innerHTML=input.value.trim()+' <span class="tag-remove" onclick="removeTag(this)">×</span>';
+    document.getElementById('tagsWrap').appendChild(tag);
+    input.value='';
+    markUnsaved();
+  }
+}
+
+/* ── LINK POPOVER ── */
+let savedRange=null;
+function showLinkPopover(){
+  const sel=window.getSelection();
+  if(sel.rangeCount)savedRange=sel.getRangeAt(0).cloneRange();
+  document.getElementById('linkPopover').classList.add('visible');
+  document.getElementById('linkInput').focus();
+}
+function hideLinkPopover(){document.getElementById('linkPopover').classList.remove('visible');}
+function applyLink(){
+  const url=document.getElementById('linkInput').value.trim();
+  if(!url)return;
+  if(savedRange){const sel=window.getSelection();sel.removeAllRanges();sel.addRange(savedRange);}
+  document.execCommand('createLink',false,url);
+  hideLinkPopover();
+  document.getElementById('linkInput').value='';
+  markUnsaved();
+}
+document.getElementById('linkInput').addEventListener('keydown',e=>{if(e.key==='Enter')applyLink();if(e.key==='Escape')hideLinkPopover();});
+
+/* ── INSERT IMAGE (placeholder) ── */
+function insertImage(){
+  const url=prompt('Image URL:');
+  if(url)execCmd('insertHTML',`<img src="${url}" alt="Image" style="max-width:100%;border-radius:10px;margin:8px 0;">`);
+}
+
+/* ── INIT ── */
+document.getElementById('postTitle').dispatchEvent(new Event('input'));
+</script>
+
+</body>
+</html>

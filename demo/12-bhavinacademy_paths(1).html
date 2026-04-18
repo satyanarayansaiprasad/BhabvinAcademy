@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning Paths — BhavinAcademy</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:#fff;color:#1d1d1f;overflow-x:hidden;}
+
+/* ─── NAV ─────────────────────────────────────────────── */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,0.08);height:52px;display:flex;align-items:center;justify-content:center;padding:0 24px;}
+.nav-inner{max-width:1080px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-size:18px;font-weight:700;letter-spacing:-0.5px;color:#1d1d1f;text-decoration:none;}
+.nav-logo span{color:#0071e3;}
+.nav-links{display:flex;gap:20px;list-style:none;}
+.nav-links a{font-size:13px;color:#1d1d1f;text-decoration:none;font-weight:400;opacity:0.7;transition:opacity 0.2s;}
+.nav-links a:hover,.nav-links a.active{opacity:1;}
+.nav-links a.active{font-weight:600;}
+.nav-btn{background:#0071e3;color:#fff;border:none;padding:7px 16px;border-radius:980px;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s;}
+.nav-btn:hover{background:#0077ed;}
+
+/* ─── PAGE HERO ───────────────────────────────────────── */
+.page-hero{background:linear-gradient(160deg,#000 0%,#1a1a2e 55%,#000 100%);padding:100px 24px 80px;text-align:center;position:relative;overflow:hidden;}
+.page-hero-glow{position:absolute;width:700px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(0,113,227,0.22) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+.page-hero-eyebrow{font-size:13px;font-weight:600;color:#0071e3;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:16px;}
+.page-hero h1{font-size:clamp(36px,5.5vw,72px);font-weight:800;line-height:1.05;letter-spacing:-2px;color:#f5f5f7;margin-bottom:18px;max-width:720px;margin-left:auto;margin-right:auto;}
+.page-hero h1 em{font-style:normal;background:linear-gradient(90deg,#0071e3,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.page-hero-sub{font-size:clamp(15px,2vw,19px);color:#86868b;line-height:1.6;max-width:520px;margin:0 auto 40px;font-weight:300;}
+.hero-stats{display:flex;justify-content:center;gap:48px;margin-top:48px;}
+.hero-stat{text-align:center;}
+.hero-stat-num{font-size:32px;font-weight:800;color:#f5f5f7;letter-spacing:-1px;}
+.hero-stat-label{font-size:13px;color:#86868b;margin-top:4px;}
+
+/* ─── FILTER BAR ──────────────────────────────────────── */
+.filter-bar{background:#f5f5f7;border-bottom:1px solid #d2d2d7;padding:0 24px;position:sticky;top:52px;z-index:90;}
+.filter-inner{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:8px;overflow-x:auto;padding:14px 0;scrollbar-width:none;}
+.filter-inner::-webkit-scrollbar{display:none;}
+.filter-chip{flex-shrink:0;padding:6px 18px;border-radius:980px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid #d2d2d7;background:#fff;color:#1d1d1f;transition:all 0.2s;white-space:nowrap;}
+.filter-chip:hover{border-color:#0071e3;color:#0071e3;}
+.filter-chip.active{background:#0071e3;border-color:#0071e3;color:#fff;}
+
+/* ─── PATH LIST ───────────────────────────────────────── */
+.paths-main{background:#fff;padding:72px 24px;}
+.paths-main-inner{max-width:1080px;margin:0 auto;}
+.section-label{font-size:13px;font-weight:600;color:#0071e3;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+.section-title{font-size:36px;font-weight:700;letter-spacing:-1px;margin-bottom:8px;}
+.section-sub{font-size:16px;color:#6e6e73;margin-bottom:48px;line-height:1.5;}
+
+/* Featured path – wide card */
+.path-featured{background:#000;border-radius:24px;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;margin-bottom:20px;min-height:360px;position:relative;}
+.path-featured-body{padding:52px 48px;display:flex;flex-direction:column;justify-content:space-between;}
+.path-featured-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,113,227,0.2);border:1px solid rgba(0,113,227,0.35);color:#40a9ff;padding:4px 14px;border-radius:980px;font-size:12px;font-weight:600;letter-spacing:0.04em;margin-bottom:20px;width:fit-content;}
+.path-featured-badge::before{content:'★';font-size:10px;}
+.path-featured-num{font-size:13px;font-weight:600;color:#0071e3;margin-bottom:10px;}
+.path-featured-title{font-size:clamp(26px,3.5vw,42px);font-weight:800;letter-spacing:-1px;color:#f5f5f7;line-height:1.1;margin-bottom:14px;}
+.path-featured-desc{font-size:15px;color:#86868b;line-height:1.65;max-width:380px;margin-bottom:28px;}
+.path-featured-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:28px;}
+.pill-dark{font-size:11px;font-weight:500;background:rgba(255,255,255,0.1);color:#c7c7cc;padding:4px 12px;border-radius:980px;border:1px solid rgba(255,255,255,0.12);}
+.path-featured-cta{display:inline-flex;align-items:center;gap:8px;background:#0071e3;color:#fff;padding:12px 24px;border-radius:980px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:background 0.2s;width:fit-content;}
+.path-featured-cta:hover{background:#0077ed;}
+.path-featured-visual{position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.path-feat-bg{position:absolute;inset:0;background:linear-gradient(135deg,#0a1628 0%,#1a2d4a 50%,#0a1628 100%);}
+.path-feat-icon-wrap{position:relative;z-index:1;text-align:center;}
+.path-feat-big-icon{font-size:96px;display:block;margin-bottom:16px;filter:drop-shadow(0 0 40px rgba(0,113,227,0.5));}
+.path-feat-meta{display:flex;gap:20px;justify-content:center;}
+.path-feat-meta-item{text-align:center;}
+.path-feat-meta-num{font-size:22px;font-weight:700;color:#f5f5f7;}
+.path-feat-meta-lbl{font-size:11px;color:#86868b;margin-top:2px;}
+
+/* Regular path cards grid */
+.paths-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.path-card{border:1px solid #d2d2d7;border-radius:20px;overflow:hidden;transition:transform 0.3s,box-shadow 0.3s,border-color 0.2s;cursor:pointer;background:#fff;display:flex;flex-direction:column;}
+.path-card:hover{transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,0.09);border-color:#0071e3;}
+.path-card-header{height:140px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.pch-ms{background:linear-gradient(135deg,#0a1628,#1e3a5f);}
+.pch-lx{background:linear-gradient(135deg,#1a1a0a,#3a3010);}
+.pch-nw{background:linear-gradient(135deg,#0a1a28,#103050);}
+.pch-cl{background:linear-gradient(135deg,#0a1e2e,#08305a);}
+.pch-sec{background:linear-gradient(135deg,#0a1a0a,#0f3020);}
+.pch-dv{background:linear-gradient(135deg,#1a0a28,#35155a);}
+.pch-ai{background:linear-gradient(135deg,#0a0a1a,#181850);}
+.path-card-icon{font-size:56px;filter:drop-shadow(0 4px 20px rgba(0,0,0,0.5));position:relative;z-index:1;}
+.path-card-num-overlay{position:absolute;top:14px;left:16px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:0.08em;}
+.path-card-level{position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);color:#c7c7cc;font-size:10px;font-weight:600;padding:3px 10px;border-radius:980px;letter-spacing:0.04em;}
+.path-card-body{padding:24px 24px 20px;flex:1;display:flex;flex-direction:column;}
+.path-card-title{font-size:19px;font-weight:700;letter-spacing:-0.4px;margin-bottom:8px;color:#1d1d1f;}
+.path-card-desc{font-size:13px;color:#6e6e73;line-height:1.6;flex:1;margin-bottom:16px;}
+.path-card-pills{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px;}
+.pill{font-size:11px;font-weight:500;background:#f5f5f7;color:#1d1d1f;padding:3px 10px;border-radius:980px;}
+.path-card-footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid #f5f5f7;padding-top:14px;}
+.path-card-metas{display:flex;gap:14px;}
+.path-card-meta-item{font-size:12px;color:#86868b;}
+.path-card-meta-item strong{font-weight:600;color:#1d1d1f;}
+.path-card-link{font-size:13px;font-weight:600;color:#0071e3;display:flex;align-items:center;gap:4px;}
+.path-card-link::after{content:'›';font-size:17px;}
+
+/* ─── HOW IT WORKS ────────────────────────────────────── */
+.how-sect{background:#f5f5f7;padding:80px 24px;}
+.how-inner{max-width:1080px;margin:0 auto;}
+.how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:48px;}
+.how-step{text-align:center;padding:32px 20px;}
+.how-step-num{width:48px;height:48px;border-radius:50%;background:#0071e3;color:#fff;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+.how-step-icon{font-size:36px;margin-bottom:14px;}
+.how-step-title{font-size:17px;font-weight:700;letter-spacing:-0.3px;margin-bottom:8px;}
+.how-step-desc{font-size:14px;color:#6e6e73;line-height:1.6;}
+.how-connector{display:flex;align-items:center;justify-content:center;padding-top:48px;}
+.how-connector-line{height:1px;flex:1;background:linear-gradient(90deg,transparent,#d2d2d7,transparent);}
+
+/* ─── CERTIFICATIONS BAND ─────────────────────────────── */
+.cert-sect{background:#000;padding:80px 24px;}
+.cert-inner{max-width:1080px;margin:0 auto;text-align:center;}
+.cert-title{font-size:clamp(24px,3.5vw,44px);font-weight:800;letter-spacing:-1.5px;color:#f5f5f7;margin-bottom:12px;}
+.cert-sub{font-size:16px;color:#86868b;margin-bottom:52px;}
+.cert-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.cert-card{background:#1d1d1f;border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:28px 20px;text-align:center;transition:border-color 0.2s,background 0.2s;}
+.cert-card:hover{border-color:rgba(0,113,227,0.5);background:#222;}
+.cert-icon{font-size:40px;margin-bottom:14px;display:block;}
+.cert-name{font-size:15px;font-weight:600;color:#f5f5f7;margin-bottom:6px;}
+.cert-org{font-size:12px;color:#86868b;}
+
+/* ─── TESTIMONIAL ─────────────────────────────────────── */
+.test-sect{background:#fff;padding:100px 24px;}
+.test-inner{max-width:900px;margin:0 auto;}
+.test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.test-card{background:#f5f5f7;border-radius:18px;padding:28px;position:relative;}
+.test-stars{color:#ffd60a;font-size:14px;letter-spacing:2px;margin-bottom:14px;}
+.test-text{font-size:15px;color:#1d1d1f;line-height:1.65;margin-bottom:20px;font-weight:400;}
+.test-author{display:flex;align-items:center;gap:12px;}
+.test-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0;}
+.av-a{background:linear-gradient(135deg,#0071e3,#00d4ff);}
+.av-b{background:linear-gradient(135deg,#e95420,#ffd60a);}
+.av-c{background:linear-gradient(135deg,#107c10,#00bcf2);}
+.test-author-info{flex:1;}
+.test-author-name{font-size:13px;font-weight:600;color:#1d1d1f;}
+.test-author-role{font-size:12px;color:#86868b;margin-top:1px;}
+.test-path-badge{position:absolute;top:20px;right:20px;background:#e8f1fb;color:#0071e3;font-size:10px;font-weight:600;padding:3px 10px;border-radius:980px;}
+
+/* ─── CTA BAND ────────────────────────────────────────── */
+.cta-band{background:#0071e3;padding:80px 24px;text-align:center;}
+.cta-band h2{font-size:clamp(28px,4vw,52px);font-weight:800;color:#fff;letter-spacing:-1.5px;margin-bottom:16px;}
+.cta-band p{font-size:17px;color:rgba(255,255,255,0.75);margin-bottom:36px;max-width:480px;margin-left:auto;margin-right:auto;}
+.btn-white{background:#fff;color:#0071e3;border:none;padding:14px 32px;border-radius:980px;font-size:16px;font-weight:600;cursor:pointer;transition:opacity 0.2s;}
+.btn-white:hover{opacity:0.9;}
+
+/* ─── FOOTER ──────────────────────────────────────────── */
+footer{background:#f5f5f7;border-top:1px solid #d2d2d7;padding:40px 24px 24px;}
+.footer-inner{max-width:1080px;margin:0 auto;}
+.footer-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;padding-bottom:32px;border-bottom:1px solid #d2d2d7;margin-bottom:24px;}
+.footer-col h4{font-size:13px;font-weight:600;color:#1d1d1f;margin-bottom:12px;}
+.footer-col ul{list-style:none;}
+.footer-col ul li{margin-bottom:8px;}
+.footer-col ul li a{font-size:13px;color:#6e6e73;text-decoration:none;transition:color 0.2s;}
+.footer-col ul li a:hover{color:#0071e3;}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;}
+.footer-copy{font-size:13px;color:#86868b;}
+.footer-logo{font-size:16px;font-weight:700;color:#1d1d1f;}
+.footer-logo span{color:#0071e3;}
+
+/* ─── ANIMATIONS ──────────────────────────────────────── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+.fade-up{opacity:0;animation:fadeUp 0.6s ease forwards;}
+.fade-up-d1{animation-delay:0.1s;}
+.fade-up-d2{animation-delay:0.2s;}
+.fade-up-d3{animation-delay:0.3s;}
+.fade-up-d4{animation-delay:0.4s;}
+.fade-up-d5{animation-delay:0.5s;}
+
+/* ─── RESPONSIVE ──────────────────────────────────────── */
+@media(max-width:900px){
+  .path-featured{grid-template-columns:1fr;}
+  .path-featured-visual{min-height:180px;}
+  .paths-grid{grid-template-columns:1fr 1fr;}
+  .how-grid{grid-template-columns:1fr 1fr;}
+  .cert-grid{grid-template-columns:1fr 1fr;}
+  .test-grid{grid-template-columns:1fr;}
+  .hero-stats{gap:28px;}
+}
+@media(max-width:600px){
+  .paths-grid{grid-template-columns:1fr;}
+  .cert-grid{grid-template-columns:1fr 1fr;}
+  .footer-cols{grid-template-columns:1fr 1fr;}
+  .nav-links{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">Bhavin<span>Academy</span></a>
+    <ul class="nav-links">
+      <li><a href="#">Courses</a></li>
+      <li><a href="#" class="active">Paths</a></li>
+      <li><a href="#">Instructor</a></li>
+      <li><a href="#">Blog</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+    <button class="nav-btn">Sign in</button>
+  </div>
+</nav>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="page-hero-glow"></div>
+  <p class="page-hero-eyebrow fade-up">Structured Learning Paths</p>
+  <h1 class="fade-up fade-up-d1">Your <em>roadmap</em> to<br>IT mastery.</h1>
+  <p class="page-hero-sub fade-up fade-up-d2">Curated sequences of courses built around real certifications and real career outcomes. Pick a path. Follow the roadmap. Get certified.</p>
+  <div class="hero-stats fade-up fade-up-d3">
+    <div class="hero-stat">
+      <div class="hero-stat-num">7</div>
+      <div class="hero-stat-label">Career Paths</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">180+</div>
+      <div class="hero-stat-label">Hours of Content</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">12</div>
+      <div class="hero-stat-label">Certifications Covered</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">4,200+</div>
+      <div class="hero-stat-label">Students Enrolled</div>
+    </div>
+  </div>
+</section>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="filter-inner">
+    <button class="filter-chip active" onclick="setFilter(this,'all')">All Paths</button>
+    <button class="filter-chip" onclick="setFilter(this,'microsoft')">🪟 Microsoft</button>
+    <button class="filter-chip" onclick="setFilter(this,'linux')">🐧 Linux</button>
+    <button class="filter-chip" onclick="setFilter(this,'networking')">🌐 Networking</button>
+    <button class="filter-chip" onclick="setFilter(this,'cloud')">☁️ Cloud</button>
+    <button class="filter-chip" onclick="setFilter(this,'security')">🔒 Security</button>
+    <button class="filter-chip" onclick="setFilter(this,'devops')">⚙️ DevOps</button>
+    <button class="filter-chip" onclick="setFilter(this,'ai')">🤖 AI & Automation</button>
+    <button class="filter-chip" onclick="setFilter(this,'beginner')">Beginner-Friendly</button>
+  </div>
+</div>
+
+<!-- MAIN PATHS -->
+<section class="paths-main">
+  <div class="paths-main-inner">
+
+    <p class="section-label">Featured Path</p>
+    <h2 class="section-title">Most popular this month</h2>
+    <p class="section-sub">Our most-enrolled path — and for good reason. This sequence takes you from zero to cloud-ready Microsoft engineer.</p>
+
+    <!-- FEATURED CARD -->
+    <div class="path-featured" data-category="microsoft">
+      <div class="path-featured-body">
+        <div>
+          <div class="path-featured-badge">Most Popular</div>
+          <div class="path-featured-num">Path 01</div>
+          <div class="path-featured-title">Microsoft<br>Engineer</div>
+          <div class="path-featured-desc">Master the full Microsoft stack — from Windows Server administration to Azure cloud and Microsoft 365. Prepares you for MCSA and MCP certifications with structured, exam-aligned content.</div>
+          <div class="path-featured-pills">
+            <span class="pill-dark">🪟 Windows Server</span>
+            <span class="pill-dark">⚙️ Active Directory</span>
+            <span class="pill-dark">☁️ Azure</span>
+            <span class="pill-dark">📧 Microsoft 365</span>
+            <span class="pill-dark">🔐 Intune</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+          <button class="path-featured-cta">Start Path →</button>
+          <span style="font-size:13px;color:#86868b;">6 courses · 72 hrs · Beginner → Advanced</span>
+        </div>
+      </div>
+      <div class="path-featured-visual">
+        <div class="path-feat-bg"></div>
+        <div class="path-feat-icon-wrap">
+          <span class="path-feat-big-icon">🪟</span>
+          <div class="path-feat-meta">
+            <div class="path-feat-meta-item">
+              <div class="path-feat-meta-num">6</div>
+              <div class="path-feat-meta-lbl">Courses</div>
+            </div>
+            <div class="path-feat-meta-item">
+              <div class="path-feat-meta-num">72h</div>
+              <div class="path-feat-meta-lbl">Content</div>
+            </div>
+            <div class="path-feat-meta-item">
+              <div class="path-feat-meta-num">3</div>
+              <div class="path-feat-meta-lbl">Certs</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALL PATHS GRID -->
+    <div style="margin-top:60px;">
+      <p class="section-label">All Paths</p>
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px;">
+        <h2 class="section-title" style="margin-bottom:0;">Choose your direction.</h2>
+        <span style="font-size:14px;color:#86868b;">7 paths available</span>
+      </div>
+    </div>
+
+    <div class="paths-grid" id="pathsGrid">
+
+      <!-- Path 02 – Linux Admin -->
+      <div class="path-card" data-category="linux">
+        <div class="path-card-header pch-lx">
+          <span class="path-card-num-overlay">PATH 02</span>
+          <span class="path-card-level">All Levels</span>
+          <span class="path-card-icon">🐧</span>
+        </div>
+        <div class="path-card-body">
+          <div class="path-card-title">Linux Administrator</div>
+          <div class="path-card-desc">Command line mastery, shell scripting, service management, and LPIC certification prep. Build the skills every Linux sysadmin needs.</div>
+          <div class="path-card-pills">
+            <span class="pill">CLI</span>
+            <span class="pill">Bash Scripting</span>
+            <span class="pill">Services</span>
+            <span class="pill">LPIC-1</span>
+          </div>
+          <div class="path-card-footer">
+            <div class="path-card-metas">
+              <div class="path-card-meta-item"><strong>5</strong> courses</div>
+              <div class="path-card-meta-item"><strong>58h</strong></div>
+            </div>
+            <span class="path-card-link">Start</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Path 03 – Network Engineer -->
+      <div class="path-card" data-category="networking">
+        <div class="path-card-header pch-nw">
+          <span class="path-card-num-overlay">PATH 03</span>
+          <span class="path-card-level">Beginner</span>
+          <span class="path-card-icon">🌐</span>
+        </div>
+        <div class="path-card-body">
+          <div class="path-card-title">Network Engineer</div>
+          <div class="path-card-desc">Routing, switching, firewalls, and subnetting — complete CCNA and CompTIA Network+ exam preparation with hands-on labs.</div>
+          <div class="path-card-pills">
+            <span class="pill">TCP/IP</span>
+            <span class="pill">Routing</span>
+            <span class="pill">Firewalls</span>
+            <span class="pill">CCNA</span>
+          </div>
+          <div class="path-card-footer">
+            <div class="path-card-metas">
+              <div class="path-card-meta-item"><strong>4</strong> courses</div>
+              <div class="path-card-meta-item"><strong>44h</strong></div>
+            </div>
+            <span class="path-card-link">Start</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Path 04 – Cloud Architect -->
+      <div class="path-card" data-category="cloud">
+        <div class="path-card-header pch-cl">
+          <span class="path-card-num-overlay">PATH 04</span>
+          <span class="path-card-level">Intermediate</span>
+          <span class="path-card-icon">☁️</span>
+        </div>
+        <div class="path-card-body">
+          <div class="path-card-title">Cloud Architect</div>
+          <div class="path-card-desc">Design and deploy scalable cloud solutions on Azure. From AZ-900 fundamentals through AZ-104 and AZ-305 architect certification.</div>
+          <div class="path-card-pills">
+            <span class="pill">Azure</span>
+            <span class="pill">AZ-900</span>
+            <span class="pill">AZ-104</span>
+            <span class="pill">AZ-305</span>
+          </div>
+          <div class="path-card-footer">
+            <div class="path-card-metas">
+              <div class="path-card-meta-item"><strong>5</strong> courses</div>
+              <div class="path-card-meta-item"><strong>54h</strong></div>
+            </div>
+            <span class="path-card-link">Start</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Path 05 – Cybersecurity Analyst -->
+      <div class="path-card" data-category="security">
+        <div class="path-card-header pch-sec">
+          <span class="path-card-num-overlay">PATH 05</span>
+          <span class="path-card-level">Advanced</span>
+          <span class="path-card-icon">🔒</span>
+        </div>
+        <div class="path-card-body">
+          <div class="path-card-title">Cybersecurity Analyst</div>
+          <div class="path-card-desc">From threat analysis to incident response, covering CompTIA Security+, CySA+, and ethical hacking fundamentals with real-world scenarios.</div>
+          <div class="path-card-pills">
+            <span class="pill">Security+</span>
+            <span class="pill">CySA+</span>
+            <span class="pill">Ethical Hacking</span>
+            <span class="pill">SIEM</span>
+          </div>
+          <div class="path-card-footer">
+            <div class="path-card-metas">
+              <div class="path-card-meta-item"><strong>6</strong> courses</div>
+              <div class="path-card-meta-item"><strong>68h</strong></div>
+            </div>
+            <span class="path-card-link">Start</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Path 06 – DevOps Engineer -->
+      <div class="path-card" data-category="devops">
+        <div class="path-card-header pch-dv">
+          <span class="path-card-num-overlay">PATH 06</span>
+          <span class="path-card-level">Intermediate</span>
+          <span class="path-card-icon">⚙️</span>
+        </div>
+        <div class="path-card-body">
+          <div class="path-card-title">DevOps Engineer</div>
+          <div class="path-card-desc">CI/CD pipelines, containers, infrastructure as code, and monitoring. Hands-on with Docker, Kubernetes, Ansible, and Azure DevOps.</div>
+          <div class="path-card-pills">
+            <span class="pill">Docker</span>
+            <span class="pill">Kubernetes</span>
+            <span class="pill">Ansible</span>
+            <span class="pill">CI/CD</span>
+          </div>
+          <div class="path-card-footer">
+            <div class="path-card-metas">
+              <div class="path-card-meta-item"><strong>5</strong> courses</div>
+              <div class="path-card-meta-item"><strong>60h</strong></div>
+            </div>
+            <span class="path-card-link">Start</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Path 07 – AI & Automation -->
+      <div class="path-card" data-category="ai">
+        <div class="path-card-header pch-ai">
+          <span class="path-card-num-overlay">PATH 07</span>
+          <span class="path-card-level">Beginner</span>
+          <span class="path-card-icon">🤖</span>
+        </div>
+        <div class="path-card-body">
+          <div class="path-card-title">AI & Automation</div>
+          <div class="path-card-desc">Leverage AI tools and automation scripts to 10× your IT productivity. PowerShell, Python automation, Azure AI services, and Copilot integration.</div>
+          <div class="path-card-pills">
+            <span class="pill">PowerShell</span>
+            <span class="pill">Python</span>
+            <span class="pill">Azure AI</span>
+            <span class="pill">Copilot</span>
+          </div>
+          <div class="path-card-footer">
+            <div class="path-card-metas">
+              <div class="path-card-meta-item"><strong>4</strong> courses</div>
+              <div class="path-card-meta-item"><strong>42h</strong></div>
+            </div>
+            <span class="path-card-link">Start</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /paths-grid -->
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-sect">
+  <div class="how-inner">
+    <p class="section-label" style="text-align:center;">How It Works</p>
+    <h2 class="section-title" style="text-align:center;letter-spacing:-1px;">From zero to certified<br>in four steps.</h2>
+    <div class="how-grid">
+      <div class="how-step">
+        <div class="how-step-num">1</div>
+        <div class="how-step-icon">🎯</div>
+        <div class="how-step-title">Pick Your Path</div>
+        <div class="how-step-desc">Choose a career direction aligned to your goals — whether that's your first IT role or your next certification.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">2</div>
+        <div class="how-step-icon">📚</div>
+        <div class="how-step-title">Follow the Roadmap</div>
+        <div class="how-step-desc">Each path sequences courses from fundamentals to advanced topics — no guesswork about what to learn next.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">3</div>
+        <div class="how-step-icon">🔬</div>
+        <div class="how-step-title">Practice in Labs</div>
+        <div class="how-step-desc">Reinforce every concept in real virtual labs and practice exams built around the actual certification objectives.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">4</div>
+        <div class="how-step-icon">🏅</div>
+        <div class="how-step-title">Get Certified</div>
+        <div class="how-step-desc">Walk into your exam confident. Earn your cert. Level up your career — and come back for the next path.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CERTIFICATIONS -->
+<section class="cert-sect">
+  <div class="cert-inner">
+    <p class="section-label" style="color:#0071e3;">Certifications Covered</p>
+    <h2 class="cert-title">Industry-recognised<br>credentials.</h2>
+    <p class="cert-sub">Every path is built around real vendor certifications that employers actively look for.</p>
+    <div class="cert-grid">
+      <div class="cert-card">
+        <span class="cert-icon">🪟</span>
+        <div class="cert-name">MCSA / MCP</div>
+        <div class="cert-org">Microsoft</div>
+      </div>
+      <div class="cert-card">
+        <span class="cert-icon">☁️</span>
+        <div class="cert-name">AZ-900 / AZ-104 / AZ-305</div>
+        <div class="cert-org">Microsoft Azure</div>
+      </div>
+      <div class="cert-card">
+        <span class="cert-icon">🌐</span>
+        <div class="cert-name">CCNA</div>
+        <div class="cert-org">Cisco</div>
+      </div>
+      <div class="cert-card">
+        <span class="cert-icon">🔒</span>
+        <div class="cert-name">Security+ / CySA+</div>
+        <div class="cert-org">CompTIA</div>
+      </div>
+      <div class="cert-card">
+        <span class="cert-icon">🐧</span>
+        <div class="cert-name">LPIC-1 / LPIC-2</div>
+        <div class="cert-org">Linux Professional Institute</div>
+      </div>
+      <div class="cert-card">
+        <span class="cert-icon">🌐</span>
+        <div class="cert-name">Network+</div>
+        <div class="cert-org">CompTIA</div>
+      </div>
+      <div class="cert-card">
+        <span class="cert-icon">⚙️</span>
+        <div class="cert-name">Azure DevOps</div>
+        <div class="cert-org">Microsoft</div>
+      </div>
+      <div class="cert-card">
+        <span class="cert-icon">🤖</span>
+        <div class="cert-name">AI-900</div>
+        <div class="cert-org">Microsoft Azure AI</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="test-sect">
+  <div class="test-inner">
+    <p class="section-label" style="text-align:center;">Student Stories</p>
+    <h2 class="section-title" style="text-align:center;letter-spacing:-1px;margin-bottom:40px;">Real results,<br>real careers.</h2>
+    <div class="test-grid">
+      <div class="test-card">
+        <div class="test-path-badge">Microsoft Path</div>
+        <div class="test-stars">★★★★★</div>
+        <div class="test-text">"I completed the Microsoft Engineer path in 4 months while working full-time. Passed my AZ-104 on the first attempt and got a promotion two weeks later."</div>
+        <div class="test-author">
+          <div class="test-avatar av-a">R</div>
+          <div class="test-author-info">
+            <div class="test-author-name">Rahul Mehta</div>
+            <div class="test-author-role">Systems Engineer, Pune</div>
+          </div>
+        </div>
+      </div>
+      <div class="test-card">
+        <div class="test-path-badge">Linux Path</div>
+        <div class="test-stars">★★★★★</div>
+        <div class="test-text">"The Linux Admin path is incredibly well-structured. Went from a Windows-only admin to confidently managing RHEL servers. The labs made all the difference."</div>
+        <div class="test-author">
+          <div class="test-avatar av-b">S</div>
+          <div class="test-author-info">
+            <div class="test-author-name">Sara Al-Farsi</div>
+            <div class="test-author-role">IT Administrator, Dubai</div>
+          </div>
+        </div>
+      </div>
+      <div class="test-card">
+        <div class="test-path-badge">Security Path</div>
+        <div class="test-stars">★★★★★</div>
+        <div class="test-text">"Bhavin's teaching style is clear and never overwhelming. I completed Security+ and CySA+ within 6 months. Now working as a SOC analyst."</div>
+        <div class="test-author">
+          <div class="test-avatar av-c">A</div>
+          <div class="test-author-info">
+            <div class="test-author-name">Arjun Krishnan</div>
+            <div class="test-author-role">SOC Analyst, Bengaluru</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-band">
+  <h2>Pick your path.<br>Start today.</h2>
+  <p>Join thousands of IT professionals who chose structure over guesswork.</p>
+  <button class="btn-white">Browse All Paths</button>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h4>Courses</h4>
+        <ul>
+          <li><a href="#">Microsoft Courses</a></li>
+          <li><a href="#">Linux Courses</a></li>
+          <li><a href="#">Networking</a></li>
+          <li><a href="#">Cloud & Azure</a></li>
+          <li><a href="#">Cybersecurity</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Learning Paths</h4>
+        <ul>
+          <li><a href="#">Microsoft Engineer</a></li>
+          <li><a href="#">Linux Administrator</a></li>
+          <li><a href="#">Network Engineer</a></li>
+          <li><a href="#">Cloud Architect</a></li>
+          <li><a href="#">Cybersecurity Analyst</a></li>
+          <li><a href="#">DevOps Engineer</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="#">Practice Exams</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-logo">Bhavin<span>Academy</span></div>
+      <div class="footer-copy">© 2026 Bhavin Academy. All rights reserved.</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function setFilter(el, cat) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+
+  const cards = document.querySelectorAll('#pathsGrid .path-card');
+  const featured = document.querySelector('.path-featured');
+
+  cards.forEach(card => {
+    const match = cat === 'all' || card.dataset.category === cat ||
+      (cat === 'beginner' && card.querySelector('.path-card-level').textContent.toLowerCase().includes('beginner'));
+    card.style.display = match ? 'flex' : 'none';
+  });
+
+  if (featured) {
+    const featMatch = cat === 'all' || featured.dataset.category === cat;
+    featured.style.display = featMatch ? 'grid' : 'none';
+  }
+}
+</script>
+</body>
+</html>

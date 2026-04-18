@@ -1,7 +1,7 @@
 import CommonForm from "@/components/common-form";
 import { signInFormControls, signUpFormControls } from "@/config";
 import { AuthContext } from "@/context/auth-context";
-import { GraduationCap, ArrowLeft, ShieldCheck, Sparkles } from "lucide-react";
+import { ChevronRight, Sparkles, Quote, CheckCircle2 } from "lucide-react";
 import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -34,9 +34,7 @@ function AuthPage() {
 
   const onMicrosoftLogin = async () => {
     try {
-      const loginResponse = await instance.loginPopup({
-        ...loginRequest,
-      });
+      const loginResponse = await instance.loginPopup({ ...loginRequest });
       if (loginResponse) {
         await handleMicrosoftLogin({
           microsoftId: loginResponse.uniqueId,
@@ -50,236 +48,145 @@ function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f2f2f2] flex flex-col">
-      {/* Header */}
-      <header className="fixed top-0 w-full px-6 py-4 flex items-center justify-between z-20 bg-white border-b border-[#e6e6e6] shadow-sm">
-        <Link to={"/"} className="flex items-center gap-2 text-black group">
-          <div className="bg-[#0067b8] p-1 rounded-sm">
-            <GraduationCap className="h-5 w-5 text-white" />
-          </div>
-          <span className="font-semibold text-lg tracking-tight">Bhavin Academy</span>
-        </Link>
-        <button
-          onClick={() => navigate("/")}
-          className="flex items-center gap-2 text-[#616161] hover:text-black font-semibold text-sm transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Home
-        </button>
-      </header>
-
-      <main className="flex-1 flex items-center justify-center p-6 pt-32 pb-16">
-        <div className="w-full max-w-[900px] grid grid-cols-1 lg:grid-cols-2 bg-white rounded-sm border border-[#e6e6e6] shadow-xl overflow-hidden">
-
-          {/* Left Side: Branding */}
-          <div className="hidden lg:flex flex-col justify-between p-12 bg-[#f8f9fa] border-r border-[#e6e6e6]">
-            <div>
-              <div className="w-12 h-12 rounded-sm bg-[#0067b8] flex items-center justify-center mb-8">
-                <Sparkles className="h-6 w-6 text-white" />
-              </div>
-              <h2 className="text-3xl font-semibold tracking-tight text-black mb-6 leading-tight">
-                Unlock your potential with professional learning.
-              </h2>
-              <p className="text-[#616161] font-normal text-sm leading-relaxed max-w-xs">
-                Join a community of dedicated learners and master new skills through structured, high-quality content.
-              </p>
-            </div>
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <ShieldCheck className="h-5 w-5 text-emerald-600" />
-                <span className="font-semibold text-xs text-black uppercase tracking-wider">Secure Access</span>
-              </div>
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-[#d2d2d2]">© 2026 BHAVIN ACADEMY</p>
-            </div>
-          </div>
-
-          {/* Right Side: Form */}
-          <div className="p-8 md:p-12 flex flex-col justify-center">
-            <div className="mb-10 flex bg-[#f2f2f2] p-1 rounded-sm">
-              <button
-                onClick={() => setActiveTab("signin")}
-                className={`flex-1 py-2.5 rounded-sm font-semibold text-sm transition-none ${activeTab === 'signin' ? 'bg-white text-black shadow-sm' : 'text-[#616161] hover:text-black'}`}
-              >
-                Sign In
-              </button>
-              <button
-                onClick={() => setActiveTab("signup")}
-                className={`flex-1 py-2.5 rounded-sm font-semibold text-sm transition-none ${activeTab === 'signup' ? 'bg-white text-black shadow-sm' : 'text-[#616161] hover:text-black'}`}
-              >
-                Sign Up
-              </button>
-            </div>
-
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-              >
-                {activeTab === "signin" ? (
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-2xl font-semibold tracking-tight text-black mb-1">Welcome back</h3>
-                      <p className="text-[#616161] font-normal text-sm">Please enter your details to sign in.</p>
-                    </div>
-                    <div className="auth-form-container">
-                      <CommonForm
-                        formControls={signInFormControls}
-                        buttonText={"Sign In"}
-                        formData={signInFormData}
-                        setFormData={setSignInFormData}
-                        isButtonDisabled={!checkIfSignInFormIsValid()}
-                        handleSubmit={handleLoginUser}
-                      />
-                      <div className="flex justify-end mt-2">
-                        <button
-                          onClick={() => setActiveTab("forgot")}
-                          className="text-xs font-semibold text-[#0067b8] hover:underline"
-                        >
-                          Forgot Password?
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ) : activeTab === "signup" ? (
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-2xl font-semibold tracking-tight text-black mb-1">Create an account</h3>
-                      <p className="text-[#616161] font-normal text-sm">Start your learning journey today.</p>
-                    </div>
-                    <div className="auth-form-container">
-                      <CommonForm
-                        formControls={signUpFormControls}
-                        buttonText={"Get Started"}
-                        formData={signUpFormData}
-                        setFormData={setSignUpFormData}
-                        isButtonDisabled={!checkIfSignUpFormIsValid()}
-                        handleSubmit={handleRegisterUser}
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <ForgotPasswordSection setActiveTab={setActiveTab} />
-                )}
-              </motion.div>
-            </AnimatePresence>
-
-            <div className="mt-8 space-y-4">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-[#e6e6e6]" />
-                </div>
-                <div className="relative flex justify-center text-[10px] uppercase font-semibold tracking-wider">
-                  <span className="bg-white px-4 text-[#616161]">Or continue with</span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="w-full flex justify-center">
-                  <GoogleLogin
-                    onSuccess={onGoogleSuccess}
-                    onError={() => console.log("Google Login Failed")}
-                    useOneTap
-                    theme="outline"
-                    shape="square"
-                    width="100%"
-                  />
-                </div>
-                <button
-                  onClick={onMicrosoftLogin}
-                  className="w-full h-[40px] flex items-center justify-center gap-2 border border-[#d2d2d2] rounded-sm hover:bg-[#f2f2f2] transition-none font-semibold text-xs"
+    <div className="min-h-screen bg-black flex flex-col font-['Inter']">
+      {/* MINIMAL NAV */}
+      <nav className="h-[52px] border-b border-white/10 flex items-center justify-center px-6 sticky top-0 z-[100] bg-black/80 backdrop-blur-xl">
+        <div className="max-w-[1080px] w-full flex items-center justify-between">
+            <Link to="/" className="text-[18px] font-bold tracking-tight text-[#f5f5f7]">
+                Bhavin<span className="text-[#0071e3]">Academy</span>
+            </Link>
+            <div className="flex items-center gap-6">
+                <Link to="/" className="text-[13px] text-[#f5f5f7]/60 hover:text-[#f5f5f7] transition-colors">Back to Home</Link>
+                <button 
+                  onClick={() => setActiveTab(activeTab === 'signin' ? 'signup' : 'signin')}
+                  className="bg-[#0071e3] text-white px-4 py-1.5 rounded-full text-[13px] font-medium hover:bg-[#0077ed] transition-colors"
                 >
-                  <svg className="w-4 h-4" viewBox="0 0 23 23">
-                    <path fill="#f3f3f3" d="M0 0h23v23H0z" />
-                    <path fill="#f35325" d="M1 1h10v10H1z" />
-                    <path fill="#81bc06" d="M12 1h10v10H12z" />
-                    <path fill="#05a6f0" d="M1 12h10v10H1z" />
-                    <path fill="#ffba08" d="M12 12h10v10H12z" />
-                  </svg>
-                  Microsoft
+                  {activeTab === 'signin' ? 'Create Account' : 'Sign In'}
                 </button>
-              </div>
             </div>
-
-            <p className="mt-10 text-center text-xs text-[#616161] font-normal">
-              By continuing, you agree to our <span className="text-black font-semibold hover:underline cursor-pointer">Terms</span> and <span className="text-black font-semibold hover:underline cursor-pointer">Privacy Policy</span>.
-            </p>
-          </div>
         </div>
-      </main>
-    </div>
-  );
-}
+      </nav>
 
-function ForgotPasswordSection({ setActiveTab }) {
-  const [email, setEmail] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [step, setStep] = useState(1);
-  const { handleForgotPassword, handleResetPassword } = useContext(AuthContext);
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2">
+        {/* LEFT: BRAND PANEL */}
+        <div className="hidden lg:flex flex-col justify-center p-16 relative overflow-hidden bg-[linear-gradient(160deg,#000_0%,#1a1a2e_60%,#000_100%)] border-r border-white/10">
+            <div className="absolute w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,rgba(0,113,227,0.25)_0%,transparent_65%)] top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+            <div className="absolute w-[250px] h-[250px] rounded-full bg-[radial-gradient(circle,rgba(0,212,255,0.1)_0%,transparent_70%)] top-20 -right-16 pointer-events-none" />
+            
+            <div className="relative z-10 max-w-[440px]">
+                <div className="text-[12px] font-bold text-[#0071e3] uppercase tracking-[0.1em] mb-6 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4" />
+                    Welcome to Bhavin Academy
+                </div>
+                <h2 className="text-[clamp(32px,3.5vw,52px)] font-extrabold text-[#f5f5f7] leading-[1.05] tracking-[-1.5px] mb-6">
+                    Begin your journey<br />of <span className="bg-[linear-gradient(90deg,#0071e3,#00d4ff)] bg-clip-text text-transparent italic">enhancement.</span>
+                </h2>
+                <p className="text-[16px] text-[#86868b] leading-[1.7] font-light mb-12">
+                    Professional training across Microsoft, Linux, and Cloud. You're the only person who can own your growth. Take the lead today.
+                </p>
 
-  async function onForgotSubmit(e) {
-    e.preventDefault();
-    const data = await handleForgotPassword(email);
-    if (data.success) setStep(2);
-  }
+                <div className="space-y-6">
+                    <div className="bg-white/5 border border-white/10 rounded-[18px] p-6 backdrop-blur-md">
+                        <Quote className="w-8 h-8 text-[#0071e3] mb-4 opacity-50" />
+                        <p className="text-[14px] text-[#d1d1d6] leading-[1.6] italic mb-4">
+                            "Every expert was once a beginner. Log in, keep going, your next milestone is one session away."
+                        </p>
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-[#0071e3] flex items-center justify-center text-[11px] font-bold text-white">BA</div>
+                            <span className="text-[12px] text-[#86868b]">Bhavin Academy Team</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-  async function onResetSubmit(e) {
-    e.preventDefault();
-    const data = await handleResetPassword(email, newPassword);
-    if (data.success) setActiveTab("signin");
-  }
+        {/* RIGHT: FORM PANEL */}
+        <div className="bg-[#0a0a0a] flex flex-col items-center justify-center p-8 lg:p-20 relative">
+            <div className="w-full max-w-[400px]">
+                <div className="mb-10 text-center lg:text-left">
+                    <h1 className="text-[28px] font-bold tracking-tight text-[#f5f5f7] mb-2">
+                        {activeTab === 'signin' ? 'Sign in to Academy' : 'Create an Account'}
+                    </h1>
+                    <p className="text-[14px] text-[#6e6e73] font-light">
+                        Discover expert-led IT courses and build your skills.
+                    </p>
+                </div>
 
-  return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-2xl font-semibold tracking-tight text-black mb-1">
-          {step === 1 ? "Reset Password" : "New Password"}
-        </h3>
-        <p className="text-[#616161] font-normal text-sm">
-          {step === 1 ? "Enter your email to verify your identity." : "Set a new secure password for your account."}
-        </p>
+                <div className="grid grid-cols-2 gap-3 mb-8">
+                    <button 
+                      onClick={onGoogleSuccess}
+                      className="flex items-center justify-center gap-2 h-11 border border-white/10 rounded-[12px] bg-white/5 text-[13px] font-medium text-[#f5f5f7] hover:bg-white/10 transition-colors"
+                    >
+                         <svg className="w-4 h-4" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                         Google
+                    </button>
+                    <button 
+                      onClick={onMicrosoftLogin}
+                      className="flex items-center justify-center gap-2 h-11 border border-white/10 rounded-[12px] bg-white/5 text-[13px] font-medium text-[#f5f5f7] hover:bg-white/10 transition-colors"
+                    >
+                        <svg className="w-4 h-4" viewBox="0 0 23 23"><path fill="#f35325" d="M1 1h10v10H1z"/><path fill="#81bc06" d="M12 1h10v10H12z"/><path fill="#05a6f0" d="M1 12h10v10H1z"/><path fill="#ffba08" d="M12 12h10v10H12z"/></svg>
+                        Microsoft
+                    </button>
+                </div>
+
+                <div className="flex items-center gap-4 mb-8">
+                    <div className="flex-1 h-[1px] bg-white/10"></div>
+                    <span className="text-[12px] text-[#6e6e73] font-medium uppercase tracking-wider">Or email</span>
+                    <div className="flex-1 h-[1px] bg-white/10"></div>
+                </div>
+
+                <AnimatePresence mode="wait">
+                    <motion.div 
+                      key={activeTab}
+                      initial={{ opacity: 0, x: 10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      className="auth-form-dark"
+                    >
+                        <CommonForm 
+                          formControls={activeTab === 'signin' ? signInFormControls : signUpFormControls}
+                          formData={activeTab === 'signin' ? signInFormData : signUpFormData}
+                          setFormData={activeTab === 'signin' ? setSignInFormData : setSignUpFormData}
+                          buttonText={activeTab === 'signin' ? "Sign In" : "Get Started"}
+                          isButtonDisabled={activeTab === 'signin' ? !checkIfSignInFormIsValid() : !checkIfSignUpFormIsValid()}
+                          handleSubmit={activeTab === 'signin' ? handleLoginUser : handleRegisterUser}
+                        />
+
+                        {activeTab === 'signin' && (
+                            <div className="mt-4 text-center">
+                                <button
+                                    onClick={() => setActiveTab('forgot')}
+                                    className="text-[13px] text-[#0071e3] hover:underline"
+                                >
+                                    Forgot password?
+                                </button>
+                            </div>
+                        )}
+                    </motion.div>
+                </AnimatePresence>
+
+                <div className="mt-8 text-center text-[13px] text-[#6e6e73]">
+                    {activeTab === 'signin' ? (
+                        <>New to Academy? <button onClick={() => setActiveTab('signup')} className="text-[#0071e3] font-semibold hover:underline">Create account</button></>
+                    ) : (
+                        <>Already have an account? <button onClick={() => setActiveTab('signin')} className="text-[#0071e3] font-semibold hover:underline">Sign in</button></>
+                    )}
+                </div>
+
+                <div className="mt-12 flex items-center justify-center gap-6 pt-8 border-t border-white/5 opacity-30">
+                     <div className="flex items-center gap-1.5 text-[11px] text-[#f5f5f7]">
+                        <CheckCircle2 className="w-3 h-3" /> Secure SSL
+                     </div>
+                     <div className="flex items-center gap-1.5 text-[11px] text-[#f5f5f7]">
+                        <CheckCircle2 className="w-3 h-3" /> GDPR Ready
+                     </div>
+                </div>
+            </div>
+        </div>
       </div>
-      <form onSubmit={step === 1 ? onForgotSubmit : onResetSubmit} className="space-y-4 auth-form-container">
-        {step === 1 ? (
-          <div>
-            <label className="text-xs font-semibold text-black mb-2 block uppercase tracking-wider">Email Address</label>
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-12 px-4 rounded-sm border border-[#e6e6e6] focus:border-[#0067b8] focus:ring-0 transition-none font-normal text-sm"
-              required
-            />
-          </div>
-        ) : (
-          <div>
-            <label className="text-xs font-semibold text-black mb-2 block uppercase tracking-wider">New Password</label>
-            <input
-              type="password"
-              placeholder="Enter new password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full h-12 px-4 rounded-sm border border-[#e6e6e6] focus:border-[#0067b8] focus:ring-0 transition-none font-normal text-sm"
-              required
-            />
-          </div>
-        )}
-        <button type="submit" className="w-full h-12 bg-[#0067b8] text-white rounded-sm font-semibold text-sm hover:bg-[#005a9e] transition-none">
-          {step === 1 ? "Verify Email" : "Reset Password"}
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab("signin")}
-          className="w-full text-center text-xs font-semibold text-[#616161] hover:text-black transition-colors py-2"
-        >
-          Back to Sign In
-        </button>
-      </form>
     </div>
   );
 }
 
 export default AuthPage;
+

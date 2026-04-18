@@ -23,6 +23,13 @@ import SubCategoryPage from "./pages/student/subcategory";
 import ScrollToTop from "./components/scroll-to-top";
 import { Toaster } from "./components/ui/toaster";
 import PaymentReturnPage from "./pages/student/payment-return";
+import BlogPage from "./pages/student/blog";
+import PathsPage from "./pages/student/paths";
+import ContactPage from "./pages/student/contact";
+import StudentExamPage from "./pages/student/exam";
+import StudentDashboardPage from "./pages/student/dashboard";
+import SuccessPage from "./pages/student/success";
+import BlogEditPage from "./pages/instructor/blog-edit";
 
 function App() {
   const { auth } = useContext(AuthContext);
@@ -136,6 +143,16 @@ function App() {
           }
         />
         <Route
+          path="/instructor/blog-edit"
+          element={
+            <RouteGuard
+              element={<BlogEditPage />}
+              authenticated={auth?.authenticate}
+              user={auth?.user}
+            />
+          }
+        />
+        <Route
           path="/"
           element={
             <StudentViewCommonLayout />
@@ -147,9 +164,33 @@ function App() {
           <Route path="category/:id" element={<CategoryPage />} />
           <Route path="subcategory/:id" element={<SubCategoryPage />} />
           <Route path="about" element={<AboutUsPage />} />
+          <Route path="blog" element={<BlogPage />} />
+          <Route path="paths" element={<PathsPage />} />
+          <Route path="contact" element={<ContactPage />} />
+          <Route path="success" element={<SuccessPage />} />
           <Route
             path="course/details/:id"
             element={<StudentViewCourseDetailsPage />}
+          />
+          <Route
+            path="dashboard"
+            element={
+              <RouteGuard
+                element={<StudentDashboardPage />}
+                authenticated={auth?.authenticate}
+                user={auth?.user}
+              />
+            }
+          />
+          <Route
+            path="exams"
+            element={
+              <RouteGuard
+                element={<StudentExamPage />}
+                authenticated={auth?.authenticate}
+                user={auth?.user}
+              />
+            }
           />
           <Route
             path="checkout"

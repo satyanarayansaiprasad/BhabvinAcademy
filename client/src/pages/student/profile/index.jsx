@@ -1,385 +1,422 @@
-import { useContext, useState, useEffect } from "react";
-import { AuthContext } from "@/context/auth-context";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-    User, Mail, Camera, Save, X, Loader2,
-    Award, Download, Trophy, BookOpen,
-    ArrowRight, Star, ShieldCheck
+import { 
+    LayoutDashboard, 
+    BookOpen, 
+    Route, 
+    FileText, 
+    TrendingUp, 
+    Settings, 
+    Bell, 
+    ShoppingCart, 
+    ChevronLeft,
+    CheckCircle2,
+    Trophy,
+    Award,
+    Mail,
+    Phone,
+    MapPin,
+    Globe,
+    CreditCard,
+    Shield,
+    Trash2,
+    Lock,
+    Save,
+    MoreVertical,
+    Download,
+    Star
 } from "lucide-react";
-import { mediaUploadService, updateUserProfileService, fetchStudentCompletedCoursesService } from "@/services";
-import { useToast } from "@/hooks/use-toast";
-import MediaProgressbar from "@/components/media-progress-bar";
-import Certificate from "@/components/certificate";
+import { Link } from "react-router-dom";
 
 function StudentProfilePage() {
-    const { auth, setAuth } = useContext(AuthContext);
-    const { toast } = useToast();
+    const [activeTab, setActiveTab] = useState("profile");
+    const [showToast, setShowToast] = useState(false);
 
-    const [isEditing, setIsEditing] = useState(false);
-    const [formData, setFormData] = useState({ userFullName: "", profileImage: "", userHeadline: "" });
-    const [uploading, setUploading] = useState(false);
-    const [uploadProgress, setUploadProgress] = useState(0);
-    const [updating, setUpdating] = useState(false);
-    const [completedCourses, setCompletedCourses] = useState([]);
-    const [downloadingCourse, setDownloadingCourse] = useState(null);
-    const [loadingCompletedCourses, setLoadingCompletedCourses] = useState(false);
-
-    useEffect(() => {
-        if (auth?.user) {
-            setFormData({
-                userFullName: auth.user.userFullName || "",
-                profileImage: auth.user.profileImage || "",
-                userHeadline: auth.user.userHeadline || "",
-            });
-            fetchCompletedCourses();
-        }
-    }, [auth]);
-
-    async function fetchCompletedCourses() {
-        try {
-            setLoadingCompletedCourses(true);
-            const response = await fetchStudentCompletedCoursesService(auth.user._id);
-            if (response.success) setCompletedCourses(response.data);
-        } catch (error) {
-            console.error("Failed to fetch completed courses:", error);
-        } finally {
-            setLoadingCompletedCourses(false);
-        }
-    }
-
-    async function handleImageUpload(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const imageFormData = new FormData();
-            imageFormData.append("file", file);
-            try {
-                setUploading(true);
-                const response = await mediaUploadService(imageFormData, setUploadProgress);
-                if (response.success) {
-                    setFormData(prev => ({ ...prev, profileImage: response.data.url }));
-                    toast({ title: "Visual Identity Updated", description: "Preview synced. Save to finalize." });
-                }
-            } catch {
-                toast({ title: "System Error", description: "Identity asset could not be synced.", variant: "destructive" });
-            } finally {
-                setUploading(false);
-                setUploadProgress(0);
-            }
-        }
-    }
-
-    async function handleUpdateProfile() {
-        if (!formData.userFullName.trim()) {
-            toast({ title: "Validation Error", description: "Name is a required credential.", variant: "destructive" });
-            return;
-        }
-        try {
-            setUpdating(true);
-            const response = await updateUserProfileService({
-                userId: auth.user._id,
-                userFullName: formData.userFullName,
-                profileImage: formData.profileImage,
-                userHeadline: formData.userHeadline,
-            });
-            if (response.success) {
-                setAuth({ ...auth, user: response.data });
-                setIsEditing(false);
-                toast({ title: "Identity Verified", description: "Your professional profile has been securely updated." });
-            }
-        } catch {
-            toast({ title: "Update Failed", description: "Security layer blocked the update or server error.", variant: "destructive" });
-        } finally {
-            setUpdating(false);
-        }
-    }
-
-    const handleTriggerDownload = (course) => {
-        toast({ title: "Securing Credentials", description: `Generating certificate for ${course.title}...` });
-        setDownloadingCourse(course);
+    const triggerToast = (msg) => {
+        setShowToast(msg);
+        setTimeout(() => setShowToast(false), 3000);
     };
 
-    if (!auth?.user) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-[#0F172A]">
-                <Loader2 className="h-12 w-12 animate-spin text-amber-500" />
-            </div>
-        );
-    }
+    const reveal = {
+        initial: { opacity: 0, y: 15 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.4 }
+    };
+
+    const sidebarNav = [
+        { icon: <LayoutDashboard size={18} />, label: "Dashboard", path: "/dashboard" },
+        { icon: <BookOpen size={18} />, label: "My Courses", path: "/student-courses", badge: "3" },
+        { icon: <Route size={18} />, label: "Learning Paths", path: "/paths" },
+        { icon: <FileText size={18} />, label: "Practice Exams", path: "/exams" },
+    ];
+
+    const tabs = [
+        { id: "profile", label: "Profile" },
+        { id: "progress", label: "Progress" },
+        { id: "billing", label: "Billing" },
+        { id: "notifications", label: "Notifications" },
+        { id: "security", label: "Security" },
+    ];
 
     return (
-        <div className="min-h-screen bg-white pb-20">
-            {/* Hero Banner */}
-            <div className="relative h-[300px] xs:h-[350px] md:h-[450px] w-full bg-[#f2f2f2] border-b border-[#e6e6e6] overflow-hidden pt-24">
-                <div className="container mx-auto px-4 xs:px-6 h-full flex flex-col justify-end pb-12 relative z-10">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex flex-col xs:flex-row items-start xs:items-end gap-6 xs:gap-10"
-                    >
-                        {/* Avatar */}
-                        <div className="relative group">
-                            <div className="w-24 h-24 xs:w-36 xs:h-36 md:w-48 md:h-48 rounded-sm overflow-hidden border-4 border-white shadow-lg relative bg-[#f2f2f2]">
-                                {formData.profileImage ? (
-                                    <img src={formData.profileImage} alt="Identity" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-[#d2d2d2]">
-                                        <User className="w-12 h-12 xs:w-16 xs:h-16 md:w-24 md:h-24" />
-                                    </div>
-                                )}
-                                <AnimatePresence>
-                                    {uploading && (
-                                        <motion.div
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center p-4"
-                                        >
-                                            <Loader2 className="w-8 h-8 animate-spin text-[#0067b8] mb-3" />
-                                            <MediaProgressbar isMediaUploading={uploading} progress={uploadProgress} />
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                            {isEditing && (
-                                <motion.label
-                                    whileHover={{ scale: 1.05 }}
-                                    className="absolute -bottom-2 -right-2 w-10 h-10 bg-[#0067b8] text-white rounded-sm flex items-center justify-center shadow-lg cursor-pointer border-2 border-white z-20"
-                                >
-                                    <Camera className="w-5 h-5" />
-                                    <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
-                                </motion.label>
-                            )}
-                        </div>
-
-                        {/* Name & Headline */}
-                        <div className="flex-1 text-left pb-4">
-                            {isEditing ? (
-                                <div className="space-y-3 max-w-xl">
-                                    <Input
-                                        value={formData.userFullName}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, userFullName: e.target.value }))}
-                                        className="h-12 xs:h-14 md:h-16 rounded-sm bg-white border-[#e6e6e6] text-black text-xl md:text-3xl font-semibold placeholder:text-[#d2d2d2] focus:ring-[#0067b8]"
-                                        placeholder="Full Name"
-                                    />
-                                    <Input
-                                        value={formData.userHeadline}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, userHeadline: e.target.value }))}
-                                        className="h-10 xs:h-12 rounded-sm bg-white border-[#e6e6e6] text-[#0067b8] text-sm md:text-base font-semibold placeholder:text-[#0067b8]/40 focus:ring-[#0067b8]"
-                                        placeholder="Professional Headline"
-                                    />
-                                </div>
-                            ) : (
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-3">
-                                        <h1 className="text-2xl xs:text-4xl md:text-5xl font-semibold tracking-tight text-black leading-none">
-                                            {auth.user.userFullName || auth.user.userName}
-                                        </h1>
-                                        <div className="bg-[#0067b8]/10 p-1.5 rounded-sm">
-                                            <ShieldCheck className="w-4 h-4 md:w-5 md:h-5 text-[#0067b8]" />
-                                        </div>
-                                    </div>
-                                    <p className="text-base xs:text-xl md:text-2xl font-normal text-[#616161] tracking-tight">
-                                        {auth.user.userHeadline || "Individual Learner"}
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Desktop Stats */}
-                        <div className="hidden lg:flex items-center gap-10 bg-white border border-[#e6e6e6] p-8 rounded-sm shadow-sm mb-4">
-                            <div className="text-center">
-                                <p className="text-black text-3xl font-semibold leading-none mb-1">{completedCourses.length}</p>
-                                <p className="text-[#616161] text-[10px] uppercase font-semibold tracking-wider">Awards</p>
-                            </div>
-                            <div className="w-[1px] h-10 bg-[#e6e6e6]" />
-                            <div className="text-center">
-                                <p className="text-black text-3xl font-semibold leading-none mb-1">08</p>
-                                <p className="text-[#616161] text-[10px] uppercase font-semibold tracking-wider">Courses</p>
-                            </div>
-                        </div>
-                    </motion.div>
+        <div className="flex min-h-screen bg-[#f5f5f7] font-['Inter']">
+            {/* SIDEBAR */}
+            <aside className="w-[240px] bg-black text-white flex flex-col fixed inset-y-0 left-0 z-50">
+                <div className="p-6 border-b border-white/10">
+                    <Link to="/" className="text-[22px] font-bold tracking-tight">Bhavin<span className="text-[#0071e3]">Academy</span></Link>
                 </div>
-            </div>
 
-            {/* Body */}
-            <div className="container mx-auto px-4 xs:px-6 mt-[-40px] xs:mt-[-50px] md:mt-[-60px] relative z-20">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10">
-                    {/* Left Panel */}
-                    <div className="lg:col-span-4 space-y-8">
-                        {/* Mobile Stats */}
-                        <div className="flex lg:hidden items-stretch gap-4 bg-white rounded-sm border border-[#e6e6e6] shadow-md p-6">
-                            <div className="flex-1 text-center">
-                                <p className="text-black text-2xl font-semibold leading-none mb-1">{completedCourses.length}</p>
-                                <p className="text-[#616161] text-[10px] uppercase font-semibold tracking-wider">Awards</p>
-                            </div>
-                            <div className="w-[1px] bg-[#e6e6e6]" />
-                            <div className="flex-1 text-center">
-                                <p className="text-black text-2xl font-semibold leading-none mb-1">08</p>
-                                <p className="text-[#616161] text-[10px] uppercase font-semibold tracking-wider">Courses</p>
-                            </div>
+                <div className="p-4 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer group">
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0071e3] to-[#00d4ff] flex items-center justify-center font-bold text-[12px]">AM</div>
+                        <div className="min-w-0 flex-1">
+                            <div className="text-[14px] font-bold truncate">Arjun Mehta</div>
+                            <div className="text-[11px] text-[#86868b]">Pro Plan · View Account ›</div>
                         </div>
-
-                        {/* Status Card */}
-                        <Card className="rounded-sm border-[#e6e6e6] shadow-md bg-white overflow-hidden">
-                            <CardContent className="p-6 md:p-8 space-y-6">
-                                <div className="space-y-5">
-                                    <div className="flex items-center gap-4">
-                                        <div className="p-3 bg-[#f2f2f2] rounded-sm">
-                                            <Mail className="w-5 h-5 text-[#616161]" />
-                                        </div>
-                                        <div className="min-w-0">
-                                            <p className="text-[10px] font-semibold uppercase tracking-wider text-[#616161]">Email Address</p>
-                                            <p className="text-black font-semibold text-sm truncate">{auth.user.userEmail}</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-4">
-                                        <div className="p-3 bg-[#f2f2f2] rounded-sm">
-                                            <Trophy className="w-5 h-5 text-[#0067b8]" />
-                                        </div>
-                                        <div>
-                                            <p className="text-[10px] font-semibold uppercase tracking-wider text-[#616161]">Membership</p>
-                                            <p className="text-black font-semibold text-sm">Verified Learner</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="h-[1px] bg-[#e6e6e6] w-full" />
-
-                                <div className="flex flex-col gap-4">
-                                    {isEditing ? (
-                                        <div className="flex gap-3">
-                                            <Button
-                                                onClick={handleUpdateProfile}
-                                                disabled={updating || uploading}
-                                                className="flex-1 bg-[#0067b8] hover:bg-[#005a9e] text-white rounded-sm h-12 md:h-14 font-semibold tracking-tight flex items-center justify-center gap-2 transition-none shadow-sm"
-                                            >
-                                                {updating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                                                Save changes
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                onClick={() => setIsEditing(false)}
-                                                className="h-12 md:h-14 px-4 rounded-sm border-[#e6e6e6] text-black hover:bg-[#f2f2f2] transition-none"
-                                            >
-                                                <X className="w-5 h-5" />
-                                            </Button>
-                                        </div>
-                                    ) : (
-                                        <Button
-                                            onClick={() => setIsEditing(true)}
-                                            className="w-full bg-[#0067b8] hover:bg-[#005a9e] text-white rounded-sm h-12 md:h-14 font-semibold tracking-tight transition-none shadow-sm uppercase text-xs"
-                                        >
-                                            Edit profile
-                                        </Button>
-                                    )}
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* Streak Card */}
-                        <div className="bg-[#f2f2f2] border border-[#e6e6e6] rounded-sm p-6 md:p-8 text-black shadow-sm relative overflow-hidden group">
-                            <Star className="w-8 h-8 text-[#0067b8] mb-4 group-hover:rotate-12 transition-transform duration-500" />
-                            <h3 className="text-xl font-semibold tracking-tight mb-2">Learning streak</h3>
-                            <p className="text-[#616161] text-sm leading-relaxed">You've completed 4 modules this week. Keep going to earn your next badge!</p>
-                        </div>
+                        <MoreVertical size={14} className="text-[#86868b] group-hover:text-white" />
                     </div>
+                </div>
 
-                    {/* Right Panel: Hall of Fame */}
-                    <div className="lg:col-span-8 space-y-8 md:space-y-10">
-                        <div className="flex items-center justify-between border-b border-[#e6e6e6] pb-6 md:pb-8">
-                            <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 md:w-14 md:h-14 bg-[#0067b8] rounded-sm flex items-center justify-center shadow-lg shrink-0">
-                                    <Award className="w-6 h-6 md:w-8 md:h-8 text-white" />
-                                </div>
-                                <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight text-black">
-                                    Hall of Fame
-                                </h2>
-                            </div>
-                            <div className="hidden xs:block px-4 py-2 bg-[#0067b8]/10 rounded-sm text-[#0067b8] font-semibold text-xs tracking-wider">
-                                {completedCourses.length} ACHIEVEMENTS
-                            </div>
-                        </div>
+                <nav className="flex-1 p-4 space-y-8 overflow-y-auto no-scrollbar">
+                    <div>
+                        <p className="text-[10px] font-black text-[#86868b] uppercase tracking-widest px-3 mb-4">Main</p>
+                        <ul className="space-y-1">
+                            {sidebarNav.map((item, i) => (
+                                <li key={i}>
+                                    <Link to={item.path} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] font-semibold transition-all text-[#86868b] hover:bg-white/5 hover:text-white`}>
+                                        {item.icon}
+                                        {item.label}
+                                        {item.badge && <span className="ml-auto bg-[#0071e3] text-white text-[10px] font-black px-2 py-0.5 rounded-full">{item.badge}</span>}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <div>
+                        <p className="text-[10px] font-black text-[#86868b] uppercase tracking-widest px-3 mb-4">Track</p>
+                        <ul className="space-y-1">
+                            <li><Link className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] font-semibold text-[#86868b] hover:bg-white/5 hover:text-white transition-all"><TrendingUp size={18} /> Progress</Link></li>
+                        </ul>
+                    </div>
+                    <div className="mt-auto pt-8">
+                        <p className="text-[10px] font-black text-[#86868b] uppercase tracking-widest px-3 mb-4">Settings</p>
+                        <ul className="space-y-1">
+                            <li><Link className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] font-semibold transition-all bg-[#0071e3]/20 text-[#40a9ff]`}><Settings size={18} /> Account Settings</Link></li>
+                        </ul>
+                    </div>
+                </nav>
+            </aside>
 
-                        {completedCourses.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-                                {completedCourses.map((course, idx) => (
-                                    <motion.div
-                                        key={course.courseId}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.05 * idx }}
-                                        className="group"
-                                    >
-                                        <Card className="relative overflow-hidden border-[#e6e6e6] shadow-md rounded-sm bg-white p-0 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-lg">
-                                            <CardContent className="p-6 md:p-8 flex flex-col justify-between h-[280px] md:h-[320px]">
-                                                <div className="space-y-4 md:space-y-6">
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="p-3 bg-[#f2f2f2] rounded-sm group-hover:bg-[#0067b8] transition-colors duration-300">
-                                                            <Award className="w-6 h-6 md:w-8 md:h-8 text-[#0067b8] group-hover:text-white" />
-                                                        </div>
-                                                        <ShieldCheck className="w-5 h-5 md:w-6 md:h-6 text-[#28a745]/30 group-hover:text-[#28a745] transition-colors" />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-[10px] font-semibold tracking-widest text-[#616161] uppercase mb-2">Verified Achievement</p>
-                                                        <h3 className="text-xl md:text-2xl font-semibold text-black leading-tight tracking-tight mb-2 line-clamp-2">
-                                                            {course.title}
-                                                        </h3>
-                                                    </div>
-                                                </div>
-                                                <div className="pt-6 border-t border-[#f2f2f2] flex items-center justify-between">
-                                                    <div className="space-y-1 text-left">
-                                                        <p className="text-[9px] font-semibold text-[#616161] uppercase tracking-wider">Earned on</p>
-                                                        <p className="text-black font-semibold text-xs md:text-sm">{new Date(course.completionDate).toLocaleDateString()}</p>
-                                                    </div>
-                                                    <motion.button
-                                                        whileHover={{ scale: 1.05 }}
-                                                        whileTap={{ scale: 0.95 }}
-                                                        onClick={() => handleTriggerDownload(course)}
-                                                        className="w-12 h-12 md:w-14 md:h-14 rounded-sm bg-[#0067b8] text-white flex items-center justify-center shadow-md hover:bg-[#005a9e] transition-none group/btn"
-                                                    >
-                                                        <Download className="w-5 h-5 md:w-6 md:h-6 group-hover/btn:translate-y-0.5 transition-transform" />
-                                                    </motion.button>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    </motion.div>
+            {/* MAIN CONTENT */}
+            <main className="ml-[240px] flex-1 flex flex-col min-h-screen">
+                {/* TOPBAR */}
+                <header className="h-[58px] bg-white/80 backdrop-blur-xl border-b border-[#000]/5 sticky top-0 z-40 px-8 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <Link to="/dashboard" className="flex items-center gap-2 px-3 py-1.5 border border-[#d2d2d7] rounded-lg bg-white text-[13px] font-semibold text-[#6e6e73] hover:border-[#0071e3] hover:text-[#0071e3] transition-all">
+                            <ChevronLeft size={14} /> Back
+                        </Link>
+                        <div className="text-[13px] text-[#86868b]">Dashboard › <span className="text-[#1d1d1f] font-bold">Account</span></div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <button className="w-9 h-9 border border-[#d2d2d7] rounded-lg flex items-center justify-center text-[#1d1d1f] hover:border-[#0071e3] transition-all relative"><Bell size={18} /></button>
+                        <button className="w-9 h-9 border border-[#d2d2d7] rounded-lg flex items-center justify-center text-[#1d1d1f] hover:border-[#0071e3] transition-all"><ShoppingCart size={18} /></button>
+                    </div>
+                </header>
+
+                <div className="p-8 pb-20 max-w-[1000px]">
+                    <div className="text-[11px] font-black text-[#0071e3] uppercase tracking-widest mb-1">My Account</div>
+                    <h1 className="text-[26px] font-extrabold tracking-tight text-[#1d1d1f] mb-8">Account Details</h1>
+
+                    {/* PROFILE HERO */}
+                    <div className="bg-black rounded-[24px] p-8 mb-8 relative overflow-hidden flex items-center gap-8">
+                        <div className="absolute left-[-40px] top-[-40px] w-64 h-64 rounded-full bg-[#0071e3]/20 blur-[100px] pointer-events-none" />
+                        <div className="relative z-10 w-22 h-22 rounded-full bg-gradient-to-br from-[#0071e3] to-[#00d4ff] flex items-center justify-center text-[30px] font-black text-white border-4 border-white/10 shadow-2xl shrink-0">AM</div>
+                        <div className="relative z-10 flex-1 min-w-0">
+                            <h2 className="text-[26px] font-black text-[#f5f5f7] leading-none mb-2">Arjun Mehta</h2>
+                            <div className="flex flex-wrap items-center gap-4 mb-4">
+                                <span className="text-[13px] text-[#86868b]">arjun.mehta@email.com</span>
+                                <span className="bg-[#0071e3]/20 border border-[#40a9ff]/30 text-[#40a9ff] text-[11px] font-black px-3 py-0.5 rounded-full uppercase tracking-widest">Pro Plan</span>
+                                <span className="text-[12px] text-[#6e6e73]">Member since Jan 2025</span>
+                            </div>
+                            <div className="flex gap-6">
+                                {[
+                                    { v: "47.5", l: "Hours" },
+                                    { v: "3", l: "Courses" },
+                                    { v: "12", l: "Streak" },
+                                    { v: "1", l: "Cert" },
+                                ].map((s, i) => (
+                                    <div key={i} className="flex flex-col">
+                                        <div className="text-[20px] font-black text-white leading-none">{s.v}</div>
+                                        <div className="text-[10px] font-bold text-[#6e6e73] uppercase mt-1 tracking-tighter">{s.l}</div>
+                                    </div>
                                 ))}
                             </div>
-                        ) : (
-                            <div className="bg-[#f2f2f2] rounded-sm p-12 md:p-20 text-center border-2 border-dashed border-[#e6e6e6] flex flex-col items-center">
-                                <div className="w-16 h-16 md:w-24 md:h-24 bg-white rounded-sm flex items-center justify-center mb-6 shadow-sm">
-                                    <BookOpen className="w-8 h-8 md:w-12 md:h-12 text-[#d2d2d2]" />
-                                </div>
-                                <h3 className="font-semibold text-2xl md:text-3xl text-black mb-3">The Hall Awaits</h3>
-                                <p className="text-[#616161] font-normal max-w-sm text-base md:text-lg leading-relaxed">
-                                    Your wall of excellence is currently empty. Complete a course to earn your first certification.
-                                </p>
-                                <Button className="mt-8 bg-[#0067b8] hover:bg-[#005a9e] text-white rounded-sm px-8 h-12 font-semibold uppercase tracking-wider text-xs transition-none shadow-sm">
-                                    Browse Courses
-                                </Button>
-                            </div>
-                        )}
+                        </div>
+                        <div className="relative z-10 flex flex-col gap-2 shrink-0">
+                            <button className="bg-[#0071e3] text-white text-[13px] font-black px-6 py-2.5 rounded-full hover:bg-[#0077ed] transition-all">Edit Profile</button>
+                            <button className="bg-white/10 text-white text-[13px] font-bold px-6 py-2.5 rounded-full border border-white/15 hover:bg-white/20 transition-all">Manage Plan</button>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            {/* Certificate Downloader */}
+                    {/* TABS */}
+                    <div className="bg-white border border-[#e8e8ed] rounded-xl p-1 inline-flex gap-1 mb-6">
+                        {tabs.map(tab => (
+                            <button 
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`px-5 py-1.5 rounded-lg text-[13px] font-bold transition-all ${activeTab === tab.id ? 'bg-[#0071e3] text-white shadow-lg' : 'text-[#6e6e73] hover:text-[#1d1d1f]'}`}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* TAB CONTENT */}
+                    <AnimatePresence mode="wait">
+                        {activeTab === "profile" && (
+                            <motion.div key="profile" {...reveal} className="space-y-4">
+                                <div className="bg-white rounded-2xl p-8 border border-black/5 shadow-sm">
+                                    <h3 className="text-[15px] font-black text-[#1d1d1f] mb-1">Personal Information</h3>
+                                    <p className="text-[12px] text-[#86868b] mb-6">Update your name, bio and contact details.</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-1.5">
+                                            <label className="text-[11px] font-black text-[#86868b] uppercase tracking-widest">First Name</label>
+                                            <input type="text" className="w-full bg-[#f5f5f7] border border-[#e8e8ed] rounded-xl px-4 py-2.5 text-[14px] outline-none focus:border-[#0071e3] focus:bg-white transition-all" defaultValue="Arjun" />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-[11px] font-black text-[#86868b] uppercase tracking-widest">Last Name</label>
+                                            <input type="text" className="w-full bg-[#f5f5f7] border border-[#e8e8ed] rounded-xl px-4 py-2.5 text-[14px] outline-none focus:border-[#0071e3] focus:bg-white transition-all" defaultValue="Mehta" />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-[11px] font-black text-[#86868b] uppercase tracking-widest">Email Address</label>
+                                            <input type="email" className="w-full bg-[#f5f5f7] border border-[#e8e8ed] rounded-xl px-4 py-2.5 text-[14px] outline-none focus:border-[#0071e3] focus:bg-white transition-all" defaultValue="arjun.mehta@email.com" />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-[11px] font-black text-[#86868b] uppercase tracking-widest">Phone Number</label>
+                                            <input type="tel" className="w-full bg-[#f5f5f7] border border-[#e8e8ed] rounded-xl px-4 py-2.5 text-[14px] outline-none focus:border-[#0071e3] focus:bg-white transition-all" defaultValue="+91 98765 43210" />
+                                        </div>
+                                        <div className="space-y-1.5 md:col-span-2">
+                                            <label className="text-[11px] font-black text-[#86868b] uppercase tracking-widest">Bio</label>
+                                            <textarea rows="3" className="w-full bg-[#f5f5f7] border border-[#e8e8ed] rounded-xl px-4 py-2.5 text-[14px] outline-none focus:border-[#0071e3] focus:bg-white transition-all resize-none" defaultValue="IT enthusiast working toward MCSA certification. Passionate about Windows Server and networking." />
+                                        </div>
+                                    </div>
+                                    <div className="mt-8 pt-6 border-t border-[#f0f0f0] flex justify-end gap-3">
+                                        <button className="px-5 py-2 rounded-full border border-[#d2d2d7] text-[13px] font-bold text-[#6e6e73] hover:border-[#1d1d1f] hover:text-[#1d1d1f] transition-all">Cancel</button>
+                                        <button onClick={() => triggerToast("Profile updated successfully")} className="px-6 py-2 rounded-full bg-[#0071e3] text-white text-[13px] font-black hover:bg-[#0077ed] transition-all shadow-lg active:scale-95">Save Changes</button>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-2xl p-8 border border-black/5 shadow-sm">
+                                    <h3 className="text-[15px] font-black text-[#1d1d1f] mb-1">Location & Preferences</h3>
+                                    <p className="text-[12px] text-[#86868b] mb-6">Set your region, language and timezone.</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-1.5">
+                                            <label className="text-[11px] font-black text-[#86868b] uppercase tracking-widest">Country</label>
+                                            <select className="w-full bg-[#f5f5f7] border border-[#e8e8ed] rounded-xl px-4 py-2.5 text-[14px] outline-none focus:border-[#0071e3] focus:bg-white transition-all">
+                                                <option>India</option>
+                                                <option>United States</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-[11px] font-black text-[#86868b] uppercase tracking-widest">Language</label>
+                                            <select className="w-full bg-[#f5f5f7] border border-[#e8e8ed] rounded-xl px-4 py-2.5 text-[14px] outline-none focus:border-[#0071e3] focus:bg-white transition-all">
+                                                <option>English</option>
+                                                <option>Hindi</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="mt-8 pt-6 border-t border-[#f0f0f0] flex justify-end">
+                                        <button onClick={() => triggerToast("Preferences saved")} className="px-6 py-2 rounded-full bg-[#0071e3] text-white text-[13px] font-black">Save Changes</button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {activeTab === "progress" && (
+                            <motion.div key="progress" {...reveal} className="space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    <div className="bg-white p-6 rounded-2xl border border-black/5">
+                                        <div className="text-[24px] font-black">47.5</div>
+                                        <div className="text-[12px] text-[#86868b]">Total Hours</div>
+                                        <div className="mt-2 text-[10px] font-black text-[#1d6f42] bg-[#e6f4ea] px-2 py-0.5 rounded-full inline-block">↑ +3.2 this week</div>
+                                    </div>
+                                    <div className="bg-white p-6 rounded-2xl border border-black/5">
+                                        <div className="text-[24px] font-black">12</div>
+                                        <div className="text-[12px] text-[#86868b]">Day Streak</div>
+                                        <div className="mt-2 text-[10px] font-black text-[#1d6f42] bg-[#e6f4ea] px-2 py-0.5 rounded-full inline-block">↑ Best: 21 days</div>
+                                    </div>
+                                    <div className="bg-white p-6 rounded-2xl border border-black/5">
+                                        <div className="text-[24px] font-black">86</div>
+                                        <div className="text-[12px] text-[#86868b]">Lessons Done</div>
+                                        <div className="mt-2 text-[10px] font-black text-[#86868b] bg-[#f5f5f7] px-2 py-0.5 rounded-full inline-block">Across 3 courses</div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-2xl p-8 border border-black/5 shadow-sm">
+                                    <h3 className="text-[15px] font-black text-[#1d1d1f] mb-1">Course Progress</h3>
+                                    <p className="text-[12px] text-[#86868b] mb-6">Track your progress across all enrolled courses.</p>
+                                    <div className="space-y-3">
+                                        {[
+                                            { title: "Windows Server Administration", pct: 50, icon: "🪟", color: "from-[#0078d4] to-[#005a9e]", lessons: "28 of 56" },
+                                            { title: "Cisco CCNA Bootcamp", pct: 24, icon: "🌐", color: "from-[#1ba1e2] to-[#0050ef]", lessons: "18 of 74" },
+                                            { title: "Azure Fundamentals AZ-900", pct: 16, icon: "☁️", color: "from-[#0089d6] to-[#00bcf2]", lessons: "6 of 38" },
+                                        ].map((c, i) => (
+                                            <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-[#f5f5f7] hover:bg-[#ebebeb] transition-all cursor-pointer">
+                                                <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${c.color} flex items-center justify-center text-xl shrink-0`}>{c.icon}</div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="text-[14px] font-bold text-[#1d1d1f] truncate">{c.title}</div>
+                                                    <div className="flex items-center gap-3 mt-1.5">
+                                                        <div className="flex-1 h-1.5 bg-[#e8e8ed] rounded-full overflow-hidden">
+                                                            <div className="h-full bg-gradient-to-r from-[#0071e3] to-[#00d4ff]" style={{ width: `${c.pct}%` }} />
+                                                        </div>
+                                                        <span className="text-[12px] font-black text-[#0071e3]">{c.pct}%</span>
+                                                    </div>
+                                                    <div className="text-[11px] text-[#86868b] mt-1.5">Lesson {c.lessons} · 22 hrs total</div>
+                                                </div>
+                                                <span className="text-[11px] font-black px-3 py-1 rounded-full bg-[#e8f1fb] text-[#0071e3]">In Progress</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-2xl p-8 border border-black/5 shadow-sm">
+                                    <h3 className="text-[15px] font-black text-[#1d1d1f] mb-1">Certificates Earned</h3>
+                                    <div className="space-y-3 mt-6">
+                                        <div className="flex items-center gap-4 p-4 rounded-xl bg-[#f5f5f7]">
+                                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#ffd60a] to-[#ff9f0a] flex items-center justify-center text-xl">🏆</div>
+                                            <div className="flex-1">
+                                                <div className="text-[13px] font-bold">Windows Fundamentals — Certificate</div>
+                                                <div className="text-[11px] text-[#86868b]">Issued Mar 10, 2025 · Verified</div>
+                                            </div>
+                                            <button className="text-[12px] font-black text-[#0071e3] hover:underline" onClick={() => triggerToast("Certificate downloaded")}>⬇ Download</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {activeTab === "billing" && (
+                            <motion.div key="billing" {...reveal} className="space-y-4">
+                                <div className="bg-black rounded-2xl p-8 relative overflow-hidden">
+                                    <div className="absolute right-[-30px] top-[-30px] w-48 h-48 rounded-full bg-[#0071e3]/20 blur-[60px] pointer-events-none" />
+                                    <div className="text-[11px] font-black text-[#40a9ff] uppercase tracking-widest mb-1">Current Plan</div>
+                                    <h3 className="text-[22px] font-black text-white mb-2">Pro Plan</h3>
+                                    <p className="text-[13px] text-[#86868b] max-w-sm mb-6">Full access to all courses, labs, practice exams and certificates.</p>
+                                    <div className="flex flex-wrap gap-4 mb-8">
+                                        {["Unlimited access", "Virtual labs", "Certificates"].map((f, i) => (
+                                            <div key={i} className="flex items-center gap-2 text-[13px] text-[#d2d2d7]">
+                                                <CheckCircle2 size={14} className="text-[#0071e3]" /> {f}
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="text-[12px] text-[#6e6e73] mb-6">Next renewal: <strong className="text-[#86868b]">January 14, 2026</strong> · ₹2,499/year</div>
+                                    <div className="flex gap-3">
+                                        <button className="bg-[#0071e3] text-white text-[13px] font-black px-6 py-2 rounded-full hover:bg-[#0077ed]">Upgrade Plan</button>
+                                        <button className="bg-white/10 text-white text-[13px] font-bold px-6 py-2 rounded-full border border-white/15 hover:bg-white/20 transition-all">Manage Billing</button>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-2xl p-8 border border-black/5 shadow-sm">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div>
+                                            <h3 className="text-[15px] font-black text-[#1d1d1f] mb-1">Payment Method</h3>
+                                            <p className="text-[12px] text-[#86868b]">Your saved payment details.</p>
+                                        </div>
+                                        <button className="text-[12px] font-black text-[#0071e3] hover:underline">+ Add New</button>
+                                    </div>
+                                    <div className="flex items-center gap-4 p-4 bg-[#f5f5f7] rounded-xl">
+                                        <div className="w-11 h-8 bg-[#1a1f71] rounded flex items-center justify-center text-[11px] font-black text-white shrink-0">VISA</div>
+                                        <div className="flex-1">
+                                            <div className="text-[14px] font-bold">Visa ending in 4242</div>
+                                            <div className="text-[11px] text-[#86868b]">Expires 08 / 2027</div>
+                                        </div>
+                                        <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-[#e6f4ea] text-[#1d6f42]">Default</span>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {activeTab === "notifications" && (
+                            <motion.div key="notifications" {...reveal}>
+                                <div className="bg-white rounded-2xl p-8 border border-black/5 shadow-sm">
+                                    <h3 className="text-[15px] font-black text-[#1d1d1f] mb-1">Email Notifications</h3>
+                                    <p className="text-[12px] text-[#86868b] mb-6">Choose which emails you want to receive.</p>
+                                    <div className="divide-y divide-[#f0f0f0]">
+                                        {[
+                                            { t: "Course Updates", d: "New lessons and content added to your courses.", c: true },
+                                            { t: "Lab Reminders", d: "Reminders before upcoming labs and exams.", c: true },
+                                            { t: "Streak Alerts", d: "Get notified if you're about to lose your streak.", c: true },
+                                            { t: "Weekly Progress", d: "Summary of your weekly activity.", c: false },
+                                        ].map((n, i) => (
+                                            <div key={i} className="flex items-center justify-between py-4">
+                                                <div>
+                                                    <div className="text-[14px] font-bold text-[#1d1d1f]">{n.t}</div>
+                                                    <div className="text-[12px] text-[#86868b] mt-0.5">{n.d}</div>
+                                                </div>
+                                                <label className="relative inline-flex items-center cursor-pointer">
+                                                    <input type="checkbox" className="sr-only peer" defaultChecked={n.c} />
+                                                    <div className="w-11 h-6 bg-[#d2d2d7] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0071e3]" />
+                                                </label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="mt-8 pt-6 border-t border-[#f0f0f0] flex justify-end">
+                                        <button onClick={() => triggerToast("Preferences saved")} className="px-6 py-2 rounded-full bg-[#0071e3] text-white text-[13px] font-black">Save Preferences</button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {activeTab === "security" && (
+                            <motion.div key="security" {...reveal} className="space-y-4">
+                                <div className="bg-white rounded-2xl p-8 border border-black/5 shadow-sm">
+                                    <h3 className="text-[15px] font-black text-[#1d1d1f] mb-1">Security Overview</h3>
+                                    <p className="text-[12px] text-[#86868b] mb-6">Manage your password, 2FA and active sessions.</p>
+                                    <div className="divide-y divide-[#f0f0f0]">
+                                        {[
+                                            { t: "Password", d: "Last changed 3 months ago", s: "Strong", ok: true },
+                                            { t: "Two-Factor Auth", d: "Authenticator app enabled", s: "Active", ok: true },
+                                            { t: "Backup Email", d: "Not configured", s: "Missing", ok: false },
+                                        ].map((s, i) => (
+                                            <div key={i} className="flex items-center justify-between py-4">
+                                                <div>
+                                                    <div className="text-[14px] font-bold text-[#1d1d1f]">{s.t}</div>
+                                                    <div className="text-[12px] text-[#86868b] mt-0.5">{s.d}</div>
+                                                </div>
+                                                <div className="flex items-center gap-4">
+                                                    <div className={`flex items-center gap-1.5 text-[12px] font-bold ${s.ok ? 'text-[#1d6f42]' : 'text-[#b25000]'}`}>
+                                                        <div className={`w-1.5 h-1.5 rounded-full ${s.ok ? 'bg-green-500' : 'bg-orange-500'}`} /> {s.s}
+                                                    </div>
+                                                    <button className="px-4 py-1.5 border border-[#d2d2d7] rounded-full text-[12px] font-bold hover:border-[#0071e3] transition-all" onClick={() => triggerToast("Settings opened")}>Manage</button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="bg-red-50/50 border border-red-200 rounded-2xl p-8">
+                                    <h3 className="text-[14px] font-black text-red-700 mb-1">⚠ Danger Zone</h3>
+                                    <p className="text-[12px] text-[#86868b] mb-6">Deleting your account is permanent. All your progress and data will be removed immediately.</p>
+                                    <button className="bg-red-600 text-white text-[13px] font-black px-6 py-2 rounded-full hover:bg-red-700 active:scale-95 transition-all">Delete Account</button>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            </main>
+
+            {/* TOAST SYSTEM */}
             <AnimatePresence>
-                {downloadingCourse && (
-                    <Certificate
-                        key={downloadingCourse.courseId}
-                        userName={auth?.user?.userFullName || auth?.user?.userName}
-                        courseTitle={downloadingCourse.title}
-                        completionDate={new Date(downloadingCourse.completionDate).toLocaleDateString('en-IN', {
-                            year: 'numeric', month: 'long', day: 'numeric'
-                        })}
-                        instructorName={downloadingCourse.instructorName}
-                        silentDownload={true}
-                        onDownloadComplete={() => setDownloadingCourse(null)}
-                    />
+                {showToast && (
+                    <motion.div 
+                        initial={{ opacity: 0, y: 100 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 100 }}
+                        className="fixed bottom-8 right-8 z-[100] bg-[#1d1d1f] text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/10"
+                    >
+                        <div className="w-5 h-5 rounded-full bg-[#34c759] flex items-center justify-center text-[10px] font-black text-white">✓</div>
+                        <span className="text-[14px] font-bold">{showToast}</span>
+                    </motion.div>
                 )}
             </AnimatePresence>
         </div>

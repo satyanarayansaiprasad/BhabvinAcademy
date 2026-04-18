@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BhavinAcademy — Cisco CCNA: Subnetting Mastery</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+/* ─── RESET & BASE ─── */
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:#f5f7fa;color:#1a1a2e;overflow-x:hidden;height:100vh;display:flex;flex-direction:column;}
+
+/* ─── TOP NAV ─── */
+.topnav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(255,255,255,0.95);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid #e2e8f0;
+  height:52px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 20px;
+  flex-shrink:0;
+  box-shadow:0 1px 4px rgba(0,0,0,0.06);
+}
+.nav-left{display:flex;align-items:center;gap:16px;}
+.nav-logo{font-size:17px;font-weight:700;color:#1a1a2e;text-decoration:none;letter-spacing:-0.3px;}
+.nav-logo span{color:#0071e3;}
+.nav-divider{width:1px;height:20px;background:#d1d9e0;}
+.nav-course-title{font-size:13px;color:#64748b;max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nav-center{display:flex;align-items:center;gap:6px;}
+.progress-wrap{display:flex;align-items:center;gap:10px;}
+.progress-bar-outer{width:160px;height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden;}
+.progress-bar-fill{height:100%;width:32%;background:#0071e3;border-radius:2px;transition:width 0.6s ease;}
+.progress-label{font-size:12px;color:#64748b;}
+.nav-right{display:flex;align-items:center;gap:12px;}
+.nav-icon-btn{background:transparent;border:none;cursor:pointer;color:#64748b;font-size:16px;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:background 0.2s,color 0.2s;}
+.nav-icon-btn:hover{background:#f1f5f9;color:#1a1a2e;}
+.nav-avatar{width:30px;height:30px;border-radius:50%;background:#0071e3;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;cursor:pointer;}
+
+/* ─── MAIN LAYOUT ─── */
+.player-layout{display:grid;grid-template-columns:1fr 360px;flex:1;overflow:hidden;min-height:0;}
+
+/* ─── LEFT COL ─── */
+.video-content-col{display:flex;flex-direction:column;overflow-y:auto;min-height:0;}
+.video-content-col::-webkit-scrollbar{width:6px;}
+.video-content-col::-webkit-scrollbar-track{background:transparent;}
+.video-content-col::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px;}
+.video-content-col::-webkit-scrollbar-thumb:hover{background:#94a3b8;}
+
+/* ─── VIDEO PLAYER ─── */
+.video-wrapper{position:relative;background:#000;aspect-ratio:16/9;width:100%;flex-shrink:0;overflow:hidden;}
+.video-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 60%, #0a1628 0%, #000 70%);cursor:pointer;position:relative;}
+.video-placeholder::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,113,227,0.05) 1px, transparent 1px),linear-gradient(90deg, rgba(0,113,227,0.05) 1px, transparent 1px);background-size:48px 48px;pointer-events:none;}
+.play-btn-wrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:20px;transition:transform 0.2s;}
+.play-btn-wrap:hover{transform:scale(1.04);}
+.play-circle{width:72px;height:72px;border-radius:50%;background:rgba(0,113,227,0.9);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 12px rgba(0,113,227,0.12), 0 0 0 28px rgba(0,113,227,0.05);transition:background 0.2s;}
+.play-btn-wrap:hover .play-circle{background:#0071e3;}
+.play-triangle{width:0;height:0;border-left:26px solid #fff;border-top:16px solid transparent;border-bottom:16px solid transparent;margin-left:5px;}
+.video-lesson-label{font-size:13px;color:rgba(255,255,255,0.5);letter-spacing:0.04em;text-align:center;}
+.video-lesson-name{font-size:18px;font-weight:600;color:#f5f5f7;text-align:center;margin-top:4px;max-width:480px;line-height:1.4;}
+.video-controls{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent, rgba(0,0,0,0.85));padding:32px 20px 16px;display:flex;flex-direction:column;gap:10px;opacity:0;transition:opacity 0.3s;}
+.video-wrapper:hover .video-controls{opacity:1;}
+.scrubber-outer{width:100%;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;cursor:pointer;position:relative;}
+.scrubber-fill{height:100%;width:28%;background:#0071e3;border-radius:2px;position:relative;transition:width 0.1s;}
+.scrubber-fill::after{content:'';position:absolute;right:-5px;top:-4px;width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 0 4px rgba(0,0,0,0.4);}
+.ctrl-row{display:flex;align-items:center;gap:12px;}
+.ctrl-btn{background:transparent;border:none;cursor:pointer;color:#fff;font-size:15px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:6px;opacity:0.85;transition:opacity 0.2s;}
+.ctrl-btn:hover{opacity:1;}
+.ctrl-time{font-size:12px;color:rgba(255,255,255,0.6);margin-left:4px;}
+.ctrl-spacer{flex:1;}
+.ctrl-badge{font-size:11px;font-weight:600;background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);padding:3px 9px;border-radius:4px;cursor:pointer;transition:background 0.2s;}
+.ctrl-badge:hover{background:rgba(255,255,255,0.2);}
+
+/* ─── LESSON NAV BAR ─── */
+.lesson-nav-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid #e2e8f0;background:#ffffff;flex-shrink:0;flex-wrap:wrap;gap:10px;}
+.lesson-breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;color:#94a3b8;}
+.lesson-breadcrumb span{color:#1a1a2e;font-weight:500;}
+.lesson-nav-btns{display:flex;gap:8px;}
+.lnav-btn{display:flex;align-items:center;gap:6px;background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s,border-color 0.2s;}
+.lnav-btn:hover{background:#e2e8f0;border-color:#cbd5e1;}
+.lnav-btn.primary{background:#0071e3;color:#fff;border-color:#0071e3;}
+.lnav-btn.primary:hover{background:#0077ed;}
+.mark-done-wrap{display:flex;align-items:center;gap:8px;}
+.done-checkbox{width:18px;height:18px;border-radius:5px;border:2px solid #cbd5e1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;background:transparent;flex-shrink:0;}
+.done-checkbox.checked{background:#16a34a;border-color:#16a34a;}
+.done-checkbox.checked::after{content:'';display:block;width:4px;height:8px;border-right:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(45deg) translate(-1px,-1px);}
+.done-label{font-size:13px;color:#64748b;cursor:pointer;}
+
+/* ─── TABS ─── */
+.tabs-bar{display:flex;gap:0;border-bottom:1px solid #e2e8f0;padding:0 24px;background:#ffffff;flex-shrink:0;}
+.tab{padding:14px 16px;font-size:14px;font-weight:500;color:#94a3b8;cursor:pointer;position:relative;transition:color 0.2s;white-space:nowrap;border:none;background:transparent;}
+.tab:hover{color:#475569;}
+.tab.active{color:#1a1a2e;}
+.tab.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:#0071e3;border-radius:1px;}
+
+/* ─── TAB CONTENT ─── */
+.tab-content{display:none;padding:28px 24px;flex:1;background:#f5f7fa;}
+.tab-content.active{display:block;}
+
+/* Overview */
+.overview-section{margin-bottom:32px;}
+.overview-section h3{font-size:17px;font-weight:700;margin-bottom:14px;color:#1a1a2e;}
+.overview-desc{font-size:15px;color:#475569;line-height:1.75;}
+.learn-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;margin-top:4px;}
+.learn-item{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:#334155;line-height:1.5;}
+.check-circle{width:18px;height:18px;border-radius:50%;background:#dcfce7;border:1px solid #16a34a;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:9px;color:#16a34a;font-weight:700;}
+
+/* Resources */
+.resource-list{display:flex;flex-direction:column;gap:10px;}
+.resource-item{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:12px;background:#ffffff;border:1px solid #e2e8f0;cursor:pointer;transition:background 0.2s,box-shadow 0.2s;text-decoration:none;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.resource-item:hover{background:#f8fafc;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+.resource-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.res-pdf{background:#fee2e2;}
+.res-lab{background:#dbeafe;}
+.res-link{background:#fef9c3;}
+.resource-info{flex:1;}
+.resource-name{font-size:14px;font-weight:500;color:#1a1a2e;margin-bottom:2px;}
+.resource-meta{font-size:12px;color:#94a3b8;}
+.resource-download{font-size:11px;font-weight:600;color:#0071e3;padding:5px 12px;border-radius:6px;background:#eff6ff;border:1px solid #bfdbfe;white-space:nowrap;}
+
+/* Notes */
+.notes-toolbar{display:flex;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap;}
+.note-stamp{font-size:12px;font-weight:600;color:#0071e3;background:#eff6ff;border:1px solid #bfdbfe;padding:5px 12px;border-radius:6px;cursor:pointer;transition:background 0.2s;}
+.note-stamp:hover{background:#dbeafe;}
+.notes-textarea{width:100%;min-height:160px;background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:16px;font-size:14px;color:#1a1a2e;line-height:1.7;font-family:inherit;resize:vertical;transition:border-color 0.2s;outline:none;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.notes-textarea:focus{border-color:#93c5fd;box-shadow:0 0 0 3px rgba(0,113,227,0.08);}
+.notes-textarea::placeholder{color:#cbd5e1;}
+.notes-save-row{display:flex;justify-content:flex-end;margin-top:12px;}
+.save-btn{background:#0071e3;color:#fff;border:none;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.2s;}
+.save-btn:hover{background:#0077ed;}
+.saved-notes{margin-top:24px;}
+.saved-notes h4{font-size:13px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;}
+.saved-note-item{padding:14px 16px;border-radius:10px;background:#ffffff;border:1px solid #e2e8f0;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.sn-time{font-size:11px;font-weight:600;color:#0071e3;margin-bottom:6px;}
+.sn-text{font-size:14px;color:#334155;line-height:1.6;}
+
+/* Q&A */
+.qa-input-wrap{display:flex;gap:12px;margin-bottom:28px;align-items:flex-start;}
+.qa-avatar{width:36px;height:36px;border-radius:50%;background:#0071e3;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;}
+.qa-input-area{flex:1;}
+.qa-textarea{width:100%;background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;font-size:14px;color:#1a1a2e;font-family:inherit;resize:none;outline:none;min-height:90px;transition:border-color 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.qa-textarea:focus{border-color:#93c5fd;box-shadow:0 0 0 3px rgba(0,113,227,0.08);}
+.qa-textarea::placeholder{color:#cbd5e1;}
+.qa-post-btn{margin-top:10px;background:#0071e3;color:#fff;border:none;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.2s;}
+.qa-post-btn:hover{background:#0077ed;}
+.qa-question{padding:18px 0;border-top:1px solid #f1f5f9;}
+.qa-q-header{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;}
+.qa-user-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;}
+.qa-q-meta{flex:1;}
+.qa-username{font-size:13px;font-weight:600;color:#1a1a2e;}
+.qa-time{font-size:11px;color:#94a3b8;margin-top:1px;}
+.qa-q-text{font-size:14px;color:#334155;line-height:1.65;margin-left:46px;}
+.qa-actions{display:flex;gap:16px;margin-left:46px;margin-top:10px;}
+.qa-act-btn{font-size:12px;color:#94a3b8;cursor:pointer;transition:color 0.2s;background:none;border:none;display:flex;align-items:center;gap:4px;}
+.qa-act-btn:hover{color:#0071e3;}
+.qa-reply{margin-left:46px;margin-top:14px;padding:14px 16px;background:#f0f7ff;border-radius:10px;border-left:2px solid #0071e3;}
+.qa-reply-header{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+.qa-reply-av{width:26px;height:26px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#16a34a;flex-shrink:0;}
+.qa-reply-name{font-size:12px;font-weight:600;color:#16a34a;}
+.qa-reply-tag{font-size:10px;font-weight:600;background:#dcfce7;color:#16a34a;padding:1px 7px;border-radius:4px;border:1px solid #bbf7d0;}
+.qa-reply-text{font-size:13px;color:#475569;line-height:1.65;}
+
+/* ─── SIDEBAR ─── */
+.sidebar{border-left:1px solid #e2e8f0;background:#ffffff;display:flex;flex-direction:column;overflow:hidden;box-shadow:-1px 0 0 #f1f5f9;}
+.sidebar-header{padding:16px 18px;border-bottom:1px solid #f1f5f9;flex-shrink:0;background:#fafbfc;}
+.sidebar-title{font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:8px;}
+.sidebar-meta{display:flex;gap:14px;}
+.smeta{font-size:12px;color:#94a3b8;}
+.smeta strong{color:#475569;font-weight:500;}
+.sidebar-progress-row{display:flex;align-items:center;gap:8px;margin-top:12px;}
+.spbar{flex:1;height:3px;background:#e2e8f0;border-radius:2px;overflow:hidden;}
+.spbar-fill{height:100%;width:32%;background:#0071e3;border-radius:2px;transition:width 0.6s ease;}
+.sp-label{font-size:11px;color:#94a3b8;}
+.sidebar-scroll{flex:1;overflow-y:auto;min-height:0;}
+.sidebar-scroll::-webkit-scrollbar{width:4px;}
+.sidebar-scroll::-webkit-scrollbar-track{background:transparent;}
+.sidebar-scroll::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:2px;}
+
+/* Module */
+.smod{border-bottom:1px solid #f1f5f9;}
+.smod-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;transition:background 0.2s;}
+.smod-head:hover{background:#f8fafc;}
+.smod-left{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;}
+.smod-num{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;}
+.smod-title{font-size:13px;font-weight:600;color:#334155;line-height:1.35;}
+.smod-meta{font-size:11px;color:#94a3b8;margin-top:2px;}
+.smod-arrow{font-size:14px;color:#94a3b8;transition:transform 0.3s;flex-shrink:0;margin-left:8px;}
+.smod-arrow.open{transform:rotate(180deg);}
+.smod-body{overflow:hidden;max-height:0;transition:max-height 0.4s ease;}
+.smod-body.open{max-height:700px;}
+
+/* Lessons */
+.slesson{display:flex;align-items:center;gap:10px;padding:10px 18px;cursor:pointer;transition:background 0.2s;position:relative;}
+.slesson:hover{background:#f8fafc;}
+.slesson.active{background:#eff6ff;}
+.slesson.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#0071e3;border-radius:0 2px 2px 0;}
+.sl-status{width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;}
+.sl-status.done{background:#dcfce7;border:1.5px solid #16a34a;color:#16a34a;font-size:10px;font-weight:700;}
+.sl-status.current{background:#eff6ff;border:1.5px solid #0071e3;color:#0071e3;font-size:8px;}
+.sl-status.locked{background:#f1f5f9;border:1.5px solid #e2e8f0;}
+.sl-info{flex:1;min-width:0;}
+.sl-name{font-size:13px;color:#475569;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.slesson.active .sl-name{color:#1a1a2e;font-weight:500;}
+.sl-sub{font-size:11px;color:#94a3b8;margin-top:2px;display:flex;gap:6px;align-items:center;}
+.sl-dur{margin-left:auto;font-size:11px;color:#94a3b8;flex-shrink:0;}
+.sl-free-badge{font-size:9px;font-weight:700;color:#0071e3;background:#eff6ff;padding:1px 6px;border-radius:3px;border:1px solid #bfdbfe;}
+.sl-lab-badge{font-size:9px;font-weight:700;color:#b45309;background:#fef3c7;padding:1px 6px;border-radius:3px;border:1px solid #fde68a;}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="nav-left">
+    <a href="#" class="nav-logo">Bhavin<span>Academy</span></a>
+    <div class="nav-divider"></div>
+    <div class="nav-course-title">Cisco CCNA Complete Bootcamp</div>
+  </div>
+  <div class="nav-center">
+    <div class="progress-wrap">
+      <div class="progress-bar-outer"><div class="progress-bar-fill" id="mainProgressFill"></div></div>
+      <span class="progress-label" id="mainProgressLabel">32% complete</span>
+    </div>
+  </div>
+  <div class="nav-right">
+    <button class="nav-icon-btn" title="Keyboard Shortcuts" onclick="alert('Space — Play/Pause\nN — Next lesson\nP — Previous lesson')">⌨</button>
+    <button class="nav-icon-btn" title="My Notes" onclick="switchTab('notes', document.querySelectorAll('.tab')[1])">📝</button>
+    <div class="nav-avatar" title="Your profile">RV</div>
+  </div>
+</nav>
+
+<!-- MAIN GRID -->
+<div class="player-layout">
+
+  <!-- LEFT: VIDEO + CONTENT -->
+  <div class="video-content-col">
+
+    <!-- VIDEO PLAYER -->
+    <div class="video-wrapper" id="videoWrapper">
+      <div class="video-placeholder" id="videoPlaceholder" onclick="togglePlay()">
+        <div class="play-btn-wrap" id="playBtnWrap">
+          <div class="play-circle" id="playCircle">
+            <div id="playTriangle" style="width:0;height:0;border-left:26px solid #fff;border-top:16px solid transparent;border-bottom:16px solid transparent;margin-left:5px;"></div>
+          </div>
+          <div class="video-lesson-label" id="videoLabel">Module 01 · Lesson 5</div>
+          <div class="video-lesson-name" id="videoName">Subnetting Mastery — Part 1</div>
+        </div>
+      </div>
+      <div class="video-controls">
+        <div class="scrubber-outer" id="scrubber" onclick="scrub(event)">
+          <div class="scrubber-fill" id="scrubberFill"></div>
+        </div>
+        <div class="ctrl-row">
+          <button class="ctrl-btn" onclick="togglePlay()" id="playPauseBtn">▶</button>
+          <button class="ctrl-btn" title="Skip back 10s">⏮</button>
+          <button class="ctrl-btn" title="Skip forward 10s">⏭</button>
+          <button class="ctrl-btn" title="Volume">🔊</button>
+          <span class="ctrl-time" id="ctrlTime">14:32 / 45:00</span>
+          <div class="ctrl-spacer"></div>
+          <span class="ctrl-badge" onclick="cycleSpeed()" id="speedBadge">1×</span>
+          <button class="ctrl-btn" title="Subtitles">CC</button>
+          <button class="ctrl-btn" title="Fullscreen">⛶</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LESSON NAV BAR -->
+    <div class="lesson-nav-bar">
+      <div class="lesson-breadcrumb" id="lessonBreadcrumb">
+        Module 01 · Networking Fundamentals &amp; Subnetting
+        <span>›</span>
+        <span>Subnetting Mastery — Part 1</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <div class="mark-done-wrap" onclick="toggleDone()">
+          <div class="done-checkbox" id="doneCheckbox"></div>
+          <span class="done-label" id="doneLabel">Mark as complete</span>
+        </div>
+        <div class="lesson-nav-btns">
+          <button class="lnav-btn" onclick="prevLesson()">‹ Previous</button>
+          <button class="lnav-btn primary" onclick="nextLesson()">Next ›</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs-bar">
+      <button class="tab active" onclick="switchTab('overview',this)">Overview</button>
+      <button class="tab" onclick="switchTab('notes',this)">Notes</button>
+      <button class="tab" onclick="switchTab('resources',this)">Resources</button>
+      <button class="tab" onclick="switchTab('qa',this)">Q&amp;A <span style="background:#eff6ff;color:#0071e3;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:4px;">3</span></button>
+    </div>
+
+    <!-- TAB: OVERVIEW -->
+    <div class="tab-content active" id="tab-overview">
+      <div class="overview-section">
+        <h3>About this lesson</h3>
+        <p class="overview-desc">In this lesson, you'll build a rock-solid understanding of IP subnetting — the skill that defines every network engineer. We'll break down binary addressing, CIDR notation, and subnet masks step by step, with Packet Tracer exercises following each concept. By the end you'll be able to design and calculate subnets mentally, a skill that appears on every CCNA exam.</p>
+      </div>
+      <div class="overview-section">
+        <h3>What you'll learn</h3>
+        <div class="learn-grid">
+          <div class="learn-item"><div class="check-circle">✓</div><span>Binary-to-decimal conversion at speed</span></div>
+          <div class="learn-item"><div class="check-circle">✓</div><span>CIDR notation and prefix lengths</span></div>
+          <div class="learn-item"><div class="check-circle">✓</div><span>Calculating network &amp; broadcast addresses</span></div>
+          <div class="learn-item"><div class="check-circle">✓</div><span>Determining usable host ranges per subnet</span></div>
+          <div class="learn-item"><div class="check-circle">✓</div><span>Subnet design for real enterprise topologies</span></div>
+          <div class="learn-item"><div class="check-circle">✓</div><span>Variable Length Subnet Masking (VLSM)</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: NOTES -->
+    <div class="tab-content" id="tab-notes">
+      <div class="notes-toolbar">
+        <span style="font-size:13px;color:#64748b;margin-right:4px;">Timestamp:</span>
+        <button class="note-stamp" id="timestampBtn" onclick="addTimestamp()">+ 14:32</button>
+        <span style="font-size:12px;color:#94a3b8;">Insert current video timestamp into note</span>
+      </div>
+      <textarea class="notes-textarea" id="noteTextarea" placeholder="Type your notes here... Use timestamps to link notes to specific moments in the video."></textarea>
+      <div class="notes-save-row">
+        <button class="save-btn" onclick="saveNote()">Save Note</button>
+      </div>
+      <div class="saved-notes">
+        <h4>Saved Notes</h4>
+        <div id="notesList">
+          <div class="saved-note-item">
+            <div class="sn-time">@ 08:15</div>
+            <div class="sn-text">Remember: /24 = 255.255.255.0 = 256 addresses, 254 usable. The -2 accounts for network address and broadcast.</div>
+          </div>
+          <div class="saved-note-item">
+            <div class="sn-time">@ 11:40</div>
+            <div class="sn-text">VLSM trick: always allocate the largest subnet first, then work downward. Prevents address space waste.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: RESOURCES -->
+    <div class="tab-content" id="tab-resources">
+      <div class="resource-list">
+        <a href="#" class="resource-item">
+          <div class="resource-icon res-pdf">📄</div>
+          <div class="resource-info">
+            <div class="resource-name">Subnetting Quick Reference Sheet</div>
+            <div class="resource-meta">PDF · 2 pages · Printable cheat sheet</div>
+          </div>
+          <div class="resource-download">Download</div>
+        </a>
+        <a href="#" class="resource-item">
+          <div class="resource-icon res-lab">🔬</div>
+          <div class="resource-info">
+            <div class="resource-name">Packet Tracer Lab: Subnet Design Exercise</div>
+            <div class="resource-meta">.pkt file · Cisco Packet Tracer 8.2+</div>
+          </div>
+          <div class="resource-download">Download</div>
+        </a>
+        <a href="#" class="resource-item">
+          <div class="resource-icon res-pdf">📊</div>
+          <div class="resource-info">
+            <div class="resource-name">Subnet Mask Cheat Table (/1–/32)</div>
+            <div class="resource-meta">PDF · Full CIDR table with host counts</div>
+          </div>
+          <div class="resource-download">Download</div>
+        </a>
+        <a href="#" class="resource-item">
+          <div class="resource-icon res-link">🔗</div>
+          <div class="resource-info">
+            <div class="resource-name">RFC 1878 — Variable Length Subnet Table</div>
+            <div class="resource-meta">External link · IETF official document</div>
+          </div>
+          <div class="resource-download">Open ↗</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- TAB: Q&A -->
+    <div class="tab-content" id="tab-qa">
+      <div class="qa-input-wrap">
+        <div class="qa-avatar">RV</div>
+        <div class="qa-input-area">
+          <textarea class="qa-textarea" placeholder="Ask a question about this lesson..."></textarea>
+          <button class="qa-post-btn">Post Question</button>
+        </div>
+      </div>
+
+      <div class="qa-question">
+        <div class="qa-q-header">
+          <div class="qa-user-av" style="background:#9b27af;">VS</div>
+          <div class="qa-q-meta"><div class="qa-username">Vijay Sharma</div><div class="qa-time">2 days ago · at 18:44</div></div>
+        </div>
+        <div class="qa-q-text">When using VLSM, if we allocate a /26 first and then a /28, does the /28 have to come right after the /26 block or can it be anywhere in the remaining address space?</div>
+        <div class="qa-actions">
+          <button class="qa-act-btn">👍 8</button>
+          <button class="qa-act-btn">Reply</button>
+        </div>
+        <div class="qa-reply">
+          <div class="qa-reply-header">
+            <div class="qa-reply-av">AK</div>
+            <span class="qa-reply-name">Ankit Kumar</span>
+            <span class="qa-reply-tag">Instructor</span>
+          </div>
+          <div class="qa-reply-text">Great question, Vijay! The /28 can go anywhere in the remaining space — no strict ordering is required protocol-wise. In practice we start from the beginning of remaining space to avoid fragmentation and keep the address plan readable. The CCNA exam tests whether you can find valid subnets, not placement order.</div>
+        </div>
+      </div>
+
+      <div class="qa-question">
+        <div class="qa-q-header">
+          <div class="qa-user-av" style="background:#c0392b;">PR</div>
+          <div class="qa-q-meta"><div class="qa-username">Pooja Raghavan</div><div class="qa-time">5 days ago · at 31:20</div></div>
+        </div>
+        <div class="qa-q-text">Is /31 actually usable for point-to-point links? I thought you always need a network and broadcast address?</div>
+        <div class="qa-actions">
+          <button class="qa-act-btn">👍 14</button>
+          <button class="qa-act-btn">Reply</button>
+        </div>
+        <div class="qa-reply">
+          <div class="qa-reply-header">
+            <div class="qa-reply-av">AK</div>
+            <span class="qa-reply-name">Ankit Kumar</span>
+            <span class="qa-reply-tag">Instructor</span>
+          </div>
+          <div class="qa-reply-text">Excellent catch — yes! RFC 3021 allows /31 on point-to-point links. Both addresses are usable as host addresses. Cisco IOS supports this and it saves address space on WAN links. I cover this in Part 2 as well!</div>
+        </div>
+      </div>
+
+      <div class="qa-question">
+        <div class="qa-q-header">
+          <div class="qa-user-av" style="background:#1a7f7f;">MK</div>
+          <div class="qa-q-meta"><div class="qa-username">Manish Khanna</div><div class="qa-time">1 week ago</div></div>
+        </div>
+        <div class="qa-q-text">The lab file isn't opening in Packet Tracer 8.1 — it says unsupported version. Do I need to upgrade?</div>
+        <div class="qa-actions">
+          <button class="qa-act-btn">👍 3</button>
+          <button class="qa-act-btn">Reply</button>
+        </div>
+        <div class="qa-reply">
+          <div class="qa-reply-header">
+            <div class="qa-reply-av">AK</div>
+            <span class="qa-reply-name">Ankit Kumar</span>
+            <span class="qa-reply-tag">Instructor</span>
+          </div>
+          <div class="qa-reply-text">Yes Manish, please upgrade to Packet Tracer 8.2 — it's a free download from the Cisco NetAcad portal. The lab uses a feature only available in 8.2+. I've added the download link in the Resources tab. Let me know if you hit any issues!</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /video-content-col -->
+
+  <!-- RIGHT: SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">Course Content</div>
+      <div class="sidebar-meta">
+        <span class="smeta"><strong>74</strong> lessons</span>
+        <span class="smeta"><strong>36h</strong> total</span>
+        <span class="smeta"><strong>24</strong> labs</span>
+      </div>
+      <div class="sidebar-progress-row">
+        <div class="spbar"><div class="spbar-fill" id="sidebarProgressFill"></div></div>
+        <span class="sp-label" id="sidebarProgressLabel">32% — 24 of 74 done</span>
+      </div>
+    </div>
+
+    <div class="sidebar-scroll">
+
+      <!-- MODULE 01 — open -->
+      <div class="smod">
+        <div class="smod-head" onclick="toggleSmod(this)">
+          <div class="smod-left">
+            <div class="smod-num">Module 01</div>
+            <div class="smod-title">Networking Fundamentals &amp; Subnetting</div>
+            <div class="smod-meta">12 lessons · 6h 20m · 4 labs</div>
+          </div>
+          <span class="smod-arrow open">▾</span>
+        </div>
+        <div class="smod-body open">
+          <div class="slesson" onclick="selectLesson(this,'Introduction to IP Addressing','Module 01 · Lesson 1')">
+            <div class="sl-status done">✓</div>
+            <div class="sl-info"><div class="sl-name">Introduction to IP Addressing</div><div class="sl-sub"><span class="sl-free-badge">FREE</span></div></div>
+            <span class="sl-dur">22 min</span>
+          </div>
+          <div class="slesson" onclick="selectLesson(this,'IPv4 vs IPv6 Overview','Module 01 · Lesson 2')">
+            <div class="sl-status done">✓</div>
+            <div class="sl-info"><div class="sl-name">IPv4 vs IPv6 Overview</div><div class="sl-sub"><span class="sl-free-badge">FREE</span></div></div>
+            <span class="sl-dur">18 min</span>
+          </div>
+          <div class="slesson" onclick="selectLesson(this,'Binary &amp; Decimal Conversion','Module 01 · Lesson 3')">
+            <div class="sl-status done">✓</div>
+            <div class="sl-info"><div class="sl-name">Binary &amp; Decimal Conversion</div></div>
+            <span class="sl-dur">31 min</span>
+          </div>
+          <div class="slesson" onclick="selectLesson(this,'Classful Addressing (A/B/C)','Module 01 · Lesson 4')">
+            <div class="sl-status done">✓</div>
+            <div class="sl-info"><div class="sl-name">Classful Addressing (A/B/C)</div></div>
+            <span class="sl-dur">27 min</span>
+          </div>
+          <div class="slesson active" onclick="selectLesson(this,'Subnetting Mastery — Part 1','Module 01 · Lesson 5')">
+            <div class="sl-status current">▶</div>
+            <div class="sl-info"><div class="sl-name">Subnetting Mastery — Part 1</div></div>
+            <span class="sl-dur">45 min</span>
+          </div>
+          <div class="slesson" onclick="selectLesson(this,'Subnetting Mastery — Part 2','Module 01 · Lesson 6')">
+            <div class="sl-status locked">🔒</div>
+            <div class="sl-info"><div class="sl-name">Subnetting Mastery — Part 2</div></div>
+            <span class="sl-dur">38 min</span>
+          </div>
+          <div class="slesson" onclick="selectLesson(this,'VLSM Deep Dive','Module 01 · Lesson 7')">
+            <div class="sl-status locked">🔒</div>
+            <div class="sl-info"><div class="sl-name">VLSM Deep Dive</div></div>
+            <span class="sl-dur">42 min</span>
+          </div>
+          <div class="slesson" onclick="selectLesson(this,'Lab: Subnet Design in Packet Tracer','Module 01 · Lab 1')">
+            <div class="sl-status locked">🔒</div>
+            <div class="sl-info"><div class="sl-name">Lab: Subnet Design in Packet Tracer</div><div class="sl-sub"><span class="sl-lab-badge">LAB</span></div></div>
+            <span class="sl-dur">55 min</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULE 02 -->
+      <div class="smod">
+        <div class="smod-head" onclick="toggleSmod(this)">
+          <div class="smod-left">
+            <div class="smod-num">Module 02</div>
+            <div class="smod-title">Cisco IOS &amp; Device Configuration</div>
+            <div class="smod-meta">10 lessons · 5h 45m · 3 labs</div>
+          </div>
+          <span class="smod-arrow">▾</span>
+        </div>
+        <div class="smod-body">
+          <div class="slesson" onclick="selectLesson(this,'Navigating Cisco IOS CLI','Module 02 · Lesson 1')">
+            <div class="sl-status locked">🔒</div>
+            <div class="sl-info"><div class="sl-name">Navigating Cisco IOS CLI</div></div>
+            <span class="sl-dur">28 min</span>
+          </div>
+          <div class="slesson" onclick="selectLesson(this,'Router &amp; Switch Initial Config','Module 02 · Lesson 2')">
+            <div class="sl-status locked">🔒</div>
+            <div class="sl-info"><div class="sl-name">Router &amp; Switch Initial Config</div></div>
+            <span class="sl-dur">35 min</span>
+          </div>
+          <div class="slesson" onclick="selectLesson(this,'Lab: First Router Setup','Module 02 · Lab 1')">
+            <div class="sl-status locked">🔒</div>
+            <div class="sl-info"><div class="sl-name">Lab: First Router Setup</div><div class="sl-sub"><span class="sl-lab-badge">LAB</span></div></div>
+            <span class="sl-dur">50 min</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULE 03 -->
+      <div class="smod">
+        <div class="smod-head" onclick="toggleSmod(this)">
+          <div class="smod-left">
+            <div class="smod-num">Module 03</div>
+            <div class="smod-title">VLANs, Trunking &amp; STP</div>
+            <div class="smod-meta">12 lessons · 6h 10m · 5 labs</div>
+          </div>
+          <span class="smod-arrow">▾</span>
+        </div>
+        <div class="smod-body">
+          <div class="slesson" onclick="selectLesson(this,'Understanding VLANs','Module 03 · Lesson 1')">
+            <div class="sl-status locked">🔒</div>
+            <div class="sl-info"><div class="sl-name">Understanding VLANs</div></div>
+            <span class="sl-dur">26 min</span>
+          </div>
+          <div class="slesson" onclick="selectLesson(this,'802.1Q Trunk Configuration','Module 03 · Lesson 2')">
+            <div class="sl-status locked">🔒</div>
+            <div class="sl-info"><div class="sl-name">802.1Q Trunk Configuration</div></div>
+            <span class="sl-dur">33 min</span>
+          </div>
+          <div class="slesson" onclick="selectLesson(this,'STP Fundamentals','Module 03 · Lesson 3')">
+            <div class="sl-status locked">🔒</div>
+            <div class="sl-info"><div class="sl-name">STP Fundamentals</div></div>
+            <span class="sl-dur">40 min</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULE 04 -->
+      <div class="smod">
+        <div class="smod-head" onclick="toggleSmod(this)">
+          <div class="smod-left">
+            <div class="smod-num">Module 04</div>
+            <div class="smod-title">Routing Protocols — OSPF &amp; EIGRP</div>
+            <div class="smod-meta">14 lessons · 7h 30m · 6 labs</div>
+          </div>
+          <span class="smod-arrow">▾</span>
+        </div>
+        <div class="smod-body">
+          <div class="slesson" onclick="selectLesson(this,'Static vs Dynamic Routing','Module 04 · Lesson 1')">
+            <div class="sl-status locked">🔒</div>
+            <div class="sl-info"><div class="sl-name">Static vs Dynamic Routing</div></div>
+            <span class="sl-dur">22 min</span>
+          </div>
+          <div class="slesson" onclick="selectLesson(this,'OSPF Single-Area Configuration','Module 04 · Lesson 2')">
+            <div class="sl-status locked">🔒</div>
+            <div class="sl-info"><div class="sl-name">OSPF Single-Area Configuration</div></div>
+            <span class="sl-dur">44 min</span>
+          </div>
+          <div class="slesson" onclick="selectLesson(this,'EIGRP Configuration &amp; Tuning','Module 04 · Lesson 3')">
+            <div class="sl-status locked">🔒</div>
+            <div class="sl-info"><div class="sl-name">EIGRP Configuration &amp; Tuning</div></div>
+            <span class="sl-dur">39 min</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULE 05 -->
+      <div class="smod">
+        <div class="smod-head" onclick="toggleSmod(this)">
+          <div class="smod-left">
+            <div class="smod-num">Module 05</div>
+            <div class="smod-title">WAN Technologies &amp; VPNs</div>
+            <div class="smod-meta">8 lessons · 4h 15m · 3 labs</div>
+          </div>
+          <span class="smod-arrow">▾</span>
+        </div>
+        <div class="smod-body">
+          <div class="slesson" onclick="selectLesson(this,'WAN Concepts &amp; Technologies','Module 05 · Lesson 1')">
+            <div class="sl-status locked">🔒</div>
+            <div class="sl-info"><div class="sl-name">WAN Concepts &amp; Technologies</div></div>
+            <span class="sl-dur">30 min</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULE 06 -->
+      <div class="smod">
+        <div class="smod-head" onclick="toggleSmod(this)">
+          <div class="smod-left">
+            <div class="smod-num">Module 06</div>
+            <div class="smod-title">Security Fundamentals &amp; ACLs</div>
+            <div class="smod-meta">10 lessons · 5h 00m · 3 labs</div>
+          </div>
+          <span class="smod-arrow">▾</span>
+        </div>
+        <div class="smod-body">
+          <div class="slesson" onclick="selectLesson(this,'Intro to Network Security','Module 06 · Lesson 1')">
+            <div class="sl-status locked">🔒</div>
+            <div class="sl-info"><div class="sl-name">Intro to Network Security</div></div>
+            <span class="sl-dur">25 min</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /sidebar-scroll -->
+  </div><!-- /sidebar -->
+
+</div><!-- /player-layout -->
+
+<script>
+// ── PLAY/PAUSE ──────────────────────────────────────────
+let isPlaying = false;
+let scrubPct = 28;
+let speedIndex = 0;
+const speeds = ['1×','1.25×','1.5×','1.75×','2×'];
+
+function togglePlay() {
+  isPlaying = !isPlaying;
+  document.getElementById('playPauseBtn').textContent = isPlaying ? '⏸' : '▶';
+}
+
+function scrub(e) {
+  const bar = document.getElementById('scrubber');
+  const rect = bar.getBoundingClientRect();
+  scrubPct = Math.max(0, Math.min(100, (e.clientX - rect.left) / rect.width * 100));
+  document.getElementById('scrubberFill').style.width = scrubPct + '%';
+  const totalSecs = 45 * 60;
+  const elapsed = Math.round(totalSecs * scrubPct / 100);
+  const em = Math.floor(elapsed/60), es = elapsed % 60;
+  const ts = `${em}:${es.toString().padStart(2,'0')}`;
+  document.getElementById('ctrlTime').textContent = ts + ' / 45:00';
+  document.getElementById('timestampBtn').textContent = '+ ' + ts;
+}
+
+function cycleSpeed() {
+  speedIndex = (speedIndex + 1) % speeds.length;
+  document.getElementById('speedBadge').textContent = speeds[speedIndex];
+}
+
+// ── TABS ────────────────────────────────────────────────
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const tc = document.getElementById('tab-' + name);
+  if (tc) tc.classList.add('active');
+}
+
+// ── SIDEBAR MODULE TOGGLE ───────────────────────────────
+function toggleSmod(head) {
+  const arrow = head.querySelector('.smod-arrow');
+  const body = head.nextElementSibling;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  arrow.classList.toggle('open', !isOpen);
+}
+
+// ── LESSON SELECT ────────────────────────────────────────
+function selectLesson(el, name, breadcrumb) {
+  // deactivate old current
+  document.querySelectorAll('.slesson').forEach(l => {
+    l.classList.remove('active');
+    const st = l.querySelector('.sl-status');
+    if (st && st.classList.contains('current')) {
+      st.classList.remove('current');
+      st.classList.add('locked');
+      st.textContent = '🔒';
+    }
+  });
+  el.classList.add('active');
+  const st = el.querySelector('.sl-status');
+  if (st && !st.classList.contains('done')) {
+    st.classList.remove('locked');
+    st.classList.add('current');
+    st.textContent = '▶';
+  }
+  // Update breadcrumb
+  document.getElementById('lessonBreadcrumb').innerHTML =
+    breadcrumb + ' <span>›</span> <span>' + name + '</span>';
+  // Update video
+  document.getElementById('videoName').textContent = name;
+  document.getElementById('videoLabel').textContent = breadcrumb;
+  // Reset done
+  document.getElementById('doneCheckbox').classList.remove('checked');
+  document.getElementById('doneLabel').textContent = 'Mark as complete';
+  // Scroll sidebar item into view
+  el.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+// ── MARK DONE ────────────────────────────────────────────
+let lessonDone = false;
+function toggleDone() {
+  lessonDone = !lessonDone;
+  document.getElementById('doneCheckbox').classList.toggle('checked', lessonDone);
+  document.getElementById('doneLabel').textContent = lessonDone ? 'Completed ✓' : 'Mark as complete';
+  if (lessonDone) {
+    const pct = 34;
+    document.getElementById('mainProgressFill').style.width = pct + '%';
+    document.getElementById('mainProgressLabel').textContent = pct + '% complete';
+    document.getElementById('sidebarProgressFill').style.width = pct + '%';
+    document.getElementById('sidebarProgressLabel').textContent = pct + '% — 25 of 74 done';
+  }
+}
+
+// ── PREV / NEXT ───────────────────────────────────────────
+function nextLesson() {
+  const all = [...document.querySelectorAll('.slesson')];
+  const idx = all.findIndex(l => l.classList.contains('active'));
+  if (idx < all.length - 1) all[idx + 1].click();
+}
+function prevLesson() {
+  const all = [...document.querySelectorAll('.slesson')];
+  const idx = all.findIndex(l => l.classList.contains('active'));
+  if (idx > 0) all[idx - 1].click();
+}
+
+// ── NOTES ────────────────────────────────────────────────
+function addTimestamp() {
+  const ta = document.getElementById('noteTextarea');
+  const totalSecs = 45 * 60;
+  const elapsed = Math.round(totalSecs * scrubPct / 100);
+  const em = Math.floor(elapsed/60), es = elapsed % 60;
+  const ts = `[@ ${em}:${es.toString().padStart(2,'0')}] `;
+  const pos = ta.selectionStart;
+  ta.value = ta.value.slice(0, pos) + ts + ta.value.slice(pos);
+  ta.focus();
+  ta.selectionStart = ta.selectionEnd = pos + ts.length;
+}
+
+function saveNote() {
+  const ta = document.getElementById('noteTextarea');
+  const text = ta.value.trim();
+  if (!text) return;
+  const totalSecs = 45 * 60;
+  const elapsed = Math.round(totalSecs * scrubPct / 100);
+  const em = Math.floor(elapsed/60), es = elapsed % 60;
+  const item = document.createElement('div');
+  item.className = 'saved-note-item';
+  item.innerHTML = `<div class="sn-time">@ ${em}:${es.toString().padStart(2,'0')}</div><div class="sn-text">${text.replace(/</g,'&lt;')}</div>`;
+  document.getElementById('notesList').prepend(item);
+  ta.value = '';
+}
+
+// ── KEYBOARD SHORTCUTS ─────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'TEXTAREA') return;
+  if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+  if (e.code === 'KeyN') nextLesson();
+  if (e.code === 'KeyP') prevLesson();
+});
+</script>
+</body>
+</html>
