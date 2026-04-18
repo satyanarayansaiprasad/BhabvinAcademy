@@ -80,11 +80,15 @@ export const languageOptions = [
   { id: "russian", label: "Russian" },
 ];
 
+export const languages = languageOptions;
+
 export const courseLevelOptions = [
   { id: "beginner", label: "Beginner" },
   { id: "intermediate", label: "Intermediate" },
   { id: "advanced", label: "Advanced" },
 ];
+
+export const courseLevels = courseLevelOptions;
 
 export const courseCategories = [
   { id: "microsoft-365", label: "Microsoft 365" },
