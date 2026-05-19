@@ -18,7 +18,7 @@ function RouteGuard({ authenticated, user, element, isLoading }) {
   }
 
   if (!authenticated && !location.pathname.includes("/auth") && !isPublicPath) {
-    return <Navigate to="/auth" />;
+    return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
   if (
@@ -28,7 +28,10 @@ function RouteGuard({ authenticated, user, element, isLoading }) {
     (location.pathname.includes("instructor") ||
       location.pathname.includes("/auth"))
   ) {
-    return <Navigate to="/home" />;
+    const redirectPath = location.state?.from
+      ? (location.state.from.pathname + (location.state.from.search || ""))
+      : "/home";
+    return <Navigate to={redirectPath} replace />;
   }
 
   if (

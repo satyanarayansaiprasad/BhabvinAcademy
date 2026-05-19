@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { getCourseImageUrl } from "@/utils/course-images";
 
 function StudentCoursesPage() {
   const { auth } = useContext(AuthContext);
@@ -60,7 +61,7 @@ function StudentCoursesPage() {
               >
                 <div className="aspect-video relative overflow-hidden bg-[#f2f2f2]">
                   <img
-                    src={course?.courseImage}
+                    src={getCourseImageUrl(course)}
                     alt={course?.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />

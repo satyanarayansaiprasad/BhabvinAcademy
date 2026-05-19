@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
-import { filterOptions, sortOptions } from "@/config";
+import { filterOptions, sortOptions, courseCategories } from "@/config";
 import { AuthContext } from "@/context/auth-context";
 import { StudentContext } from "@/context/student-context";
 import { fetchStudentViewCourseListService } from "@/services";
@@ -47,12 +47,16 @@ function StudentViewCoursesPage() {
 
   function handleFilterOnChange(getSectionId, getCurrentOptionId) {
     let cpyFilters = { ...filters };
-    if (!cpyFilters[getSectionId]) {
-      cpyFilters[getSectionId] = [getCurrentOptionId];
+    if (getCurrentOptionId === null) {
+      delete cpyFilters[getSectionId];
     } else {
-      const index = cpyFilters[getSectionId].indexOf(getCurrentOptionId);
-      if (index === -1) cpyFilters[getSectionId].push(getCurrentOptionId);
-      else cpyFilters[getSectionId].splice(index, 1);
+      if (!cpyFilters[getSectionId]) {
+        cpyFilters[getSectionId] = [getCurrentOptionId];
+      } else {
+        const index = cpyFilters[getSectionId].indexOf(getCurrentOptionId);
+        if (index === -1) cpyFilters[getSectionId].push(getCurrentOptionId);
+        else cpyFilters[getSectionId].splice(index, 1);
+      }
     }
     setFilters(cpyFilters);
   }
@@ -141,17 +145,27 @@ function StudentViewCoursesPage() {
             />
           </div>
           <div className="flex gap-2">
-            {["all", "microsoft", "linux", "networking", "cloud", "security"].map((cat) => (
+            <button
+              onClick={() => handleFilterOnChange("category", null)}
+              className={`px-4 py-[7px] border rounded-[980px] text-[13px] font-medium transition-all ${
+                (!filters.category || filters.category.length === 0)
+                  ? "bg-[#0071e3] border-[#0071e3] text-white"
+                  : "bg-white border-[#d2d2d7] text-[#6e6e73] hover:border-[#0071e3] hover:text-[#0071e3]"
+              }`}
+            >
+              All
+            </button>
+            {courseCategories.map((cat) => (
               <button 
-                key={cat}
-                onClick={() => handleFilterOnChange("category", cat === "all" ? null : cat)}
+                key={cat.id}
+                onClick={() => handleFilterOnChange("category", cat.id)}
                 className={`px-4 py-[7px] border rounded-[980px] text-[13px] font-medium transition-all ${
-                  (cat === "all" && !filters.category?.length) || filters.category?.includes(cat)
+                  filters.category?.includes(cat.id)
                     ? "bg-[#0071e3] border-[#0071e3] text-white"
                     : "bg-white border-[#d2d2d7] text-[#6e6e73] hover:border-[#0071e3] hover:text-[#0071e3]"
                 }`}
               >
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                {cat.label}
               </button>
             ))}
           </div>

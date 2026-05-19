@@ -6,11 +6,9 @@ import ScrollToTop from "./components/scroll-to-top";
 import { Toaster } from "./components/ui/toaster";
 
 const AuthPage = lazy(() => import("./pages/auth"));
-const InstructorDashboardpage = lazy(() => import("./pages/instructor"));
 const StudentViewCommonLayout = lazy(() => import("./components/student-view/common-layout"));
 const StudentHomePage = lazy(() => import("./pages/student/home"));
 const NotFoundPage = lazy(() => import("./pages/not-found"));
-const AddNewCoursePage = lazy(() => import("./pages/instructor/add-new-course"));
 const StudentViewCoursesPage = lazy(() => import("./pages/student/courses"));
 const StudentViewCourseDetailsPage = lazy(() => import("./pages/student/course-details"));
 const StudentCoursesPage = lazy(() => import("./pages/student/student-courses"));
@@ -29,7 +27,6 @@ const ContactPage = lazy(() => import("./pages/student/contact"));
 const StudentExamPage = lazy(() => import("./pages/student/exam"));
 const StudentDashboardPage = lazy(() => import("./pages/student/dashboard"));
 const SuccessPage = lazy(() => import("./pages/student/success"));
-const BlogEditPage = lazy(() => import("./pages/instructor/blog-edit"));
 
 function App() {
   const { auth, isLoading } = useContext(AuthContext);
@@ -64,22 +61,6 @@ function App() {
         <Routes>
           <Route path="/auth" element={
               <RouteGuard element={<AuthPage />} authenticated={auth?.authenticate} user={auth?.user} isLoading={isLoading} />
-            }
-          />
-          <Route path="/instructor" element={
-              <RouteGuard element={<InstructorDashboardpage />} authenticated={auth?.authenticate} user={auth?.user} isLoading={isLoading} />
-            }
-          />
-          <Route path="/instructor/create-new-course" element={
-              <RouteGuard element={<AddNewCoursePage />} authenticated={auth?.authenticate} user={auth?.user} isLoading={isLoading} />
-            }
-          />
-          <Route path="/instructor/edit-course/:courseId" element={
-              <RouteGuard element={<AddNewCoursePage />} authenticated={auth?.authenticate} user={auth?.user} isLoading={isLoading} />
-            }
-          />
-          <Route path="/instructor/blog-edit" element={
-              <RouteGuard element={<BlogEditPage />} authenticated={auth?.authenticate} user={auth?.user} isLoading={isLoading} />
             }
           />
           <Route path="/" element={<StudentViewCommonLayout />}>

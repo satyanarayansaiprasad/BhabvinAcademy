@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
     LayoutDashboard, 
@@ -17,11 +17,23 @@ import {
     Flame,
     MoreVertical
 } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { AuthContext } from "@/context/auth-context";
+import { StudentContext } from "@/context/student-context";
+import { getCourseImageUrl } from "@/utils/course-images";
 
 function StudentDashboardPage() {
     const location = useLocation();
+    const navigate = useNavigate();
+    const { auth } = useContext(AuthContext);
+    const { studentBoughtCoursesList, fetchBoughtCourses } = useContext(StudentContext);
     const [searchQuery, setSearchQuery] = useState("");
+
+    useEffect(() => {
+        if (auth?.user?._id) {
+            fetchBoughtCourses(auth?.user?._id);
+        }
+    }, [auth]);
 
     const reveal = {
         initial: { opacity: 0, y: 15 },
@@ -45,9 +57,17 @@ function StudentDashboardPage() {
         }
     };
 
+    const userFullName = auth?.user?.userFullName || auth?.user?.userName || "Student";
+    const userInitials = userFullName
+        .split(" ")
+        .map(n => n[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase();
+
     const sidebarNav = [
         { icon: <LayoutDashboard size={18} />, label: "Dashboard", path: "/dashboard", active: true },
-        { icon: <BookOpen size={18} />, label: "My Courses", path: "/student-courses", badge: "3" },
+        { icon: <BookOpen size={18} />, label: "My Courses", path: "/student-courses", badge: studentBoughtCoursesList?.length?.toString() },
         { icon: <FileText size={18} />, label: "Practice Exams", path: "/exams" },
     ];
 
@@ -59,12 +79,21 @@ function StudentDashboardPage() {
                     <Link to="/" className="text-[22px] font-bold tracking-tight">Bhavin<span className="text-[#0071e3]">Academy</span></Link>
                 </div>
 
-                <div className="p-4 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer group">
+                <div 
+                    onClick={() => navigate("/profile")}
+                    className="p-4 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer group"
+                >
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0071e3] to-[#00d4ff] flex items-center justify-center font-bold text-[12px]">AM</div>
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0071e3] to-[#00d4ff] flex items-center justify-center font-bold text-[12px] text-white">
+                            {auth?.user?.profileImage ? (
+                                <img src={auth.user.profileImage} className="w-full h-full rounded-full object-cover" />
+                            ) : (
+                                userInitials
+                            )}
+                        </div>
                         <div className="min-w-0 flex-1">
-                            <div className="text-[14px] font-bold truncate">Arjun Mehta</div>
-                            <div className="text-[11px] text-[#86868b]">Pro Plan · View Account ›</div>
+                            <div className="text-[14px] font-bold truncate">{userFullName}</div>
+                            <div className="text-[11px] text-[#86868b]">View Account ›</div>
                         </div>
                         <MoreVertical size={14} className="text-[#86868b] group-hover:text-white" />
                     </div>
@@ -89,14 +118,14 @@ function StudentDashboardPage() {
                     <div>
                         <p className="text-[10px] font-black text-[#86868b] uppercase tracking-widest px-3 mb-4">Track</p>
                         <ul className="space-y-1">
-                            <li><Link className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] font-semibold text-[#86868b] hover:bg-white/5 hover:text-white transition-all"><TrendingUp size={18} /> Progress</Link></li>
+                            <li><Link to="/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] font-semibold text-[#86868b] hover:bg-white/5 hover:text-white transition-all"><TrendingUp size={18} /> Progress</Link></li>
                         </ul>
                     </div>
 
                     <div className="mt-auto pt-8">
                         <p className="text-[10px] font-black text-[#86868b] uppercase tracking-widest px-3 mb-4">Settings</p>
                         <ul className="space-y-1">
-                            <li><Link className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] font-semibold text-[#86868b] hover:bg-white/5 hover:text-white transition-all"><Settings size={18} /> Account Settings</Link></li>
+                            <li><Link to="/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] font-semibold text-[#86868b] hover:bg-white/5 hover:text-white transition-all"><Settings size={18} /> Account Settings</Link></li>
                         </ul>
                     </div>
                 </nav>
@@ -107,8 +136,8 @@ function StudentDashboardPage() {
                 {/* TOPBAR */}
                 <header className="h-[58px] bg-white/80 backdrop-blur-xl border-b border-[#000]/5 sticky top-0 z-40 px-8 flex items-center justify-between">
                     <div>
-                        <div className="text-[14px] font-bold text-[#1d1d1f]">Good morning, Arjun 👋</div>
-                        <div className="text-[11px] text-[#86868b]">Wednesday, 1 April 2026</div>
+                        <div className="text-[14px] font-bold text-[#1d1d1f]">Good morning, {userFullName.split(" ")[0]} 👋</div>
+                        <div className="text-[11px] text-[#86868b]">{new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</div>
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -137,7 +166,7 @@ function StudentDashboardPage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-10">
                         {[
                             { val: "47.5", label: "Hours Learned", change: "↑ +3.2 this week", up: true },
-                            { val: "3", label: "Courses Enrolled", change: "1 completed", neutral: true },
+                            { val: studentBoughtCoursesList?.length?.toString() || "0", label: "Courses Enrolled", change: `${studentBoughtCoursesList?.length ? "Active" : "No courses"}`, neutral: true },
                             { val: "12", label: "Day Streak", change: "↑ Best: 21 days", up: true },
                         ].map((s, i) => (
                             <motion.div key={i} {...reveal} transition={{ delay: i * 0.1 }} className="bg-white rounded-2xl p-6 border border-black/5 hover:shadow-lg transition-shadow">
@@ -161,33 +190,50 @@ function StudentDashboardPage() {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            {[
-                                { title: "Windows Server Administration", tag: "Microsoft", progress: 50, color: "from-[#0078d4] to-[#005a9e]", icon: "🪟", next: "DHCP Config" },
-                                { title: "Cisco CCNA Bootcamp", tag: "Networking", progress: 24, color: "from-[#1ba1e2] to-[#0050ef]", icon: "🌐", next: "OSI Model" },
-                                { title: "Azure Fundamentals AZ-900", tag: "Cloud", progress: 16, color: "from-[#0089d6] to-[#00bcf2]", icon: "☁️", next: "Azure Core" },
-                            ].map((c, i) => (
-                                <motion.div key={i} {...reveal} transition={{ delay: i * 0.1 }} className="bg-white rounded-[20px] overflow-hidden border border-black/5 group cursor-pointer hover:shadow-2xl transition-all">
-                                    <div className={`h-[120px] bg-gradient-to-br ${c.color} relative flex items-center justify-center overflow-hidden`}>
-                                        <span className="text-5xl drop-shadow-lg group-hover:scale-110 transition-transform duration-500">{c.icon}</span>
-                                        <button className="absolute bottom-3 right-3 bg-white/20 backdrop-blur-md border border-white/30 text-white text-[11px] font-bold px-4 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">▶ Resume</button>
-                                    </div>
-                                    <div className="p-5">
-                                        <div className="text-[10px] font-black text-[#86868b] uppercase tracking-widest mb-1">{c.tag}</div>
-                                        <h3 className="text-[15px] font-bold text-[#1d1d1f] mb-3 leading-snug line-clamp-2 h-10">{c.title}</h3>
-                                        <div className="flex justify-between text-[11px] font-bold mb-2">
-                                            <span className="text-[#86868b]">Progress</span>
-                                            <span className="text-[#0071e3]">{c.progress}%</span>
+                            {studentBoughtCoursesList && studentBoughtCoursesList.length > 0 ? (
+                                studentBoughtCoursesList.slice(0, 3).map((c, i) => (
+                                    <motion.div 
+                                        key={c.courseId} 
+                                        {...reveal} 
+                                        transition={{ delay: i * 0.1 }} 
+                                        onClick={() => navigate(`/course-progress/${c.courseId}`)}
+                                        className="bg-white rounded-[20px] overflow-hidden border border-black/5 group cursor-pointer hover:shadow-2xl transition-all"
+                                    >
+                                        <div className="h-[120px] relative overflow-hidden bg-[#f5f5f7] flex items-center justify-center shrink-0">
+                                            <img 
+                                                src={getCourseImageUrl(c)} 
+                                                alt={c.title}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            />
+                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                                                <button className="bg-white text-black text-[11px] font-bold px-4 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm">▶ Resume</button>
+                                            </div>
                                         </div>
-                                        <div className="h-1 bg-[#f0f0f0] rounded-full overflow-hidden mb-4">
-                                            <div className="h-full bg-gradient-to-r from-[#0071e3] to-[#00d4ff]" style={{ width: `${c.progress}%` }} />
+                                        <div className="p-5">
+                                            <div className="text-[10px] font-black text-[#0071e3] uppercase tracking-widest mb-1">{c.instructorName || "Instructor"}</div>
+                                            <h3 className="text-[15px] font-bold text-[#1d1d1f] mb-3 leading-snug line-clamp-2 h-10 group-hover:text-[#0071e3] transition-colors">{c.title}</h3>
+                                            <div className="flex justify-between text-[11px] font-bold mb-2">
+                                                <span className="text-[#86868b]">Progress</span>
+                                                <span className="text-[#0071e3]">{c.progress || 0}%</span>
+                                            </div>
+                                            <div className="h-1 bg-[#f0f0f0] rounded-full overflow-hidden mb-4">
+                                                <div className="h-full bg-gradient-to-r from-[#0071e3] to-[#00d4ff]" style={{ width: `${c.progress || 0}%` }} />
+                                            </div>
+                                            <div className="flex items-center justify-between text-[11px]">
+                                                <span className="text-[#86868b]">Click to open course</span>
+                                                <span className="text-[#0071e3] font-bold">Resume →</span>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center justify-between text-[11px]">
-                                            <span className="text-[#86868b]">Last activity: 2h ago</span>
-                                            <span className="text-[#0071e3] font-bold">Next: {c.next} →</span>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            ))}
+                                    </motion.div>
+                                ))
+                            ) : (
+                                <div className="col-span-full bg-white rounded-2xl p-10 border border-black/5 text-center flex flex-col items-center py-16">
+                                    <BookOpen className="w-12 h-12 text-[#cbd5e1] mb-4" />
+                                    <h3 className="text-[16px] font-bold text-[#1d1d1f] mb-1">No courses in progress</h3>
+                                    <p className="text-[13px] text-[#86868b] mb-6 max-w-xs">You have not enrolled in any courses yet. Start your journey today!</p>
+                                    <Link to="/courses" className="bg-[#0071e3] hover:bg-[#0077ed] text-white text-[12px] font-bold px-6 py-2.5 rounded-full transition-all">Explore Courses</Link>
+                                </div>
+                            )}
                         </div>
                     </div>
 
