@@ -285,3 +285,8 @@ export async function deleteAdminStudentService(studentId) {
   const { data } = await axiosInstance.delete(`/instructor/student-progress/delete/${studentId}`);
   return data;
 }
+
+export async function submitContactService(formData) {
+  const { data } = await axiosInstance.post("/contact/submit", formData);
+  return data;
+}

@@ -3,7 +3,6 @@ import { StudentContext } from "@/context/student-context";
 import { fetchStudentViewCourseListService } from "@/services";
 import { useNavigate } from "react-router-dom";
 import CourseCard from "@/components/student-view/course-card";
-import PathCard from "@/components/student-view/path-card";
 
 function StudentHomePage() {
   const { studentViewCoursesList, setStudentViewCoursesList } = useContext(StudentContext);
@@ -25,24 +24,6 @@ function StudentHomePage() {
     "🔒 CompTIA Security+", "⚙️ Active Directory", "📡 Network+"
   ];
 
-  const featuredPaths = [
-    {
-      title: "Microsoft Engineer",
-      description: "From Windows basics to Azure cloud and Microsoft 365 administration. Prepares you for MCSA and MCP.",
-      tags: ["Windows", "Active Directory", "Azure", "Microsoft 365"]
-    },
-    {
-      title: "Linux Admin",
-      description: "Command line mastery, shell scripting, service management, and LPIC certification prep.",
-      tags: ["CLI", "Bash Scripting", "Services", "LPIC-1"]
-    },
-    {
-      title: "Network Engineer",
-      description: "Routing, switching, firewalls, subnetting — full CCNA and CompTIA Network+ exam prep included.",
-      tags: ["TCP/IP", "Routing", "Firewalls", "CCNA"]
-    }
-  ];
-
   return (
     <div className="flex flex-col">
       {/* HERO */}
@@ -59,7 +40,6 @@ function StudentHomePage() {
         </p>
         <div className="flex gap-[16px] flex-wrap justify-center">
           <button onClick={() => navigate('/courses')} className="btn btn-blue btn-lg">Explore Courses</button>
-          <button onClick={() => navigate('/paths')} className="btn btn-outline border-[rgba(245,245,247,0.3)] text-[#f5f5f7] hover:border-[#f5f5f7] btn-lg">View All Paths →</button>
         </div>
       </section>
 
@@ -143,19 +123,6 @@ function StudentHomePage() {
                 <div key={i} className="h-[300px] bg-white rounded-[18px] animate-pulse" />
               ))
             )}
-          </div>
-        </div>
-      </section>
-
-      {/* LEARNING PATHS */}
-      <section className="bg-white py-[80px] px-6">
-        <div className="max-w-[1080px] mx-auto">
-          <p className="section-label">Learning Paths</p>
-          <h2 className="section-title mb-8">Your roadmap to certification.</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-[16px]">
-            {featuredPaths.map((path, idx) => (
-              <PathCard key={idx} path={path} index={idx} />
-            ))}
           </div>
         </div>
       </section>

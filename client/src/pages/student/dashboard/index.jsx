@@ -48,7 +48,6 @@ function StudentDashboardPage() {
     const sidebarNav = [
         { icon: <LayoutDashboard size={18} />, label: "Dashboard", path: "/dashboard", active: true },
         { icon: <BookOpen size={18} />, label: "My Courses", path: "/student-courses", badge: "3" },
-        { icon: <Route size={18} />, label: "Learning Paths", path: "/paths" },
         { icon: <FileText size={18} />, label: "Practice Exams", path: "/exams" },
     ];
 

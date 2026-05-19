@@ -4,18 +4,17 @@ import {
     Mail, 
     MessageCircle, 
     Users, 
-    MapPin, 
-    ChevronRight, 
+    Globe, 
     CheckCircle2, 
     Send, 
-    Plus, 
-    Minus,
-    Phone,
-    Globe,
+    Plus,
     HelpCircle,
-    ArrowUpRight
+    ArrowUpRight,
+    Clock,
+    ArrowRight
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { submitContactService } from "../../../services";
 
 function ContactPage() {
     const [formData, setFormData] = useState({
@@ -43,9 +42,30 @@ function ContactPage() {
         { q: "Do you offer group or corporate pricing?", a: "Yes! We offer discounted plans for teams of 5 or more, with a centralised admin dashboard and progress tracking. Select 'Team / Corporate Training' as your topic." },
     ];
 
-    const handleSubmit = (e) => {
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState(null);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsSubmitted(true);
+        setIsSubmitting(true);
+        setError(null);
+        try {
+            const data = await submitContactService({
+                name: `${formData.fname} ${formData.lname}`.trim(),
+                email: formData.email,
+                category: formData.topic,
+                message: formData.message
+            });
+            if (data.success) {
+                setIsSubmitted(true);
+            } else {
+                setError(data.message || "Something went wrong.");
+            }
+        } catch (err) {
+            setError(err.message || "Failed to submit form.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -132,23 +152,23 @@ function ContactPage() {
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                         <div className="space-y-3">
                                             <label className="text-[11px] font-black text-[#86868b] uppercase tracking-widest">First Name</label>
-                                            <input type="text" placeholder="e.g. Ravi" className="w-full h-14 px-5 bg-[#f5f5f7] border border-transparent rounded-[20px] text-[15px] font-medium outline-none focus:bg-white focus:border-[#0071e3]/30 focus:shadow-xl focus:shadow-blue-500/5 transition-all" required />
+                                            <input type="text" placeholder="e.g. Ravi" className="w-full h-14 px-5 bg-[#f5f5f7] border border-transparent rounded-[20px] text-[15px] font-medium outline-none focus:bg-white focus:border-[#0071e3]/30 focus:shadow-xl focus:shadow-blue-500/5 transition-all" required value={formData.fname} onChange={(e) => setFormData({...formData, fname: e.target.value})} />
                                         </div>
                                         <div className="space-y-3">
                                             <label className="text-[11px] font-black text-[#86868b] uppercase tracking-widest">Last Name</label>
-                                            <input type="text" placeholder="e.g. Sharma" className="w-full h-14 px-5 bg-[#f5f5f7] border border-transparent rounded-[20px] text-[15px] font-medium outline-none focus:bg-white focus:border-[#0071e3]/30 focus:shadow-xl focus:shadow-blue-500/5 transition-all" />
+                                            <input type="text" placeholder="e.g. Sharma" className="w-full h-14 px-5 bg-[#f5f5f7] border border-transparent rounded-[20px] text-[15px] font-medium outline-none focus:bg-white focus:border-[#0071e3]/30 focus:shadow-xl focus:shadow-blue-500/5 transition-all" value={formData.lname} onChange={(e) => setFormData({...formData, lname: e.target.value})} />
                                         </div>
                                     </div>
 
                                     <div className="space-y-3">
                                         <label className="text-[11px] font-black text-[#86868b] uppercase tracking-widest">Email Address</label>
-                                        <input type="email" placeholder="terminal@domain.com" className="w-full h-14 px-5 bg-[#f5f5f7] border border-transparent rounded-[20px] text-[15px] font-medium outline-none focus:bg-white focus:border-[#0071e3]/30 focus:shadow-xl focus:shadow-blue-500/5 transition-all" required />
+                                        <input type="email" placeholder="terminal@domain.com" className="w-full h-14 px-5 bg-[#f5f5f7] border border-transparent rounded-[20px] text-[15px] font-medium outline-none focus:bg-white focus:border-[#0071e3]/30 focus:shadow-xl focus:shadow-blue-500/5 transition-all" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
                                     </div>
 
                                     <div className="space-y-3">
                                         <label className="text-[11px] font-black text-[#86868b] uppercase tracking-widest">Inquiry Vector</label>
-                                        <select className="w-full h-14 px-5 bg-[#f5f5f7] border border-transparent rounded-[20px] text-[15px] font-bold outline-none focus:bg-white focus:border-[#0071e3]/30 transition-all cursor-pointer appearance-none">
-                                            <option value="" disabled selected>Select Protocol Category...</option>
+                                        <select className="w-full h-14 px-5 bg-[#f5f5f7] border border-transparent rounded-[20px] text-[15px] font-bold outline-none focus:bg-white focus:border-[#0071e3]/30 transition-all cursor-pointer appearance-none" required value={formData.topic} onChange={(e) => setFormData({...formData, topic: e.target.value})}>
+                                            <option value="" disabled>Select Protocol Category...</option>
                                             <option value="course">Technical Course Query</option>
                                             <option value="enroll">Account Access Synchronisation</option>
                                             <option value="billing">Transactional Audit Reply</option>
@@ -159,14 +179,15 @@ function ContactPage() {
 
                                     <div className="space-y-3">
                                         <label className="text-[11px] font-black text-[#86868b] uppercase tracking-widest">Message Intel</label>
-                                        <textarea placeholder="Provide detailed intelligence regarding your query..." className="w-full min-h-[160px] p-6 bg-[#f5f5f7] border border-transparent rounded-[24px] text-[15px] font-light leading-relaxed outline-none focus:bg-white focus:border-[#0071e3]/30 focus:shadow-xl focus:shadow-blue-500/5 transition-all resize-none" maxLength="1000" required></textarea>
-                                        <div className="text-[10px] text-[#b0b0b5] text-right font-black uppercase tracking-widest opacity-40">0 / 1000 CHARS</div>
+                                        <textarea placeholder="Provide detailed intelligence regarding your query..." className="w-full min-h-[160px] p-6 bg-[#f5f5f7] border border-transparent rounded-[24px] text-[15px] font-light leading-relaxed outline-none focus:bg-white focus:border-[#0071e3]/30 focus:shadow-xl focus:shadow-blue-500/5 transition-all resize-none" maxLength="1000" required value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})}></textarea>
+                                        <div className="text-[10px] text-[#b0b0b5] text-right font-black uppercase tracking-widest opacity-40">{formData.message.length} / 1000 CHARS</div>
                                     </div>
 
+                                    {error && <div className="text-red-500 text-sm font-medium">{error}</div>}
                                     <div className="flex flex-col sm:flex-row items-center justify-between gap-8 pt-6 border-t border-[#f5f5f7]">
                                         <p className="text-[11px] text-[#86868b] max-w-[280px] font-medium leading-relaxed italic pr-6 border-l-2 border-[#f5f5f7] pl-4">Your data is governed by strict technical secrecy protocols. No 3rd party leakage.</p>
-                                        <button type="submit" className="h-16 px-12 bg-[#0071e3] text-white rounded-[24px] text-[14px] font-black uppercase tracking-[0.2em] hover:bg-[#0077ed] transition-all flex items-center gap-3 shadow-2xl shadow-[#0071e3]/20 active:scale-95 group/btn">
-                                            Sync Now <ArrowRight size={20} className="group-hover/btn:translate-x-1 transition-transform" />
+                                        <button type="submit" disabled={isSubmitting} className="h-16 px-12 bg-[#0071e3] text-white rounded-[24px] text-[14px] font-black uppercase tracking-[0.2em] hover:bg-[#0077ed] transition-all flex items-center gap-3 shadow-2xl shadow-[#0071e3]/20 active:scale-95 group/btn disabled:opacity-50">
+                                            {isSubmitting ? "Syncing..." : "Sync Now"} <ArrowRight size={20} className="group-hover/btn:translate-x-1 transition-transform" />
                                         </button>
                                     </div>
                                 </form>

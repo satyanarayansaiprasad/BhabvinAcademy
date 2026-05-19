@@ -145,9 +145,10 @@ export default function AuthProvider({ children }) {
         auth,
         setAuth,
         resetCredentials,
+        isLoading: loading,
       }}
     >
-      {loading ? <Skeleton /> : children}
+      {children}
     </AuthContext.Provider>
   );
 }
