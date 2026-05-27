@@ -5,7 +5,7 @@ import Footer from "./footer";
 function StudentViewCommonLayout() {
   const location = useLocation();
   return (
-    <div className="min-h-screen flex flex-col pt-12 xs:pt-14 md:pt-16">
+    <div className="min-h-screen flex flex-col pt-[52px]">
       {!location.pathname.includes("course-progress") ? (
         <StudentViewCommonHeader />
       ) : null}
