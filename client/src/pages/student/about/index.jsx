@@ -1,229 +1,265 @@
-import React from "react";
-import { motion } from "framer-motion";
-import { GraduationCap, Award, Globe, Users, CheckCircle2, Quote, Laptop, Building2, UserCheck, Mic2, Target, Beaker, Sprout, Share2, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function AboutUsPage() {
-    const reveal = {
-        initial: { opacity: 0, y: 30 },
-        whileInView: { opacity: 1, y: 0 },
-        viewport: { once: true },
-        transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] }
-    };
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
 
-    const stats = [
-        { icon: <Laptop className="w-5 h-5" />, label: "Years in enterprise IT", value: "15+", suffix: "+" },
-        { icon: <Building2 className="w-5 h-5" />, label: "Companies worked in", value: "7+", suffix: "+" },
-        { icon: <UserCheck className="w-5 h-5" />, label: "Customers served", value: "500+", suffix: "+" },
-        { icon: <Mic2 className="w-5 h-5" />, label: "Training & events conducted", value: "450+", suffix: "+" },
-    ];
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    alert(`Subscribed: ${email}`);
+    setEmail("");
+  };
 
-    return (
-        <div className="min-h-screen bg-white font-['Inter']">
-            {/* HERO SECTION */}
-            <section className="relative min-h-[80vh] flex flex-col items-center justify-center p-6 bg-[linear-gradient(160deg,#000_0%,#1a1a2e_50%,#000_100%)] overflow-hidden text-center">
-                <div className="absolute w-[700px] h-[700px] rounded-full bg-[radial-gradient(circle,rgba(0,113,227,0.2)_0%,transparent_70%)] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-                <div className="absolute w-[300px] h-[300px] rounded-full bg-[radial-gradient(circle,rgba(0,212,255,0.08)_0%,transparent_70%)] bottom-1/4 right-1/4 pointer-events-none" />
-                
-                <motion.div {...reveal}>
-                    <div className="text-[12px] font-bold text-[#0071e3] uppercase tracking-[0.1em] mb-4">About Bhavin Academy</div>
-                    <h1 className="text-[clamp(40px,7vw,80px)] font-extrabold text-[#f5f5f7] leading-[1.05] tracking-[-2.5px] max-w-[900px] mb-8">
-                        Built by a practitioner.<br />
-                        <span className="bg-[linear-gradient(90deg,#0071e3,#00d4ff)] bg-clip-text text-transparent italic">For practitioners.</span>
-                    </h1>
-                    <p className="text-[18px] text-[#86868b] leading-[1.6] max-w-[600px] mx-auto font-light">
-                        Bhavin Academy is built on a fundamental: Master the depth, scale the width with applied knowledge.
-                    </p>
-                </motion.div>
-
-                <div className="absolute bottom-12 flex flex-col items-center gap-2 opacity-30">
-                    <span className="text-[10px] text-white uppercase tracking-widest">Scroll Down</span>
-                    <div className="w-[1px] h-10 bg-gradient-to-b from-white to-transparent" />
-                </div>
-            </section>
-
-            {/* THE STORY */}
-            <section className="py-24 px-6 md:py-32">
-                <div className="max-w-[1080px] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-16 items-start">
-                    <motion.div {...reveal} className="space-y-8">
-                        <div>
-                            <div className="text-[13px] font-bold text-[#0071e3] uppercase tracking-[0.06em] mb-4">The Story</div>
-                            <h2 className="text-[clamp(32px,5vw,48px)] font-extrabold text-[#1d1d1f] tracking-[-1.5px] leading-[1.1]">
-                                Not just a teacher.<br />A career <span className="text-[#0071e3]">witness</span>.
-                            </h2>
-                        </div>
-                        <div className="text-[16px] text-[#6e6e73] leading-[1.8] space-y-6">
-                            <p>I started my IT career the hard way. I was self-taught - studying late into the night after a full-time job, chasing technologies that felt impossibly distant, and implementing everything I learned. Every lab mistake, every exam I failed before I passed, and every concept that finally "clicked" is woven into the DNA of BhavinAcademy today.</p>
-                            <p>After <strong>15+ years in enterprise IT</strong>; spanning Windows infrastructure, Active Directory, and Linux administration to networking and cloud security, I realized that most people in the industry strive for the right path through applied knowledge and a simplified learning methodology. Answering a long-standing calling to support this mission, I have dedicated myself to teaching the skills I’ve mastered to help others walk their path efficiently.</p>
-                            <p>This platform is the result of my passion for IT, and Life Enhancement. Now, it’s your turn to put it to work for your career and growth.</p>
-                            <p className="text-[#1d1d1f] font-medium">Wish you a great journey ahead!</p>
-                        </div>
-                        <Link to="/courses" className="inline-flex items-center gap-2 text-[15px] font-semibold text-[#0071e3] hover:underline">
-                            Explore all courses <ArrowRight className="w-4 h-4" />
-                        </Link>
-                    </motion.div>
-
-                    <motion.div {...reveal} transition={{ delay: 0.2 }} className="sticky top-[80px]">
-                        <div className="bg-black text-[#f5f5f7] rounded-[24px] p-8 shadow-2xl overflow-hidden relative">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-                            <div className="relative z-10">
-                                <div className="w-20 h-20 rounded-full bg-[linear-gradient(135deg,#0071e3,#00d4ff)] flex items-center justify-center text-3xl font-extrabold mb-6">BK</div>
-                                <h3 className="text-[22px] font-extrabold tracking-tight mb-1">Bhavin Khatri</h3>
-                                <p className="text-[13px] text-[#86868b] leading-tight mb-6">Founder & Lead Instructor<br />BhavinAcademy</p>
-                                
-                                <div className="w-full h-[1px] bg-white/10 mb-6" />
-                                
-                                <div className="space-y-4">
-                                    {[
-                                        { icon: "🧑‍💻", text: "<strong>15+ years</strong> in enterprise IT" },
-                                        { icon: "🏢", text: "Worked in <strong>7+ companies</strong>" },
-                                        { icon: "🤝", text: "Served <strong>500+ customers</strong>" },
-                                        { icon: "🎙️", text: "Conducted <strong>450+ training</strong>" },
-                                        { icon: "🌍", text: "Based in <strong>India</strong> · Global reach" },
-                                    ].map((row, i) => (
-                                        <div key={i} className="flex items-start gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-[#0071e3]/20 border border-[#0071e3]/30 flex items-center justify-center text-[15px] shrink-0">{row.icon}</div>
-                                            <span className="text-[13px] text-[#c7c7cc] leading-[1.4]" dangerouslySetInnerHTML={{ __html: row.text }} />
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <div className="flex flex-wrap gap-2 mt-8">
-                                    {["MCSA", "AZ-104", "CCNA", "LPIC-1", "Security+", "Network+"].map((cert, i) => (
-                                        <span key={i} className="text-[10px] font-bold bg-[#0071e3]/20 text-[#40a9ff] border border-[#0071e3]/30 px-2.5 py-1 rounded-full uppercase tracking-wider">{cert}</span>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </motion.div>
-                </div>
-            </section>
-
-            {/* NUMBERS BAND */}
-            <section className="bg-black py-24 px-6 overflow-hidden">
-                <div className="max-w-[1080px] mx-auto">
-                    <p className="text-[13px] font-bold text-[#0071e3]/70 uppercase tracking-[0.1em] mb-12">By the numbers</p>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-[2px] bg-white/10 rounded-[20px] overflow-hidden border border-white/10">
-                        {stats.map((stat, i) => (
-                            <motion.div 
-                                key={i} 
-                                {...reveal}
-                                transition={{ delay: i * 0.1 }}
-                                className="bg-black p-10 relative overflow-hidden group"
-                            >
-                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-[#0071e3]/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                                <div className="relative z-10">
-                                    <div className="text-[clamp(42px,5vw,64px)] font-black text-[#f5f5f7] leading-none mb-3 tracking-[-3px]">
-                                        {stat.value.replace('+', '')}<span className="text-[0.6em] text-[#0071e3] tracking-normal">+</span>
-                                    </div>
-                                    <div className="text-[13px] text-[#86868b] leading-tight font-light">{stat.label}</div>
-                                </div>
-                                <div className="absolute top-6 right-6 opacity-10 group-hover:opacity-20 transition-opacity">{stat.icon}</div>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* MISSION SECTION */}
-            <section className="bg-[#f5f5f7] py-24 px-6">
-                <div className="max-w-[1080px] mx-auto">
-                    <div className="mb-16">
-                        <div className="text-[13px] font-bold text-[#0071e3] uppercase tracking-[0.06em] mb-4">Our Mission</div>
-                        <h2 className="text-[clamp(28px,4.5vw,46px)] font-extrabold text-[#1d1d1f] tracking-[-1.5px] leading-[1.1]">
-                            Every principle that<br />guides how we teach.
-                        </h2>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {[
-                            { icon: "🎯", color: "blue", title: "Exam-ready, job-ready", desc: "Certifications open doors — but it's real-world competence that keeps them open. Every course ensures you do both." },
-                            { icon: "🔬", color: "dark", title: "Labs before lectures", desc: "You don't learn to drive by reading a manual. Every concept is reinforced with a hands-on lab environment." },
-                            { icon: "🌱", color: "green", title: "Fundamentals never expire", desc: "Cloud providers shift, but TCP/IP and identity concepts remain timeless. We prioritize foundations over trends." },
-                        ].map((v, i) => (
-                            <motion.div 
-                                key={i}
-                                {...reveal}
-                                transition={{ delay: i * 0.1 }}
-                                className="bg-white border border-transparent hover:border-[#0071e3]/30 rounded-[20px] p-10 transition-all hover:shadow-xl hover:-translate-y-1"
-                            >
-                                <div className="w-14 h-14 rounded-2xl bg-black/5 flex items-center justify-center text-2xl mb-6">{v.icon}</div>
-                                <h3 className="text-[20px] font-extrabold text-[#1d1d1f] mb-4 tracking-[-0.4px]">{v.title}</h3>
-                                <p className="text-[14px] text-[#6e6e73] leading-[1.7]">{v.desc}</p>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* PHILOSOPHY */}
-            <section className="bg-black py-32 px-6 text-center relative overflow-hidden">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-[#0071e3]/10 rounded-full blur-[120px] pointer-events-none" />
-                <div className="max-w-[800px] mx-auto relative z-10">
-                    <Quote className="w-20 h-20 text-[#0071e3]/20 mx-auto mb-8" />
-                    <p className="text-[clamp(22px,3vw,34px)] font-light text-[#f5f5f7] leading-[1.6] tracking-[-0.5px] mb-10">
-                        "While technology shifts with every decade, your value remains constant through two rules: <strong>Master the fundamentals</strong>, as they are timeless; and <strong>keep learning</strong>, for the world never stops turning."
-                    </p>
-                    <div className="text-[14px] text-[#86868b] uppercase tracking-widest font-bold">· Bhavin Khatri ·</div>
-                    <div className="text-[12px] text-[#86868b]/40 mt-2">Founder, BhavinAcademy</div>
-                </div>
-            </section>
-
-            {/* WHAT WE COVER Grid */}
-            <section className="py-24 px-6 md:py-32">
-                <div className="max-w-[1080px] mx-auto">
-                    <motion.div {...reveal} className="mb-16">
-                        <div className="text-[13px] font-bold text-[#0071e3] uppercase tracking-[0.06em] mb-4">What We Cover</div>
-                        <h2 className="text-[clamp(32px,5vw,48px)] font-extrabold text-[#1d1d1f] tracking-[-1.5px] leading-[1.1]">
-                            Six domains. One platform.
-                        </h2>
-                    </motion.div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {[
-                            { title: "Microsoft & Cloud", icon: "🪟", color: "from-[#001830] to-[#003a6b]", pills: ["Server", "AD DS", "M365", "Azure"] },
-                            { title: "Linux Systems", icon: "🐧", color: "from-[#1a0e00] to-[#3d2200]", pills: ["Ubuntu", "RHEL", "Bash", "LPIC"] },
-                            { title: "Networking", icon: "🌐", color: "from-[#001a30] to-[#003060]", pills: ["Cisco", "TCP/IP", "VPN", "CCNA"] },
-                            { title: "Cybersecurity", icon: "🔒", color: "from-[#001a0a] to-[#003018]", pills: ["Security+", "IAM", "PKI", "SIEM"] },
-                            { title: "DevOps & Iac", icon: "⚙️", color: "from-[#130020] to-[#2a0040]", pills: ["Ansible", "Terraform", "Git", "Pipelines"] },
-                            { title: "Modern Workplace", icon: "💼", color: "from-[#1e1e1e] to-[#333]", pills: ["Intune", "Endpoint", "Collaboration", "MS-900"] },
-                        ].map((domain, i) => (
-                            <motion.div 
-                                key={i}
-                                {...reveal}
-                                transition={{ delay: i * 0.05 }}
-                                className={`rounded-[24px] p-10 bg-gradient-to-br ${domain.color} text-white hover:scale-[1.02] transition-transform cursor-pointer group shadow-xl`}
-                            >
-                                <div className="text-4xl mb-6 group-hover:scale-110 transition-transform inline-block">{domain.icon}</div>
-                                <h3 className="text-[20px] font-bold mb-3">{domain.title}</h3>
-                                <p className="text-[13px] text-white/50 font-light mb-6">Master enterprise-grade implementation with hands-on scenarios.</p>
-                                <div className="flex flex-wrap gap-2">
-                                    {domain.pills.map((pill, pi) => (
-                                        <span key={pi} className="text-[10px] font-bold bg-white/10 px-2.5 py-1 rounded-full">{pill}</span>
-                                    ))}
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* CTA SECTION */}
-            <section className="bg-[#0071e3] py-24 px-6 text-center text-white">
-                <motion.div {...reveal} className="max-w-[600px] mx-auto">
-                    <h2 className="text-[clamp(32px,5vw,52px)] font-extrabold tracking-[-1.5px] leading-[1.1] mb-6">
-                        Ready to start<br />your IT journey?
-                    </h2>
-                    <p className="text-[18px] text-white/70 font-light mb-10">
-                        Join 20,000+ students on their path to becoming industry experts.
-                    </p>
-                    <Link to="/courses" className="inline-block bg-white text-[#0071e3] px-10 py-5 rounded-full text-[16px] font-bold hover:bg-white/90 transition-colors shadow-2xl">
-                        Explore All Courses
-                    </Link>
-                </motion.div>
-            </section>
+  return (
+    <div className="bg-surface text-on-surface font-body selection:bg-primary-fixed selection:text-on-primary-fixed min-h-screen">
+      {/* Hero Section: The Breathable Grid */}
+      <section className="relative px-6 py-20 lg:py-32 overflow-hidden bg-surface">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="lg:col-span-7 z-10 text-left">
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-secondary-container/20 text-secondary font-headline text-xs font-bold tracking-widest uppercase mb-6">
+              Expert Verified Authority
+            </span>
+            <h1 className="font-headline font-extrabold text-5xl lg:text-7xl text-on-surface leading-[1.1] tracking-tight mb-8">
+              About Our <span className="text-primary">Mission</span>
+            </h1>
+            <p className="text-xl text-on-surface-variant leading-relaxed max-w-xl font-normal">
+              Helping you choose safe, effective health products through rigorous clinical standards and uncompromising editorial integrity.
+            </p>
+          </div>
+          <div className="lg:col-span-5 relative">
+            <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl rotate-3 scale-105">
+              <img 
+                alt="Clinical Excellence" 
+                className="w-full h-full object-cover" 
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFgtQ6-WhjQN8TAobGnapfqOKjGRnxOztFXx4pedWfubdjI-Vlx7xOYnUIufQ2fFCQeT-BlJikk3nQWQZ0aS9Yue5k0BXspGuCMeULR0O_O22yrn4LuO0OmWi2DRTEcgiBjlug7hijzlymzPh-gjv225PF5ZnHt_Qsr89ycP7ZNpqIbmftpTfLRAqvpZ0qQRNOTMIn5uyLVDzZjO24K4On1w7o0lr1s4t0Y9bzlY0-PGutLLZXWWGyEIkKPBvqY1Ja5FPHShNrRfdf"
+              />
+            </div>
+            {/* Decorative Asymmetrical Element */}
+            <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-secondary-fixed/30 rounded-full blur-3xl -z-10"></div>
+          </div>
         </div>
-    );
+      </section>
+
+      {/* Our Story: Intentional Asymmetry */}
+      <section className="bg-surface-container-low py-24 px-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 text-left">
+          <div className="space-y-6">
+            <h2 className="font-headline text-3xl font-bold tracking-tight">Our Story</h2>
+            <div className="w-12 h-1 bg-primary"></div>
+          </div>
+          <div className="prose prose-lg text-on-surface-variant leading-relaxed font-body">
+            <p className="mb-6">
+              Editorial Health Authority was founded in 2018 with a singular, urgent purpose: to bring clinical-grade clarity to the increasingly cluttered health and wellness marketplace. 
+            </p>
+            <p className="mb-6">
+              In an era of influencers and paid sponsorships, we recognized a critical deficit of transparency. Our platform was built as a sanctuary for research-backed reviews, where product efficacy is measured not by marketing budgets, but by rigorous scientific data and expert hands-on testing.
+            </p>
+            <p>
+              Today, we stand as the "Clinical Curator" for millions of readers, bridging the gap between complex pharmaceutical research and everyday consumer decisions.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Our Mission & Values: Icon-based Cards */}
+      <section className="py-24 px-6 bg-surface">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="font-headline text-4xl font-extrabold tracking-tight mb-4">Core Principles</h2>
+            <p className="text-on-surface-variant max-w-2xl mx-auto font-body">Foundational values that dictate every clinical review we publish.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left">
+            {/* Value 1 */}
+            <div className="bg-surface-container-lowest p-8 rounded-xl shadow-atmospheric hover:scale-102 transition-transform duration-300">
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-6">
+                <span className="material-symbols-outlined text-primary text-3xl">verified</span>
+              </div>
+              <h3 className="font-headline font-bold text-lg mb-3">Transparency</h3>
+              <p className="text-sm text-on-surface-variant leading-relaxed font-body">We disclose every funding source and affiliate link, maintaining absolute editorial independence.</p>
+            </div>
+            
+            {/* Value 2 */}
+            <div className="bg-surface-container-lowest p-8 rounded-xl shadow-atmospheric hover:scale-102 transition-transform duration-300">
+              <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center mb-6">
+                <span className="material-symbols-outlined text-secondary text-3xl">science</span>
+              </div>
+              <h3 className="font-headline font-bold text-lg mb-3">Scientific Research</h3>
+              <p className="text-sm text-on-surface-variant leading-relaxed font-body">Every claim is cross-referenced with peer-reviewed journals and clinical trial data.</p>
+            </div>
+            
+            {/* Value 3 */}
+            <div className="bg-surface-container-lowest p-8 rounded-xl shadow-atmospheric hover:scale-102 transition-transform duration-300">
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-6">
+                <span className="material-symbols-outlined text-primary text-3xl">health_and_safety</span>
+              </div>
+              <h3 className="font-headline font-bold text-lg mb-3">User Safety</h3>
+              <p className="text-sm text-on-surface-variant leading-relaxed font-body">Patient outcomes and side-effect profiles are prioritized over aesthetic promises.</p>
+            </div>
+            
+            {/* Value 4 */}
+            <div className="bg-surface-container-lowest p-8 rounded-xl shadow-atmospheric hover:scale-102 transition-transform duration-300">
+              <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center mb-6">
+                <span className="material-symbols-outlined text-secondary text-3xl">fact_check</span>
+              </div>
+              <h3 className="font-headline font-bold text-lg mb-3">Honest Reviews</h3>
+              <p className="text-sm text-on-surface-variant leading-relaxed font-body">If a product doesn't work, we say it. No exceptions, no paid positive outcomes.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Expert Team: E-E-A-T Focus */}
+      <section className="py-24 px-6 bg-surface-container-low">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="font-headline text-4xl font-extrabold tracking-tight mb-12 text-center lg:text-left">The Board of Reviewers</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-left">
+            {/* Expert 1 */}
+            <div className="group">
+              <div className="relative mb-6 overflow-hidden rounded-2xl aspect-[4/5] bg-surface-container-high">
+                <img 
+                  alt="Dr. Elena Rossi" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDd0k47zRLKzz-qlYAg0GF3uaMXjah6Q5PWczJxTTvhg9sOjZ1Ca4Z3ULTFxXGSC6Y1wOFtQ094RXEKp2Jc9z82XSyClSY3aIWqGWWuhdQem_GzIGWTXpucvu5H5ByCU1Lx1lTze4vT7eWWtoA8FtGgFkolwRC5P1nZL_57XbSZZts4pKgpaLOq6aoyTDWVRMvo5OKgN-tFP3xzXRdEiNMvjS_gVqUPDosHw9t-zZpVLVzKry0yuBYPCPK-OpG2QuIcg6vlh53u5ypc"
+                />
+                <div className="absolute top-4 right-4 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg">
+                  <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span> MD, PhD
+                </div>
+              </div>
+              <h4 class="font-headline font-bold text-xl mb-1 text-on-surface">Dr. Elena Rossi</h4>
+              <p className="text-primary font-medium text-sm mb-3">Senior Medical Advisor</p>
+              <p className="text-sm text-on-surface-variant leading-relaxed font-body">Board-certified physician with 15 years in internal medicine. Specializes in supplement metabolic interactions.</p>
+            </div>
+            
+            {/* Expert 2 */}
+            <div className="group">
+              <div className="relative mb-6 overflow-hidden rounded-2xl aspect-[4/5] bg-surface-container-high">
+                <img 
+                  alt="Marcus Thorne" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTUMSApx3qjISDh4GK_nL99lWMtGRvXx8GWv6H9VXjB9lc_-BLTVoZm72QB0nPZDchway6UDfXVCfAzUmC7zywXtz8PgAwcRLH18pLbELtBOE-f8AA6-VqfewOrg23Y6oblup9jFiIRep5sTOReORwdRhsL8O3NCrBo9v9H284fUPi5CHo8E1gCr_dlMU3LLk-OHr31q7mlDgmXQtTTssfM5H7YBtkEJg3VFHguuZK2n729Ce3EgK4Aj1B-O4iEMMHMZlu6c2j3BBE"
+                />
+                <div className="absolute top-4 right-4 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg">
+                  <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span> RD, MSc
+                </div>
+              </div>
+              <h4 class="font-headline font-bold text-xl mb-1 text-on-surface">Marcus Thorne</h4>
+              <p className="text-primary font-medium text-sm mb-3">Clinical Nutritionist</p>
+              <p className="text-sm text-on-surface-variant leading-relaxed font-body">Registered Dietitian focused on evidence-based dietary intervention and bio-availability analysis.</p>
+            </div>
+            
+            {/* Expert 3 */}
+            <div className="group">
+              <div className="relative mb-6 overflow-hidden rounded-2xl aspect-[4/5] bg-surface-container-high">
+                <img 
+                  alt="Sarah Jenkins" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3Hb4Y9HfGq6waIa7GPR2MyD4QYdKZ6CqC7ckd4JrGlMmBNcLZaeZGsAHQMMXysVyXzhWKFQkg_r0K-kgB_CRXaAHtJfi9Lww-Eidij3-zDB4khC_AKrkG7Aj6zWvrUK2gDdeVn2-IMKkpWVNy85S7wZ8IxJDhExHH37fGpgj0gUUxyl-ysfDOezTLoCF_rTCJZa5LH8xLqLYe1-mZmHoKFdbKdi_OhDmIwTbIaSHvzhP93K1ae3q-01e5R72yhHgK92ZsQunnAEKQ"
+                />
+                <div className="absolute top-4 right-4 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg">
+                  <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span> CSCS
+                </div>
+              </div>
+              <h4 class="font-headline font-bold text-xl mb-1 text-on-surface">Sarah Jenkins</h4>
+              <p className="text-primary font-medium text-sm mb-3">Kinesiology Specialist</p>
+              <p className="text-sm text-on-surface-variant leading-relaxed font-body">Certified Strength & Conditioning Specialist evaluating health tech and fitness performance wearables.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How We Review: Step-by-Step UI */}
+      <section className="py-24 px-6 bg-surface">
+        <div className="max-w-7xl mx-auto text-left">
+          <div className="mb-16">
+            <h2 className="font-headline text-4xl font-extrabold tracking-tight mb-4">Our Review Protocol</h2>
+            <p className="text-on-surface-variant font-body">The clinical pathway every product travels before receiving our endorsement.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
+            {/* Desktop Connecting Line */}
+            <div className="hidden md:block absolute top-12 left-0 w-full h-[2px] bg-slate-200 -z-10"></div>
+            
+            {/* Step 1 */}
+            <div className="relative bg-surface p-6">
+              <div className="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold mb-6 shadow-lg shadow-primary/20">1</div>
+              <span className="material-symbols-outlined text-primary mb-4 text-3xl">manage_search</span>
+              <h4 className="font-headline font-bold text-lg mb-2">Research</h4>
+              <p className="text-sm text-on-surface-variant font-body">Deep dive into clinical studies, ingredient purity, and brand history.</p>
+            </div>
+            
+            {/* Step 2 */}
+            <div className="relative bg-surface p-6">
+              <div className="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold mb-6 shadow-lg shadow-primary/20">2</div>
+              <span className="material-symbols-outlined text-primary mb-4 text-3xl">biotech</span>
+              <h4 className="font-headline font-bold text-lg mb-2">Testing</h4>
+              <p className="text-sm text-on-surface-variant font-body">In-house testing for usability and verification of laboratory results.</p>
+            </div>
+            
+            {/* Step 3 */}
+            <div className="relative bg-surface p-6">
+              <div className="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold mb-6 shadow-lg shadow-primary/20">3</div>
+              <span className="material-symbols-outlined text-primary mb-4 text-3xl">compare_arrows</span>
+              <h4 className="font-headline font-bold text-lg mb-2">Comparison</h4>
+              <p className="text-sm text-on-surface-variant font-body">Benchmarking against industry standards and leading competitors.</p>
+            </div>
+            
+            {/* Step 4 */}
+            <div className="relative bg-surface p-6">
+              <div className="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold mb-6 shadow-lg shadow-primary/20">4</div>
+              <span className="material-symbols-outlined text-primary mb-4 text-3xl">gavel</span>
+              <h4 className="font-headline font-bold text-lg mb-2">Final Verdict</h4>
+              <p className="text-sm text-on-surface-variant font-body">A definitive rating based on efficacy, safety, and overall value.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust & Disclaimer */}
+      <section className="py-16 px-6 bg-surface-container-high/30 border-y border-outline-variant/10">
+        <div className="max-w-4xl mx-auto text-center">
+          <span className="material-symbols-outlined text-primary/40 text-5xl mb-6">shield_with_heart</span>
+          <h2 className="font-headline font-bold text-2xl mb-6 text-on-surface">Trust & Integrity</h2>
+          <div className="space-y-4 text-sm text-on-surface-variant italic leading-relaxed font-body">
+            <p><strong>Medical Disclaimer:</strong> The content on Editorial Health is for informational purposes only and does not constitute medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.</p>
+            <p><strong>Affiliate Disclosure:</strong> We may earn commissions from products purchased through our links. This does not influence our editorial integrity or product ratings. Our recommendations are solely based on clinical performance and expert analysis.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA SECTION */}
+      <section className="py-24 px-6 bg-surface">
+        <div className="max-w-5xl mx-auto bg-primary rounded-3xl p-12 lg:p-20 relative overflow-hidden text-center">
+          {/* Background Decoration */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-primary-container/30 rounded-full blur-3xl -mr-48 -mt-48"></div>
+          <div className="relative z-10">
+            <h2 className="font-headline text-4xl lg:text-5xl font-extrabold text-on-primary mb-6">Ready to choose with confidence?</h2>
+            <p className="text-on-primary-container text-lg mb-10 max-w-2xl mx-auto">Join 50,000+ readers who receive our clinical insights weekly.</p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <button onClick={() => navigate("/courses")} className="bg-surface-container-lowest text-primary px-8 py-4 rounded-xl font-headline font-bold text-lg shadow-xl hover:scale-105 transition-transform">
+                Explore Reviews
+              </button>
+              
+              <form onSubmit={handleSubscribe} className="flex w-full sm:w-auto max-w-md">
+                <input 
+                  className="flex-grow bg-primary-container/20 border-none text-on-primary placeholder:text-on-primary-container/60 rounded-l-xl px-6 py-4 focus:ring-2 focus:ring-white/50 text-sm outline-none" 
+                  placeholder="Enter your email" 
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <button type="submit" className="bg-secondary-container text-on-secondary-container px-6 py-4 rounded-r-xl font-headline font-bold hover:bg-secondary-fixed transition-colors">
+                  Subscribe
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
 }
 
 export default AboutUsPage;

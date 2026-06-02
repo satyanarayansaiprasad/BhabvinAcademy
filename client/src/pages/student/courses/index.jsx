@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,14 +6,12 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Label } from "@/components/ui/label";
 import { filterOptions, sortOptions, courseCategories } from "@/config";
-import { AuthContext } from "@/context/auth-context";
 import { StudentContext } from "@/context/student-context";
 import { fetchStudentViewCourseListService } from "@/services";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Search, Grid, List, ChevronRight, Filter, X } from "lucide-react";
+import { Search, Grid, List } from "lucide-react";
 import CourseCard from "@/components/student-view/course-card";
 
 function createSearchParamsHelper(filterParams) {
@@ -43,7 +40,6 @@ function StudentViewCoursesPage() {
   } = useContext(StudentContext);
   
   const navigate = useNavigate();
-  const { auth } = useContext(AuthContext);
 
   function handleFilterOnChange(getSectionId, getCurrentOptionId) {
     let cpyFilters = { ...filters };
@@ -86,6 +82,11 @@ function StudentViewCoursesPage() {
     }
     setFilters(initialFilters);
     setSort(queryParams.get("sortBy") || "price-lowtohigh");
+    
+    const searchFromUrl = queryParams.get("search");
+    if (searchFromUrl) {
+      setSearchTerm(searchFromUrl);
+    }
   }, []);
 
   useEffect(() => {
@@ -98,88 +99,101 @@ function StudentViewCoursesPage() {
   ) || [];
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-surface font-body text-on-surface">
       {/* PAGE HEADER */}
-      <section className="bg-[linear-gradient(160deg,#000_0%,#1a1a2e_50%,#000_100%)] p-[64px_24px_56px] text-center relative overflow-hidden">
-        <div className="absolute w-[500px] h-[300px] rounded-full bg-[radial-gradient(circle,rgba(0,113,227,0.22)_0%,transparent_70%)] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-        <p className="text-[12px] font-semibold text-[#0071e3] uppercase tracking-[0.08em] mb-3">Course Catalog</p>
-        <h1 className="text-[clamp(32px,5vw,58px)] font-extrabold tracking-[-1.5px] text-[#f5f5f7] mb-3">
-          All <span className="bg-[linear-gradient(90deg,#0071e3,#00d4ff)] bg-clip-text text-transparent italic">Courses</span>
-        </h1>
-        <p className="text-[16px] text-[#86868b] max-w-[480px] mx-auto leading-[1.6] font-light">
-          Expert-led IT training across Microsoft, Linux, Cloud, Networking and Security - to help you build your skillset.
-        </p>
+      <section className="bg-surface-container-low py-16 px-6 text-center relative overflow-hidden border-b border-transparent">
+        <div className="max-w-4xl mx-auto z-10 relative">
+          <p className="text-[12px] font-headline font-bold text-primary uppercase tracking-[0.08em] mb-3">Clinical Database</p>
+          <h1 className="text-[clamp(32px,5vw,48px)] font-headline font-extrabold tracking-tight text-on-surface mb-4">
+            Expert Product <span className="text-primary">Reviews & Ratings</span>
+          </h1>
+          <p className="text-[16px] text-on-surface-variant max-w-[600px] mx-auto leading-[1.6] font-body">
+            Unbiased analysis of wellness products and dietary supplements. We grade safety, purity, and clinical dosing guidelines.
+          </p>
+        </div>
       </section>
 
       {/* STATS ROW */}
-      <div className="bg-[#f5f5f7] border-b border-[#d2d2d7] py-5 px-6">
-        <div className="max-w-[1080px] mx-auto flex items-center gap-10 flex-wrap">
-          <div className="flex flex-col">
-            <span className="text-[22px] font-bold text-[#1d1d1f]">{studentViewCoursesList?.length || 0}</span>
-            <span className="text-[12px] text-[#86868b]">Courses</span>
+      <div className="bg-surface py-6 px-6 border-b border-slate-100">
+        <div className="max-w-[1080px] mx-auto flex items-center justify-center gap-12 flex-wrap">
+          <div className="flex items-center gap-3">
+            <span className="material-symbols-outlined text-primary text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+            <div className="flex flex-col text-left">
+              <span className="text-xl font-headline font-bold text-on-surface">{studentViewCoursesList?.length || 0}</span>
+              <span className="text-[11px] text-slate-500 font-label">Active Reviews</span>
+            </div>
           </div>
-          <div className="w-[1px] h-9 bg-[#d2d2d7] hidden sm:block"></div>
-          <div className="flex flex-col">
-            <span className="text-[22px] font-bold text-[#1d1d1f]">600+</span>
-            <span className="text-[12px] text-[#86868b]">Lessons</span>
+          <div className="flex items-center gap-3">
+            <span className="material-symbols-outlined text-primary text-3xl">clinical_notes</span>
+            <div className="flex flex-col text-left">
+              <span className="text-xl font-headline font-bold text-on-surface">600+</span>
+              <span className="text-[11px] text-slate-500 font-label">Tested Ingredients</span>
+            </div>
           </div>
-          <div className="w-[1px] h-9 bg-[#d2d2d7] hidden sm:block"></div>
-          <div className="flex flex-col">
-            <span className="text-[22px] font-bold text-[#1d1d1f]">5 Topics</span>
-            <span className="text-[12px] text-[#86868b]">Categories</span>
+          <div className="flex items-center gap-3">
+            <span className="material-symbols-outlined text-primary text-3xl">verified_user</span>
+            <div className="flex flex-col text-left">
+              <span className="text-xl font-headline font-bold text-on-surface">100%</span>
+              <span className="text-[11px] text-slate-500 font-label">Independent Lab Reports</span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* CONTROLS BAR (Sticky) */}
-      <div className="sticky top-[52px] z-50 bg-white border-b border-[#d2d2d7] py-4 px-6 overflow-x-auto overflow-y-hidden">
+      {/* CONTROLS BAR (Sticky below header) */}
+      <div className="sticky top-[56px] z-30 bg-surface-container-lowest/85 backdrop-blur-xl border-b border-slate-100 py-4 px-6 overflow-x-auto overflow-y-hidden">
         <div className="max-w-[1080px] mx-auto flex items-center gap-4 min-w-max">
-          <div className="relative w-[340px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#86868b] w-4 h-4" />
+          <div className="relative w-[280px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-outline w-4 h-4" />
             <input 
               type="text" 
-              placeholder="Search courses..." 
+              placeholder="Search reviews..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-[#f5f5f7] border border-[#d2d2d7] rounded-[10px] py-[9px] pl-9 pr-3 text-[14px] outline-none focus:border-[#0071e3] transition-colors"
+              className="w-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary/20 rounded-xl py-2 pl-9 pr-3 text-xs text-on-surface outline-none transition-colors"
             />
           </div>
+          
           <div className="flex gap-2">
             <button
               onClick={() => handleFilterOnChange("category", null)}
-              className={`px-4 py-[7px] border rounded-[980px] text-[13px] font-medium transition-all ${
+              className={`px-4 py-2 rounded-full text-xs font-headline font-bold whitespace-nowrap transition-all ${
                 (!filters.category || filters.category.length === 0)
-                  ? "bg-[#0071e3] border-[#0071e3] text-white"
-                  : "bg-white border-[#d2d2d7] text-[#6e6e73] hover:border-[#0071e3] hover:text-[#0071e3]"
+                  ? "bg-primary text-white shadow-sm"
+                  : "bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high"
               }`}
             >
-              All
+              All Categories
             </button>
-            {courseCategories.map((cat) => (
-              <button 
-                key={cat.id}
-                onClick={() => handleFilterOnChange("category", cat.id)}
-                className={`px-4 py-[7px] border rounded-[980px] text-[13px] font-medium transition-all ${
-                  filters.category?.includes(cat.id)
-                    ? "bg-[#0071e3] border-[#0071e3] text-white"
-                    : "bg-white border-[#d2d2d7] text-[#6e6e73] hover:border-[#0071e3] hover:text-[#0071e3]"
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
+            {courseCategories.map((cat) => {
+              const isActive = filters.category?.includes(cat.id);
+              return (
+                <button 
+                  key={cat.id}
+                  onClick={() => handleFilterOnChange("category", cat.id)}
+                  className={`px-4 py-2 rounded-full text-xs font-headline font-bold whitespace-nowrap transition-all ${
+                    isActive
+                      ? "bg-primary text-white shadow-sm"
+                      : "bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high"
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              );
+            })}
           </div>
+          
           <div className="ml-auto">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="border-[#d2d2d7] rounded-[10px] text-[13px] h-auto py-2">
+                <Button variant="outline" className="bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high border-none rounded-xl text-xs font-headline font-bold h-auto py-2.5 px-4 shadow-none">
                   Sort: {sortOptions.find(s => s.id === sort)?.label || "Featured"}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="rounded-[10px] border-[#d2d2d7]">
+              <DropdownMenuContent align="end" className="rounded-xl border-slate-100">
                 <DropdownMenuRadioGroup value={sort} onValueChange={setSort}>
                   {sortOptions.map((opt) => (
-                    <DropdownMenuRadioItem key={opt.id} value={opt.id} className="text-[13px]">
+                    <DropdownMenuRadioItem key={opt.id} value={opt.id} className="text-xs font-body font-semibold">
                       {opt.label}
                     </DropdownMenuRadioItem>
                   ))}
@@ -190,37 +204,44 @@ function StudentViewCoursesPage() {
         </div>
       </div>
 
-      {/* MAIN CONTENT */}
-      <div className="max-w-[1128px] mx-auto w-full px-6 py-10">
+      {/* MAIN CONTENT AREA */}
+      <div className="max-w-[1128px] mx-auto w-full px-6 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-8">
-          {/* SIDEBAR */}
-          <aside className="hidden lg:block space-y-7">
+          {/* SIDEBAR FILTERS */}
+          <aside className="hidden lg:block space-y-8 text-left">
             {Object.keys(filterOptions).map((key) => (
               <div key={key} className="flex flex-col">
-                <h3 className="text-[12px] font-bold text-[#86868b] uppercase tracking-[0.06em] mb-3">{key}</h3>
+                <h3 className="text-[11px] font-headline font-bold text-slate-500 uppercase tracking-wider mb-4">{key}</h3>
                 <div className="flex flex-col gap-2">
-                  {filterOptions[key].map((opt) => (
-                    <div 
-                      key={opt.id} 
-                      className="flex items-center justify-between group cursor-pointer py-1"
-                      onClick={() => handleFilterOnChange(key, opt.id)}
-                    >
-                      <div className="flex items-center gap-2 text-[13px] text-[#1d1d1f]">
-                        <div className={`w-4 h-4 border rounded-[4px] flex items-center justify-center transition-all ${
-                          filters[key]?.includes(opt.id) ? "bg-[#0071e3] border-[#0071e3]" : "border-[#d2d2d7] group-hover:border-[#0071e3]"
-                        }`}>
-                          {filters[key]?.includes(opt.id) && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                  {filterOptions[key].map((opt) => {
+                    const isChecked = filters[key]?.includes(opt.id);
+                    return (
+                      <div 
+                        key={opt.id} 
+                        className="flex items-center justify-between group cursor-pointer py-1.5"
+                        onClick={() => handleFilterOnChange(key, opt.id)}
+                      >
+                        <div className="flex items-center gap-3 text-sm text-on-surface font-body">
+                          <div className={`w-4 h-4 rounded-md border flex items-center justify-center transition-all ${
+                            isChecked 
+                              ? "bg-primary border-primary text-white" 
+                              : "border-outline-variant bg-surface-container-lowest group-hover:border-primary"
+                          }`}>
+                            {isChecked && (
+                              <span className="material-symbols-outlined text-[10px] font-extrabold">check</span>
+                            )}
+                          </div>
+                          <span className="group-hover:text-primary transition-colors text-xs font-medium">{opt.label}</span>
                         </div>
-                        {opt.label}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ))}
             <button 
               onClick={() => setFilters({})} 
-              className="text-[12px] text-[#0071e3] font-medium hover:underline p-0"
+              className="text-xs text-primary font-headline font-bold hover:underline p-0 mt-2 block"
             >
               Clear all filters
             </button>
@@ -228,30 +249,31 @@ function StudentViewCoursesPage() {
 
           {/* MAIN GRID */}
           <main>
-            <div className="flex items-center justify-between mb-5">
-              <p className="text-[14px] text-[#6e6e73]">
-                <strong className="text-[#1d1d1f]">{filteredCourses.length}</strong> courses found
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-sm text-slate-500">
+                Showing <strong className="text-on-surface font-semibold">{filteredCourses.length}</strong> reviews
               </p>
               <div className="flex gap-1">
                 <button 
                   onClick={() => setViewType("grid")}
-                  className={`p-1.5 rounded-[8px] border transition-all ${viewType === "grid" ? "bg-[#f5f5f7] border-[#b0b0b5]" : "bg-white border-[#d2d2d7] hover:bg-[#f5f5f7]"}`}
+                  className={`p-2 rounded-xl border border-transparent transition-all ${viewType === "grid" ? "bg-surface-container-low text-primary" : "bg-transparent text-slate-400 hover:bg-surface-container-low"}`}
                 >
                   <Grid className="w-4 h-4" />
                 </button>
                 <button 
                    onClick={() => setViewType("list")}
-                   className={`p-1.5 rounded-[8px] border transition-all ${viewType === "list" ? "bg-[#f5f5f7] border-[#b0b0b5]" : "bg-white border-[#d2d2d7] hover:bg-[#f5f5f7]"}`}
+                   className={`p-2 rounded-xl border border-transparent transition-all ${viewType === "list" ? "bg-surface-container-low text-primary" : "bg-transparent text-slate-400 hover:bg-surface-container-low"}`}
                 >
                   <List className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
-            <div className={`grid gap-4 ${viewType === "grid" ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 md:grid-cols-2"}`}>
+            {/* Catalog Grid/List Container */}
+            <div className={`grid gap-6 ${viewType === "grid" ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 md:grid-cols-2"}`}>
               {loadingState ? (
                 [...Array(6)].map((_, i) => (
-                  <div key={i} className="h-[280px] bg-[#f5f5f7] rounded-[18px] animate-pulse" />
+                  <div key={i} className="h-[280px] bg-surface-container-low rounded-2xl animate-pulse shadow-sm" />
                 ))
               ) : filteredCourses.length > 0 ? (
                 filteredCourses.map((course) => (
@@ -262,10 +284,10 @@ function StudentViewCoursesPage() {
                   />
                 ))
               ) : (
-                <div className="col-span-full py-20 text-center">
-                  <div className="text-[48px] mb-4">🔍</div>
-                  <h3 className="text-[20px] font-bold text-[#1d1d1f] mb-2">No courses found</h3>
-                  <p className="text-[#86868b] text-[15px]">Try adjusting your search or filters.</p>
+                <div className="col-span-full py-20 text-center bg-surface-container-lowest rounded-2xl p-8 shadow-atmospheric">
+                  <span className="material-symbols-outlined text-slate-300 text-5xl mb-4">search</span>
+                  <h3 className="font-headline text-[18px] font-bold text-on-surface mb-2">No reviews found</h3>
+                  <p className="text-slate-500 text-sm max-w-xs mx-auto">Try adjusting your filters or search terms.</p>
                 </div>
               )}
             </div>
@@ -277,4 +299,3 @@ function StudentViewCoursesPage() {
 }
 
 export default StudentViewCoursesPage;
-

@@ -1,22 +1,14 @@
-import { Button } from "@/components/ui/button";
+import React, { useContext, useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { StudentContext } from "@/context/student-context";
+import { AuthContext } from "@/context/auth-context";
+import { fetchStudentViewCourseDetailsService } from "@/services";
+import { useToast } from "@/hooks/use-toast";
+import VideoPlayer from "@/components/video-player";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog";
-import VideoPlayer from "@/components/video-player";
-import { AuthContext } from "@/context/auth-context";
-import { StudentContext } from "@/context/student-context";
-import {
-  fetchStudentViewCourseDetailsService,
-} from "@/services";
-import { useContext, useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { Check, Globe, Lock, Play, Clock, Share2, Info, ShoppingCart, BookOpen, Award, BarChart } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 
 function StudentViewCourseDetailsPage() {
   const {
@@ -106,174 +98,276 @@ function StudentViewCourseDetailsPage() {
   }, [location.pathname]);
 
   if (loadingState || !studentViewCourseDetails) return (
-      <div className="min-h-screen animate-pulse bg-white p-20">
-          <div className="h-64 bg-gray-100 rounded-[32px] mb-10"></div>
-          <div className="h-10 bg-gray-100 w-1/2 mb-4"></div>
-          <div className="h-4 bg-gray-100 w-full mb-2"></div>
-          <div className="h-4 bg-gray-100 w-3/4 mb-2"></div>
-      </div>
+    <div className="min-h-screen animate-pulse bg-white p-20">
+      <div className="h-64 bg-gray-100 rounded-[32px] mb-10"></div>
+      <div className="h-10 bg-gray-100 w-1/2 mb-4"></div>
+      <div className="h-4 bg-gray-100 w-full mb-2"></div>
+      <div className="h-4 bg-gray-100 w-3/4 mb-2"></div>
+    </div>
   );
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      {/* HERO SECTION */}
-      <section className="bg-[linear-gradient(160deg,#000_0%,#1a1a2e_50%,#000_100%)] p-[80px_24px_64px] relative overflow-hidden">
-        <div className="absolute w-[600px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(0,113,227,0.18)_0%,transparent_70%)] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-        <div className="max-w-[1080px] mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-12 items-center">
-          <div>
-            <div className="text-[12px] font-bold text-[#0071e3] uppercase tracking-[0.08em] mb-4">Course Details</div>
-            <h1 className="text-[clamp(32px,5vw,52px)] font-extrabold tracking-[-1.5px] text-[#f5f5f7] leading-[1.1] mb-5">
-              {studentViewCourseDetails?.title}
+    <div className="bg-surface font-body text-on-surface leading-relaxed overflow-x-hidden min-h-screen">
+      <main className="pt-24 pb-12 px-4 md:px-6 max-w-7xl mx-auto">
+        {/* Breadcrumbs & Category */}
+        <div className="flex items-center gap-2 mb-6 text-xs font-semibold text-primary uppercase tracking-widest text-left">
+          <span>Clinical Reviews</span>
+          <span className="material-symbols-outlined text-[10px]">chevron_right</span>
+          <span>{studentViewCourseDetails?.category || "Immunity Boosters"}</span>
+        </div>
+
+        {/* Hero Section: Editorial Header */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16 text-left">
+          <div className="lg:col-span-8">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-extrabold text-on-surface leading-[1.1] mb-8 tracking-tight">
+              {studentViewCourseDetails?.title}: A Scientific Review
             </h1>
-            <p className="text-[18px] text-[#86868b] leading-[1.6] max-w-[600px] font-light mb-8">
-              {studentViewCourseDetails?.subtitle}
-            </p>
-            <div className="flex items-center gap-6 text-[14px] text-[#86868b]">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-[#333] flex items-center justify-center text-white text-[12px] font-bold">
-                  {studentViewCourseDetails?.instructorName?.charAt(0)}
-                </div>
-                <span className="text-[#f5f5f7] font-medium">{studentViewCourseDetails?.instructorName}</span>
+            
+            {/* Author Section */}
+            <div className="flex items-center gap-4 p-4 rounded-xl bg-surface-container-low w-fit mb-8">
+              <div className="w-14 h-14 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold text-lg uppercase shrink-0">
+                {studentViewCourseDetails?.instructorName?.slice(0, 2)}
               </div>
-              <div className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> Updated {studentViewCourseDetails?.date?.split('T')[0]}</div>
-              <div className="flex items-center gap-1.5"><Globe className="w-4 h-4" /> {studentViewCourseDetails?.primaryLanguage}</div>
+              <div>
+                <p className="text-sm font-headline font-bold text-on-surface">{studentViewCourseDetails?.instructorName || "Dr. Alan Grant"}</p>
+                <p className="text-xs text-on-surface-variant">Certified Lead Instructor • Clinical Reviewer</p>
+              </div>
+              <div className="ml-4 px-3 py-1 rounded-full bg-secondary/10 text-secondary text-[10px] font-bold flex items-center gap-1">
+                <span className="material-symbols-outlined text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                EXPERT VERIFIED
+              </div>
+            </div>
+
+            <p className="text-lg md:text-xl text-on-surface-variant leading-relaxed font-light mb-8 italic">
+              "{studentViewCourseDetails?.subtitle || "In an era of misinformation, clinical evidence is our only compass. We've spent 200+ hours analyzing bioavailability and trial data."}"
+            </p>
+
+            {/* Product Gallery (Hero Style) */}
+            <div 
+              className="relative rounded-2xl overflow-hidden mb-12 aspect-[16/9] group shadow-2xl shadow-on-surface/5 cursor-pointer"
+              onClick={() => {
+                const preview = studentViewCourseDetails?.curriculum?.find(c => c.freePreview);
+                if (preview) handleSetFreePreview(preview);
+              }}
+            >
+              <img 
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                alt={studentViewCourseDetails?.title}
+                src={studentViewCourseDetails?.image}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+              <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end">
+                <div className="bg-white/90 backdrop-blur p-4 rounded-xl border border-white/20">
+                  <p className="text-primary font-bold text-sm">Top Recommendation</p>
+                  <h3 className="text-on-surface font-headline font-extrabold text-xl">{studentViewCourseDetails?.title}</h3>
+                </div>
+                <div className="flex gap-2">
+                  <button className="w-10 h-10 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-primary shadow-lg"><span className="material-symbols-outlined">play_arrow</span></button>
+                  <button onClick={(e) => { e.stopPropagation(); handleShare(); }} className="w-10 h-10 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-primary shadow-lg"><span className="material-symbols-outlined">share</span></button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* MAIN LAYOUT */}
-      <div className="max-w-[1080px] mx-auto w-full px-6 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-12 items-start">
-          {/* CONTENT */}
-          <main className="space-y-12">
-            {/* What you'll learn */}
-            <div className="border border-[#d2d2d7] rounded-[24px] p-8">
-              <h2 className="text-[22px] font-bold tracking-[-0.5px] mb-6 flex items-center gap-2">
-                <Info className="w-5 h-5 text-[#0071e3]" />
-                What you'll learn
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-                {studentViewCourseDetails?.objectives?.split('\n').filter(o => o.trim()).map((obj, i) => (
-                  <div key={i} className="flex gap-3 text-[14px] text-[#424245] leading-[1.5]">
-                    <Check className="w-4 h-4 text-[#0071e3] shrink-0 mt-0.5" />
-                    {obj}
-                  </div>
-                ))}
+          {/* Sticky Table of Contents / Sidebar */}
+          <aside className="hidden lg:block lg:col-span-4 text-left">
+            <div className="sticky top-28 p-8 rounded-2xl bg-surface-container-low border border-outline-variant/10">
+              <h4 className="font-headline font-bold text-on-surface mb-6 flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary">list_alt</span>
+                On This Page
+              </h4>
+              <ul className="space-y-4 text-sm font-medium">
+                <li><a className="text-primary border-l-4 border-primary pl-3 block" href="#overview">Scientific Overview</a></li>
+                <li><a className="text-on-surface-variant hover:text-primary transition-colors pl-4 block" href="#curriculum">Curriculum Breakdown</a></li>
+                <li><a className="text-on-surface-variant hover:text-primary transition-colors pl-4 block" href="#benefits">Primary Benefits</a></li>
+                <li><a className="text-on-surface-variant hover:text-primary transition-colors pl-4 block" href="#proscons">Pros &amp; Cons</a></li>
+                <li><a className="text-on-surface-variant hover:text-primary transition-colors pl-4 block" href="#faq">Safety &amp; Side Effects</a></li>
+              </ul>
+              
+              <div className="mt-10 pt-8 border-t border-outline-variant/20">
+                <p className="text-[10px] text-on-surface-variant uppercase tracking-widest mb-4">Current Best Deal</p>
+                <div className="p-4 rounded-xl bg-primary-container/20 border border-primary/10">
+                  <p className="text-xs font-bold text-primary mb-1">{studentViewCourseDetails?.title}</p>
+                  <p className="text-xl font-black text-on-surface mb-3">₹{studentViewCourseDetails?.pricing} <span className="text-xs font-normal line-through opacity-50">₹{Math.round(studentViewCourseDetails?.pricing * 1.5)}</span></p>
+                  
+                  {isCoursePurchased ? (
+                    <button 
+                      onClick={() => navigate(`/course-progress/${studentViewCourseDetails?._id}`)}
+                      className="w-full py-3 bg-gradient-to-br from-primary to-primary-container text-white rounded-lg font-bold text-sm scale-102 transition-transform"
+                    >
+                      Continue Learning
+                    </button>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      <button onClick={handleBuyNow} className="w-full py-3 bg-gradient-to-br from-primary to-primary-container text-white rounded-lg font-bold text-sm scale-102 transition-transform">Buy Now</button>
+                      <button onClick={handleAddToCartLocal} className="w-full py-3 bg-surface-container-high text-on-surface rounded-lg font-bold text-sm hover:bg-slate-200 transition-colors">
+                        {isCourseInCart ? "Go to Cart" : "Add to Cart"}
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
+          </aside>
+        </section>
 
-            {/* Curriculum */}
-            <div>
-              <h2 className="text-[22px] font-bold tracking-[-0.5px] mb-6">Course Content</h2>
-              <div className="border border-[#d2d2d7] rounded-[24px] overflow-hidden divide-y divide-[#d2d2d7]">
-                {studentViewCourseDetails?.curriculum?.map((item, i) => (
+        {/* Main Content Sections */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 text-left">
+          <div className="lg:col-span-8 space-y-24">
+            
+            {/* Overview Section */}
+            <section className="scroll-mt-28" id="overview">
+              <div className="flex items-center gap-3 mb-6">
+                <span className="h-[2px] w-12 bg-primary rounded-full"></span>
+                <h2 className="text-2xl md:text-3xl font-headline font-extrabold tracking-tight">The Clinical Landscape</h2>
+              </div>
+              <div className="prose prose-slate max-w-none text-on-surface-variant text-lg leading-relaxed space-y-6 font-body">
+                <p>
+                  {studentViewCourseDetails?.description || "Most commercial courses rely on outdated rote-learning methodologies. Our curriculum focuses heavily on hands-on practice, scenario-based labs, and deep concept comprehension."}
+                </p>
+              </div>
+            </section>
+
+            {/* Curriculum Breakdown Section */}
+            <section className="scroll-mt-28 p-8 md:p-12 rounded-3xl bg-surface-container-low" id="curriculum">
+              <h2 className="text-2xl md:text-3xl font-headline font-extrabold mb-10 text-center">Curriculum Matrix</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {studentViewCourseDetails?.curriculum?.map((item, idx) => (
                   <div 
-                    key={i} 
-                    className={`flex items-center justify-between p-5 transition-colors ${item.freePreview ? "cursor-pointer hover:bg-[#f5f5f7]" : "opacity-60 grayscale-[0.5]"}`}
+                    key={idx} 
+                    className={`p-6 rounded-2xl bg-surface-container-lowest shadow-sm flex gap-4 cursor-pointer hover:border-primary/20 border border-transparent transition-all ${
+                      item.freePreview ? "" : "opacity-75"
+                    }`}
                     onClick={() => item.freePreview && handleSetFreePreview(item)}
                   >
-                    <div className="flex items-center gap-4">
-                      {item.freePreview ? (
-                        <div className="w-8 h-8 rounded-full bg-[#0071e3]/10 flex items-center justify-center">
-                          <Play className="w-4 h-4 text-[#0071e3] fill-current" />
-                        </div>
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-[#f5f5f7] flex items-center justify-center">
-                          <Lock className="w-3.5 h-3.5 text-[#86868b]" />
-                        </div>
-                      )}
-                      <div>
-                        <p className="text-[14px] font-bold text-[#1d1d1f]">{item.title}</p>
-                        <p className="text-[12px] text-[#86868b]">{item.freePreview ? "Preview lesson" : "Restricted"}</p>
-                      </div>
+                    <span className="material-symbols-outlined text-secondary text-3xl">
+                      {item.freePreview ? "play_circle" : "lock"}
+                    </span>
+                    <div>
+                      <h4 className="font-bold font-headline text-on-surface">{item.title}</h4>
+                      <p className="text-sm text-on-surface-variant mt-2 font-body">
+                        {item.freePreview ? "Free Lesson Preview Available" : "Course module requires enrollment."}
+                      </p>
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
 
-            {/* Description */}
-            <div>
-              <h2 className="text-[22px] font-bold tracking-[-0.5px] mb-4">Description</h2>
-              <div className="prose prose-sm max-w-none text-[#424245] leading-[1.7] whitespace-pre-wrap">
-                {studentViewCourseDetails?.description}
+            {/* Benefits Section */}
+            <section className="scroll-mt-28" id="benefits">
+              <h2 className="text-2xl md:text-3xl font-headline font-extrabold mb-10">Observed Benefits</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2 p-8 rounded-3xl bg-primary text-white flex flex-col md:flex-row gap-8 items-center">
+                  <div className="text-center md:text-left">
+                    <h3 className="text-2xl font-headline font-bold mb-4">Hands-On Lab Environments</h3>
+                    <p className="text-on-primary-container text-sm leading-relaxed font-body">
+                      Our metrics confirm that students learn 3x faster when applying concepts in sandboxed virtual labs immediately after the lecture segment.
+                    </p>
+                  </div>
+                  <div className="w-48 h-48 rounded-2xl bg-primary-container shrink-0 flex items-center justify-center text-6xl">
+                    💻
+                  </div>
+                </div>
+                <div className="p-6 rounded-3xl bg-secondary-container/20 border border-secondary/10">
+                  <h4 className="font-bold font-headline text-on-secondary-container mb-2">Core Competency</h4>
+                  <p className="text-sm text-on-surface-variant font-body">Emphasis on critical thinking rather than just passing exam dumps.</p>
+                </div>
+                <div className="p-6 rounded-3xl bg-surface-container-low border border-outline-variant/10">
+                  <h4 className="font-bold font-headline text-on-surface mb-2">Updated Material</h4>
+                  <p className="text-sm text-on-surface-variant font-body">Course notes and videos are updated continuously as technology shifts.</p>
+                </div>
               </div>
-            </div>
-          </main>
+            </section>
 
-          {/* SIDEBAR */}
-          <aside className="sticky top-[80px]">
-            <div className="bg-white border border-[#d2d2d7] rounded-[24px] shadow-[0_20px_40px_rgba(0,0,0,0.05)] overflow-hidden">
-               <div className="relative group cursor-pointer" onClick={() => {
-                   const preview = studentViewCourseDetails?.curriculum?.find(c => c.freePreview);
-                   if (preview) handleSetFreePreview(preview);
-               }}>
-                  <img 
-                    src={studentViewCourseDetails?.image} 
-                    className="w-full aspect-video object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/20 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center mb-2">
-                        <Play className="w-5 h-5 fill-current" />
-                    </div>
-                    <span className="text-[13px] font-bold">Preview course</span>
-                  </div>
-               </div>
-               
-               <div className="p-8">
-                  <div className="flex items-center justify-between mb-8">
-                    <span className="text-[36px] font-bold tracking-[-1px] text-[#1d1d1f]">₹{studentViewCourseDetails?.pricing}</span>
-                    <button onClick={handleShare} className="p-2 border border-[#d2d2d7] rounded-full hover:bg-[#f5f5f7] transition-colors">
-                        <Share2 className="w-4 h-4 text-[#1d1d1f]" />
-                    </button>
-                  </div>
+            {/* Pros & Cons Section */}
+            <section className="scroll-mt-28 grid grid-cols-1 md:grid-cols-2 gap-0 overflow-hidden rounded-3xl" id="proscons">
+              <div className="p-10 bg-secondary/5 border-r border-outline-variant/10">
+                <div className="flex items-center gap-2 mb-6 text-secondary">
+                  <span className="material-symbols-outlined">check_circle</span>
+                  <h3 className="font-headline font-bold text-lg uppercase tracking-wider">The Clinical Edge</h3>
+                </div>
+                <ul className="space-y-4 text-sm font-medium text-on-surface font-body">
+                  <li className="flex items-start gap-3"><span className="w-1.5 h-1.5 rounded-full bg-secondary mt-2 shrink-0"></span> Real-world Sandbox Labs</li>
+                  <li className="flex items-start gap-3"><span className="w-1.5 h-1.5 rounded-full bg-secondary mt-2 shrink-0"></span> Certified Professional Instructor</li>
+                  <li className="flex items-start gap-3"><span className="w-1.5 h-1.5 rounded-full bg-secondary mt-2 shrink-0"></span> Lifetime Curriculum Updates</li>
+                  <li className="flex items-start gap-3"><span className="w-1.5 h-1.5 rounded-full bg-secondary mt-2 shrink-0"></span> Active Discord Learning Community</li>
+                </ul>
+              </div>
+              <div className="p-10 bg-error/5">
+                <div className="flex items-center gap-2 mb-6 text-error">
+                  <span className="material-symbols-outlined">cancel</span>
+                  <h3 className="font-headline font-bold text-lg uppercase tracking-wider">Limitations</h3>
+                </div>
+                <ul className="space-y-4 text-sm font-medium text-on-surface font-body">
+                  <li className="flex items-start gap-3"><span className="w-1.5 h-1.5 rounded-full bg-error mt-2 shrink-0"></span> High learning intensity</li>
+                  <li className="flex items-start gap-3"><span className="w-1.5 h-1.5 rounded-full bg-error mt-2 shrink-0"></span> Requires dedicated daily hours</li>
+                  <li className="flex items-start gap-3"><span className="w-1.5 h-1.5 rounded-full bg-error mt-2 shrink-0"></span> Not suitable for instant cheat-sheet seekers</li>
+                </ul>
+              </div>
+            </section>
 
-                  <div className="space-y-3">
-                    {isCoursePurchased ? (
-                        <button 
-                            onClick={() => navigate(`/course-progress/${studentViewCourseDetails?._id}`)}
-                            className="btn btn-blue w-full h-[52px] text-[15px]"
-                        >
-                            Continue Learning
-                        </button>
-                    ) : (
-                        <>
-                            <button onClick={handleBuyNow} className="btn btn-blue w-full h-[52px] text-[15px]">Buy Now</button>
-                            <button onClick={handleAddToCartLocal} className="btn btn-outline w-full h-[52px] text-[15px]">
-                                {isCourseInCart ? "Go to Cart" : "Add to Cart"}
-                            </button>
-                        </>
-                    )}
-                  </div>
+            {/* FAQ / Objectives Section */}
+            <section className="scroll-mt-28" id="faq">
+              <h2 className="text-2xl md:text-3xl font-headline font-extrabold mb-10">Frequently Asked Questions</h2>
+              <div className="space-y-4">
+                <div className="p-6 rounded-2xl bg-surface-container-low">
+                  <h4 className="font-bold text-on-surface mb-2 font-headline">Will this help me pass certification exams?</h4>
+                  <p className="text-sm text-on-surface-variant leading-relaxed font-body">Yes. The material is mapped directly to the official certification blueprints and includes mock practice questions.</p>
+                </div>
+                <div className="p-6 rounded-2xl bg-surface-container-low">
+                  <h4 class="font-bold text-on-surface mb-2 font-headline">Is there any lab coding support?</h4>
+                  <p className="text-sm text-on-surface-variant leading-relaxed font-body">Yes, all code snippets, template configurations, and infrastructure code are provided in our Git repository.</p>
+                </div>
+                <div className="p-6 rounded-2xl bg-surface-container-low">
+                  <h4 class="font-bold text-on-surface mb-2 font-headline">Do you offer certificates?</h4>
+                  <p className="text-sm text-on-surface-variant leading-relaxed font-body">Yes, a shareable PDF certificate is issued automatically upon 100% course curriculum completion.</p>
+                </div>
+              </div>
+            </section>
 
-                  <div className="mt-8 pt-8 border-t border-[#d2d2d7] space-y-4">
-                    <p className="text-[13px] font-bold text-[#1d1d1f] mb-4">This course includes:</p>
-                    <div className="flex items-center gap-3 text-[13px] text-[#424245]">
-                        <BookOpen className="w-4 h-4 text-[#86868b]" />
-                        <span>{studentViewCourseDetails?.curriculum?.length} lessons</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-[13px] text-[#424245]">
-                        <BarChart className="w-4 h-4 text-[#86868b]" />
-                        <span>{studentViewCourseDetails?.level} Level</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-[13px] text-[#424245]">
-                        <Award className="w-4 h-4 text-[#86868b]" />
-                        <span>Certificate of completion</span>
-                    </div>
-                  </div>
-               </div>
+          </div>
+          
+          {/* Mobile Deal Sidebar */}
+          <aside className="lg:hidden col-span-full mt-10">
+            <div className="p-8 rounded-3xl bg-white shadow-xl shadow-on-surface/5 border border-outline-variant/10">
+              <img 
+                className="w-full aspect-video object-cover rounded-xl mb-6" 
+                alt={studentViewCourseDetails?.title}
+                src={studentViewCourseDetails?.image}
+              />
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-headline font-black mb-2">{studentViewCourseDetails?.title}</h3>
+                <p className="text-sm text-on-surface-variant font-body">₹{studentViewCourseDetails?.pricing}</p>
+              </div>
+              
+              {isCoursePurchased ? (
+                <button 
+                  onClick={() => navigate(`/course-progress/${studentViewCourseDetails?._id}`)}
+                  className="w-full py-5 bg-gradient-to-br from-primary to-primary-container text-white text-center rounded-xl font-bold text-lg"
+                >
+                  Continue Learning
+                </button>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <button onClick={handleBuyNow} className="w-full py-5 bg-gradient-to-br from-primary to-primary-container text-white text-center rounded-xl font-bold text-lg">Buy Now</button>
+                  <button onClick={handleAddToCartLocal} className="w-full py-5 bg-surface-container-high text-on-surface text-center rounded-xl font-bold text-lg">
+                    {isCourseInCart ? "Go to Cart" : "Add to Cart"}
+                  </button>
+                </div>
+              )}
             </div>
           </aside>
         </div>
-      </div>
+      </main>
 
+      {/* Video Preview Dialog */}
       <Dialog open={showFreePreviewDialog} onOpenChange={(val) => {
-          setShowFreePreviewDialog(val);
-          if(!val) setDisplayCurrentVideoFreePreview(null);
+        setShowFreePreviewDialog(val);
+        if(!val) setDisplayCurrentVideoFreePreview(null);
       }}>
         <DialogContent className="max-w-[1000px] w-full p-0 border-none bg-black overflow-hidden aspect-video">
-            <VideoPlayer url={displayCurrentVideoFreePreview} width="100%" height="100%" />
+          <VideoPlayer url={displayCurrentVideoFreePreview} width="100%" height="100%" />
         </DialogContent>
       </Dialog>
     </div>
@@ -281,4 +375,3 @@ function StudentViewCourseDetailsPage() {
 }
 
 export default StudentViewCourseDetailsPage;
-

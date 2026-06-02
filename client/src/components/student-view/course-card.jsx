@@ -6,33 +6,45 @@ function CourseCard({ course, onClick }) {
 
   return (
     <div 
-      className="card-base cursor-pointer group flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-black/5 hover:shadow-2xl hover:border-[#0071e3]/30 transition-all duration-300"
+      className="bg-surface-container-lowest rounded-3xl overflow-hidden group hover:-translate-y-2 transition-all duration-300 shadow-atmospheric cursor-pointer flex flex-col h-full border border-transparent"
       onClick={() => onClick && onClick(course?._id)}
     >
-      <div className="h-[160px] relative overflow-hidden bg-[#f5f5f7] shrink-0">
+      <div className="relative aspect-square overflow-hidden bg-surface-container-high shrink-0">
         <img 
           src={imageUrl} 
           alt={course?.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
-      </div>
-      <div className="p-[20px] flex flex-col flex-1">
-        <div className="text-[11px] font-bold uppercase tracking-[0.06em] text-[#0071e3] mb-[6px]">
-          {course?.category}
-        </div>
-        <div className="text-[17px] font-bold text-[#1d1d1f] mb-[6px] leading-[1.3] group-hover:text-[#0071e3] transition-colors line-clamp-2 min-h-[44px]">
-          {course?.title}
-        </div>
-        <div className="text-[13px] text-[#86868b] flex gap-[12px] mt-auto">
-          <span>{course?.curriculum?.length || 0} lessons</span>
-          <span>·</span>
-          <span>{course?.duration || '0'} hrs</span>
-        </div>
-        <div className="inline-block self-start px-[10px] py-[2px] rounded-[980px] text-[11px] font-bold bg-[#e8f1fb] text-[#0071e3] mt-[10px]">
+        <div className="absolute top-4 left-4 bg-secondary text-on-secondary px-3 py-1 rounded-full text-[10px] font-bold shadow-md uppercase tracking-wider">
           {course?.level || 'All Levels'}
         </div>
+      </div>
+      <div className="p-6 flex flex-col flex-grow">
+        {/* Rating */}
+        <div className="flex items-center gap-1 mb-3 text-yellow-500">
+          <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+          <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+          <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+          <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+          <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star_half</span>
+          <span className="text-xs font-bold text-on-surface-variant ml-1">4.8</span>
+        </div>
+        
+        {/* Title */}
+        <h3 className="text-lg font-bold font-headline mb-2 text-on-surface group-hover:text-primary transition-colors line-clamp-2">
+          {course?.title}
+        </h3>
+        
+        {/* Description */}
+        <p className="text-xs text-on-surface-variant mb-6 font-body">
+          {course?.category} • {course?.curriculum?.length || 0} lessons • {course?.duration || 0} hrs
+        </p>
+
+        {/* Button */}
+        <button className="w-full mt-auto py-3 bg-surface-container-high text-on-primary-fixed-variant font-bold rounded-xl text-sm group-hover:bg-primary group-hover:text-on-primary transition-colors duration-200">
+          Read Review
+        </button>
       </div>
     </div>
   );
