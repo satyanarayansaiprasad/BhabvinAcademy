@@ -154,8 +154,6 @@ function StudentExamPage() {
                     </div>
                     <ul className="hidden md:flex gap-5 list-none text-left">
                         <li><Link to="/courses" className="text-[13px] text-[#f5f5f7]/60 no-underline hover:text-[#f5f5f7] transition-all">Courses</Link></li>
-                        <li><Link to="/courses" className="text-[13px] text-[#f5f5f7]/60 no-underline hover:text-[#f5f5f7] transition-all">Paths</Link></li>
-                        <li><Link to="/about" className="text-[13px] text-[#f5f5f7]/60 no-underline hover:text-[#f5f5f7] transition-all">Instructor</Link></li>
                         <li><Link to="/blog" className="text-[13px] text-[#f5f5f7]/60 no-underline hover:text-[#f5f5f7] transition-all">Blog</Link></li>
                         <li><Link to="/about" className="text-[13px] text-[#f5f5f7]/60 no-underline hover:text-[#f5f5f7] transition-all">About</Link></li>
                         <li><Link to="/contact" className="text-[13px] text-[#f5f5f7]/60 no-underline hover:text-[#f5f5f7] transition-all">Contact</Link></li>

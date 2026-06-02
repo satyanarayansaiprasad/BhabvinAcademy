@@ -21,26 +21,11 @@ function RouteGuard({ authenticated, user, element, isLoading }) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  if (
-    authenticated &&
-    user?.role !== "instructor" &&
-    user?.role !== "sub-admin" &&
-    (location.pathname.includes("instructor") ||
-      location.pathname.includes("/auth"))
-  ) {
+  if (authenticated && location.pathname.includes("/auth")) {
     const redirectPath = location.state?.from
       ? (location.state.from.pathname + (location.state.from.search || ""))
       : "/home";
     return <Navigate to={redirectPath} replace />;
-  }
-
-  if (
-    authenticated &&
-    (user?.role === "instructor" || user?.role === "sub-admin") &&
-    !location.pathname.includes("instructor") &&
-    !location.pathname.includes("profile")
-  ) {
-    return <Navigate to="/instructor" />;
   }
 
   return <Fragment>{element}</Fragment>;

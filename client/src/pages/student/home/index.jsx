@@ -42,9 +42,6 @@ function StudentHomePage() {
           <button onClick={() => navigate('/courses')} className="bg-[#0071e3] text-white py-[14px] px-[28px] rounded-[980px] text-[16px] font-medium hover:bg-[#0077ed] transition-colors">
             Explore Courses
           </button>
-          <button onClick={() => navigate('/courses')} className="bg-transparent text-[#f5f5f7] border border-[#f5f5f7]/30 py-[14px] px-[28px] rounded-[980px] text-[16px] font-medium hover:border-[#f5f5f7] transition-colors">
-            View All Paths →
-          </button>
         </div>
       </section>
 
@@ -175,66 +172,6 @@ function StudentHomePage() {
                 <div key={i} className="h-[300px] bg-white rounded-[18px] animate-pulse" />
               ))
             )}
-          </div>
-        </div>
-      </section>
-
-      {/* LEARNING PATHS */}
-      <section id="paths" className="bg-white py-[80px] px-6 border-t border-[#d2d2d7]/30">
-        <div className="max-w-[1080px] mx-auto">
-          <p className="text-[13px] font-semibold text-[#0071e3] uppercase tracking-[0.06em] mb-[10px]">Learning Paths</p>
-          <h2 className="text-[36px] font-bold tracking-[-1px] text-[#1d1d1f] mb-[32px]">Your roadmap to certification.</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-[16px]">
-            
-            {/* Path 1 */}
-            <div onClick={() => navigate('/courses')} className="border border-[#d2d2d7] rounded-[18px] p-[32px_28px] transition-all duration-[0.2s] cursor-pointer hover:border-[#0071e3] hover:shadow-[0_4px_20px_rgba(0,113,227,0.1)]">
-              <div className="text-[13px] font-semibold text-[#0071e3] mb-[12px]">Path 01</div>
-              <div className="text-[22px] font-bold tracking-[-0.5px] mb-[10px] text-[#1d1d1f]">Microsoft Engineer</div>
-              <div className="text-[14px] text-[#6e6e73] leading-[1.6] mb-[20px]">
-                From Windows basics to Azure cloud and Microsoft 365 administration. Prepares you for MCSA and MCP.
-              </div>
-              <div className="flex flex-wrap gap-[6px]">
-                <span className="text-[11px] font-medium bg-[#f5f5f7] text-[#1d1d1f] px-[12px] py-[4px] rounded-[980px]">Windows</span>
-                <span className="text-[11px] font-medium bg-[#f5f5f7] text-[#1d1d1f] px-[12px] py-[4px] rounded-[980px]">Active Directory</span>
-                <span className="text-[11px] font-medium bg-[#f5f5f7] text-[#1d1d1f] px-[12px] py-[4px] rounded-[980px]">Azure</span>
-                <span className="text-[11px] font-medium bg-[#f5f5f7] text-[#1d1d1f] px-[12px] py-[4px] rounded-[980px]">Microsoft 365</span>
-              </div>
-              <span className="block mt-[20px] text-[#0071e3] text-[13px] font-semibold">Start path →</span>
-            </div>
-
-            {/* Path 2 */}
-            <div onClick={() => navigate('/courses')} className="border border-[#d2d2d7] rounded-[18px] p-[32px_28px] transition-all duration-[0.2s] cursor-pointer hover:border-[#0071e3] hover:shadow-[0_4px_20px_rgba(0,113,227,0.1)]">
-              <div className="text-[13px] font-semibold text-[#0071e3] mb-[12px]">Path 02</div>
-              <div className="text-[22px] font-bold tracking-[-0.5px] mb-[10px] text-[#1d1d1f]">Linux Admin</div>
-              <div className="text-[14px] text-[#6e6e73] leading-[1.6] mb-[20px]">
-                Command line mastery, shell scripting, service management, and LPIC certification prep.
-              </div>
-              <div className="flex flex-wrap gap-[6px]">
-                <span className="text-[11px] font-medium bg-[#f5f5f7] text-[#1d1d1f] px-[12px] py-[4px] rounded-[980px]">CLI</span>
-                <span className="text-[11px] font-medium bg-[#f5f5f7] text-[#1d1d1f] px-[12px] py-[4px] rounded-[980px]">Bash Scripting</span>
-                <span className="text-[11px] font-medium bg-[#f5f5f7] text-[#1d1d1f] px-[12px] py-[4px] rounded-[980px]">Services</span>
-                <span className="text-[11px] font-medium bg-[#f5f5f7] text-[#1d1d1f] px-[12px] py-[4px] rounded-[980px]">LPIC-1</span>
-              </div>
-              <span className="block mt-[20px] text-[#0071e3] text-[13px] font-semibold">Start path →</span>
-            </div>
-
-            {/* Path 3 */}
-            <div onClick={() => navigate('/courses')} className="border border-[#d2d2d7] rounded-[18px] p-[32px_28px] transition-all duration-[0.2s] cursor-pointer hover:border-[#0071e3] hover:shadow-[0_4px_20px_rgba(0,113,227,0.1)]">
-              <div className="text-[13px] font-semibold text-[#0071e3] mb-[12px]">Path 03</div>
-              <div className="text-[22px] font-bold tracking-[-0.5px] mb-[10px] text-[#1d1d1f]">Network Engineer</div>
-              <div className="text-[14px] text-[#6e6e73] leading-[1.6] mb-[20px]">
-                Routing, switching, firewalls, subnetting — full CCNA and CompTIA Network+ exam prep included.
-              </div>
-              <div className="flex flex-wrap gap-[6px]">
-                <span className="text-[11px] font-medium bg-[#f5f5f7] text-[#1d1d1f] px-[12px] py-[4px] rounded-[980px]">TCP/IP</span>
-                <span className="text-[11px] font-medium bg-[#f5f5f7] text-[#1d1d1f] px-[12px] py-[4px] rounded-[980px]">Routing</span>
-                <span className="text-[11px] font-medium bg-[#f5f5f7] text-[#1d1d1f] px-[12px] py-[4px] rounded-[980px]">Firewalls</span>
-                <span className="text-[11px] font-medium bg-[#f5f5f7] text-[#1d1d1f] px-[12px] py-[4px] rounded-[980px]">CCNA</span>
-              </div>
-              <span className="block mt-[20px] text-[#0071e3] text-[13px] font-semibold">Start path →</span>
-            </div>
-
           </div>
         </div>
       </section>

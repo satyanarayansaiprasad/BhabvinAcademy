@@ -15,15 +15,6 @@ function Footer() {
       ]
     },
     {
-      title: "Learning Paths",
-      links: [
-        { label: "Microsoft Engineer", path: "#" },
-        { label: "Linux Administrator", path: "#" },
-        { label: "Network Engineer", path: "#" },
-        { label: "Cloud Architect", path: "#" },
-      ]
-    },
-    {
       title: "Platform",
       links: [
         { label: "Virtual Labs", path: "#" },

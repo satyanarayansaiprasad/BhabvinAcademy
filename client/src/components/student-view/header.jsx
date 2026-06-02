@@ -26,8 +26,6 @@ function StudentViewCommonHeader() {
 
   const navLinks = [
     { label: "Courses", path: "/courses" },
-    { label: "Paths", path: "/#paths" },
-    { label: "Instructor", path: "/about" },
     { label: "Blog", path: "/blog" },
     { label: "About", path: "/about" },
     { label: "Contact", path: "/contact" },
