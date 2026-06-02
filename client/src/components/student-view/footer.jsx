@@ -3,56 +3,74 @@ import { Link } from "react-router-dom";
 function Footer() {
   const currentYear = new Date().getFullYear();
 
+  const footerGroups = [
+    {
+      title: "Courses",
+      links: [
+        { label: "Microsoft Courses", path: "#" },
+        { label: "Linux Courses", path: "#" },
+        { label: "Networking", path: "#" },
+        { label: "Cloud & Azure", path: "#" },
+        { label: "Cybersecurity", path: "#" },
+      ]
+    },
+    {
+      title: "Learning Paths",
+      links: [
+        { label: "Microsoft Engineer", path: "#" },
+        { label: "Linux Administrator", path: "#" },
+        { label: "Network Engineer", path: "#" },
+        { label: "Cloud Architect", path: "#" },
+      ]
+    },
+    {
+      title: "Platform",
+      links: [
+        { label: "Virtual Labs", path: "#" },
+        { label: "Practice Exams", path: "#" },
+        { label: "Certifications", path: "#" },
+        { label: "Community", path: "#" },
+      ]
+    },
+    {
+      title: "Company",
+      links: [
+        { label: "About Us", path: "/about" },
+        { label: "Blog", path: "/blog" },
+        { label: "Contact", path: "/contact" },
+        { label: "Privacy Policy", path: "/privacy" },
+        { label: "Terms of Service", path: "/terms" },
+      ]
+    }
+  ];
+
   return (
-    <footer className="bg-slate-100 dark:bg-slate-950 w-full mt-20 py-12">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Left Column */}
-        <div className="space-y-4">
-          <Link to="/" className="font-manrope font-black text-slate-900 dark:text-white text-xl no-underline block">
-            Editorial Health
+    <footer className="bg-[#f5f5f7] border-t border-[#d2d2d7] pt-[40px] pb-[24px] px-6">
+      <div className="max-w-[1080px] mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-[32px] pb-[32px] border-b border-[#d2d2d7] mb-[24px]">
+          {footerGroups.map((group, idx) => (
+            <div key={idx} className="flex flex-col">
+              <h4 className="text-[13px] font-semibold text-[#1d1d1f] mb-[12px]">{group.title}</h4>
+              <ul className="list-none flex flex-col gap-[8px]">
+                {group.links.map((link, lIdx) => (
+                  <li key={lIdx}>
+                    <Link to={link.path} className="text-[13px] text-[#6e6e73] no-underline hover:text-[#0071e3] transition-colors">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <Link to="/" className="text-[16px] font-bold text-[#1d1d1f] no-underline">
+            Bhavin<span className="text-[#0071e3]">Academy</span>
           </Link>
-          <p className="text-slate-500 font-inter text-xs leading-relaxed max-w-xs">
-            © {currentYear} Editorial Health Authority. Clinical precision in every review. Science-backed methodologies for modern wellness.
-          </p>
-        </div>
-
-        {/* Center Navigation Columns */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2 flex flex-col">
-            <h5 className="text-blue-800 dark:text-blue-300 font-bold text-xs uppercase tracking-widest mb-4 font-headline">
-              Authority
-            </h5>
-            <Link to="/privacy" className="text-slate-500 hover:text-blue-600 font-inter text-xs transition-colors no-underline">
-              Medical Disclaimer
-            </Link>
-            <Link to="/privacy" className="text-slate-500 hover:text-blue-600 font-inter text-xs transition-colors no-underline">
-              Privacy Policy
-            </Link>
-            <Link to="/about" className="text-slate-500 hover:text-blue-600 font-inter text-xs transition-colors underline decoration-secondary no-underline">
-              Editorial Process
-            </Link>
+          <div className="text-[13px] text-[#86868b]">
+            © {currentYear} Bhavin Academy. All rights reserved.
           </div>
-          <div className="space-y-2 flex flex-col">
-            <h5 className="text-blue-800 dark:text-blue-300 font-bold text-xs uppercase tracking-widest mb-4 font-headline">
-              Connect
-            </h5>
-            <Link to="/home" className="text-slate-500 hover:text-blue-600 font-inter text-xs transition-colors no-underline">
-              Newsletter
-            </Link>
-            <Link to="/contact" className="text-slate-500 hover:text-blue-600 font-inter text-xs transition-colors no-underline">
-              Contact
-            </Link>
-            <a href="https://twitter.com" target="_blank" rel="noreferrer" className="text-slate-500 hover:text-blue-600 font-inter text-xs transition-colors no-underline">
-              Twitter
-            </a>
-          </div>
-        </div>
-
-        {/* Right Column (Mission Statement box) */}
-        <div className="bg-surface-container-low p-6 rounded-2xl">
-          <p className="text-[10px] text-on-surface-variant font-medium leading-relaxed italic font-body">
-            "Our mission is to provide the highest level of health product transparency. Each review is double-blind peer reviewed by our clinical board before publication."
-          </p>
         </div>
       </div>
     </footer>

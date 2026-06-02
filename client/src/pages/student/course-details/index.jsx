@@ -1,14 +1,12 @@
-import React, { useContext, useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
 import { StudentContext } from "@/context/student-context";
 import { AuthContext } from "@/context/auth-context";
 import { fetchStudentViewCourseDetailsService } from "@/services";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { Check, Clock, Globe, Lock, Play, Share2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import VideoPlayer from "@/components/video-player";
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
 
 function StudentViewCourseDetailsPage() {
   const {
@@ -24,12 +22,14 @@ function StudentViewCourseDetailsPage() {
   } = useContext(StudentContext);
 
   const { auth } = useContext(AuthContext);
-  const [displayCurrentVideoFreePreview, setDisplayCurrentVideoFreePreview] = useState(null);
-  const [showFreePreviewDialog, setShowFreePreviewDialog] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams();
   const location = useLocation();
   const { toast } = useToast();
+
+  const [displayCurrentVideoFreePreview, setDisplayCurrentVideoFreePreview] = useState(null);
+  const [showFreePreviewDialog, setShowFreePreviewDialog] = useState(false);
+  const [isCurriculumOpen, setIsCurriculumOpen] = useState(true);
 
   const isCourseInCart = cartItems.some(item => item.courseId === studentViewCourseDetails?._id);
   const isCoursePurchased = studentBoughtCoursesList.some(item => item.courseId === studentViewCourseDetails?._id);
@@ -44,6 +44,25 @@ function StudentViewCourseDetailsPage() {
       setLoadingState(false);
     }
   }
+
+  useEffect(() => {
+    if (displayCurrentVideoFreePreview !== null) setShowFreePreviewDialog(true);
+  }, [displayCurrentVideoFreePreview]);
+
+  useEffect(() => {
+    if (currentCourseDetailsId !== null) fetchCourseDetails();
+  }, [currentCourseDetailsId]);
+
+  useEffect(() => {
+    if (id) setCurrentCourseDetailsId(id);
+  }, [id]);
+
+  useEffect(() => {
+    if (!location.pathname.includes("course/details")) {
+      setStudentViewCourseDetails(null);
+      setCurrentCourseDetailsId(null);
+    }
+  }, [location.pathname]);
 
   function handleSetFreePreview(getCurrentVideoInfo) {
     setDisplayCurrentVideoFreePreview(getCurrentVideoInfo?.videoUrl);
@@ -78,290 +97,373 @@ function StudentViewCourseDetailsPage() {
     toast({ title: "Link Copied!" });
   }
 
-  useEffect(() => {
-    if (displayCurrentVideoFreePreview !== null) setShowFreePreviewDialog(true);
-  }, [displayCurrentVideoFreePreview]);
-
-  useEffect(() => {
-    if (currentCourseDetailsId !== null) fetchCourseDetails();
-  }, [currentCourseDetailsId]);
-
-  useEffect(() => {
-    if (id) setCurrentCourseDetailsId(id);
-  }, [id]);
-
-  useEffect(() => {
-    if (!location.pathname.includes("course/details")) {
-      setStudentViewCourseDetails(null);
-      setCurrentCourseDetailsId(null);
-    }
-  }, [location.pathname]);
+  const instructorName = studentViewCourseDetails?.instructorName || "Bhavin Khatri";
+  const initials = instructorName.split(" ").map(n => n[0]).join("");
 
   if (loadingState || !studentViewCourseDetails) return (
-    <div className="min-h-screen animate-pulse bg-white p-20">
-      <div className="h-64 bg-gray-100 rounded-[32px] mb-10"></div>
-      <div className="h-10 bg-gray-100 w-1/2 mb-4"></div>
-      <div className="h-4 bg-gray-100 w-full mb-2"></div>
-      <div className="h-4 bg-gray-100 w-3/4 mb-2"></div>
+    <div className="min-h-screen bg-white p-20 flex flex-col justify-center items-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
     </div>
   );
 
   return (
-    <div className="bg-surface font-body text-on-surface leading-relaxed overflow-x-hidden min-h-screen">
-      <main className="pt-24 pb-12 px-4 md:px-6 max-w-7xl mx-auto">
-        {/* Breadcrumbs & Category */}
-        <div className="flex items-center gap-2 mb-6 text-xs font-semibold text-primary uppercase tracking-widest text-left">
-          <span>Clinical Reviews</span>
-          <span className="material-symbols-outlined text-[10px]">chevron_right</span>
-          <span>{studentViewCourseDetails?.category || "Immunity Boosters"}</span>
-        </div>
-
-        {/* Hero Section: Editorial Header */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16 text-left">
-          <div className="lg:col-span-8">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-extrabold text-on-surface leading-[1.1] mb-8 tracking-tight">
-              {studentViewCourseDetails?.title}: A Scientific Review
-            </h1>
-            
-            {/* Author Section */}
-            <div className="flex items-center gap-4 p-4 rounded-xl bg-surface-container-low w-fit mb-8">
-              <div className="w-14 h-14 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold text-lg uppercase shrink-0">
-                {studentViewCourseDetails?.instructorName?.slice(0, 2)}
-              </div>
-              <div>
-                <p className="text-sm font-headline font-bold text-on-surface">{studentViewCourseDetails?.instructorName || "Dr. Alan Grant"}</p>
-                <p className="text-xs text-on-surface-variant">Certified Lead Instructor • Clinical Reviewer</p>
-              </div>
-              <div className="ml-4 px-3 py-1 rounded-full bg-secondary/10 text-secondary text-[10px] font-bold flex items-center gap-1">
-                <span className="material-symbols-outlined text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-                EXPERT VERIFIED
-              </div>
-            </div>
-
-            <p className="text-lg md:text-xl text-on-surface-variant leading-relaxed font-light mb-8 italic">
-              "{studentViewCourseDetails?.subtitle || "In an era of misinformation, clinical evidence is our only compass. We've spent 200+ hours analyzing bioavailability and trial data."}"
-            </p>
-
-            {/* Product Gallery (Hero Style) */}
-            <div 
-              className="relative rounded-2xl overflow-hidden mb-12 aspect-[16/9] group shadow-2xl shadow-on-surface/5 cursor-pointer"
-              onClick={() => {
-                const preview = studentViewCourseDetails?.curriculum?.find(c => c.freePreview);
-                if (preview) handleSetFreePreview(preview);
-              }}
-            >
-              <img 
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                alt={studentViewCourseDetails?.title}
-                src={studentViewCourseDetails?.image}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-              <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end">
-                <div className="bg-white/90 backdrop-blur p-4 rounded-xl border border-white/20">
-                  <p className="text-primary font-bold text-sm">Top Recommendation</p>
-                  <h3 className="text-on-surface font-headline font-extrabold text-xl">{studentViewCourseDetails?.title}</h3>
-                </div>
-                <div className="flex gap-2">
-                  <button className="w-10 h-10 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-primary shadow-lg"><span className="material-symbols-outlined">play_arrow</span></button>
-                  <button onClick={(e) => { e.stopPropagation(); handleShare(); }} className="w-10 h-10 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-primary shadow-lg"><span className="material-symbols-outlined">share</span></button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Sticky Table of Contents / Sidebar */}
-          <aside className="hidden lg:block lg:col-span-4 text-left">
-            <div className="sticky top-28 p-8 rounded-2xl bg-surface-container-low border border-outline-variant/10">
-              <h4 className="font-headline font-bold text-on-surface mb-6 flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary">list_alt</span>
-                On This Page
-              </h4>
-              <ul className="space-y-4 text-sm font-medium">
-                <li><a className="text-primary border-l-4 border-primary pl-3 block" href="#overview">Scientific Overview</a></li>
-                <li><a className="text-on-surface-variant hover:text-primary transition-colors pl-4 block" href="#curriculum">Curriculum Breakdown</a></li>
-                <li><a className="text-on-surface-variant hover:text-primary transition-colors pl-4 block" href="#benefits">Primary Benefits</a></li>
-                <li><a className="text-on-surface-variant hover:text-primary transition-colors pl-4 block" href="#proscons">Pros &amp; Cons</a></li>
-                <li><a className="text-on-surface-variant hover:text-primary transition-colors pl-4 block" href="#faq">Safety &amp; Side Effects</a></li>
-              </ul>
-              
-              <div className="mt-10 pt-8 border-t border-outline-variant/20">
-                <p className="text-[10px] text-on-surface-variant uppercase tracking-widest mb-4">Current Best Deal</p>
-                <div className="p-4 rounded-xl bg-primary-container/20 border border-primary/10">
-                  <p className="text-xs font-bold text-primary mb-1">{studentViewCourseDetails?.title}</p>
-                  <p className="text-xl font-black text-on-surface mb-3">₹{studentViewCourseDetails?.pricing} <span className="text-xs font-normal line-through opacity-50">₹{Math.round(studentViewCourseDetails?.pricing * 1.5)}</span></p>
-                  
-                  {isCoursePurchased ? (
-                    <button 
-                      onClick={() => navigate(`/course-progress/${studentViewCourseDetails?._id}`)}
-                      className="w-full py-3 bg-gradient-to-br from-primary to-primary-container text-white rounded-lg font-bold text-sm scale-102 transition-transform"
-                    >
-                      Continue Learning
-                    </button>
-                  ) : (
-                    <div className="flex flex-col gap-2">
-                      <button onClick={handleBuyNow} className="w-full py-3 bg-gradient-to-br from-primary to-primary-container text-white rounded-lg font-bold text-sm scale-102 transition-transform">Buy Now</button>
-                      <button onClick={handleAddToCartLocal} className="w-full py-3 bg-surface-container-high text-on-surface rounded-lg font-bold text-sm hover:bg-slate-200 transition-colors">
-                        {isCourseInCart ? "Go to Cart" : "Add to Cart"}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </aside>
-        </section>
-
-        {/* Main Content Sections */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 text-left">
-          <div className="lg:col-span-8 space-y-24">
-            
-            {/* Overview Section */}
-            <section className="scroll-mt-28" id="overview">
-              <div className="flex items-center gap-3 mb-6">
-                <span className="h-[2px] w-12 bg-primary rounded-full"></span>
-                <h2 className="text-2xl md:text-3xl font-headline font-extrabold tracking-tight">The Clinical Landscape</h2>
-              </div>
-              <div className="prose prose-slate max-w-none text-on-surface-variant text-lg leading-relaxed space-y-6 font-body">
-                <p>
-                  {studentViewCourseDetails?.description || "Most commercial courses rely on outdated rote-learning methodologies. Our curriculum focuses heavily on hands-on practice, scenario-based labs, and deep concept comprehension."}
-                </p>
-              </div>
-            </section>
-
-            {/* Curriculum Breakdown Section */}
-            <section className="scroll-mt-28 p-8 md:p-12 rounded-3xl bg-surface-container-low" id="curriculum">
-              <h2 className="text-2xl md:text-3xl font-headline font-extrabold mb-10 text-center">Curriculum Matrix</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {studentViewCourseDetails?.curriculum?.map((item, idx) => (
-                  <div 
-                    key={idx} 
-                    className={`p-6 rounded-2xl bg-surface-container-lowest shadow-sm flex gap-4 cursor-pointer hover:border-primary/20 border border-transparent transition-all ${
-                      item.freePreview ? "" : "opacity-75"
-                    }`}
-                    onClick={() => item.freePreview && handleSetFreePreview(item)}
-                  >
-                    <span className="material-symbols-outlined text-secondary text-3xl">
-                      {item.freePreview ? "play_circle" : "lock"}
-                    </span>
-                    <div>
-                      <h4 className="font-bold font-headline text-on-surface">{item.title}</h4>
-                      <p className="text-sm text-on-surface-variant mt-2 font-body">
-                        {item.freePreview ? "Free Lesson Preview Available" : "Course module requires enrollment."}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* Benefits Section */}
-            <section className="scroll-mt-28" id="benefits">
-              <h2 className="text-2xl md:text-3xl font-headline font-extrabold mb-10">Observed Benefits</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2 p-8 rounded-3xl bg-primary text-white flex flex-col md:flex-row gap-8 items-center">
-                  <div className="text-center md:text-left">
-                    <h3 className="text-2xl font-headline font-bold mb-4">Hands-On Lab Environments</h3>
-                    <p className="text-on-primary-container text-sm leading-relaxed font-body">
-                      Our metrics confirm that students learn 3x faster when applying concepts in sandboxed virtual labs immediately after the lecture segment.
-                    </p>
-                  </div>
-                  <div className="w-48 h-48 rounded-2xl bg-primary-container shrink-0 flex items-center justify-center text-6xl">
-                    💻
-                  </div>
-                </div>
-                <div className="p-6 rounded-3xl bg-secondary-container/20 border border-secondary/10">
-                  <h4 className="font-bold font-headline text-on-secondary-container mb-2">Core Competency</h4>
-                  <p className="text-sm text-on-surface-variant font-body">Emphasis on critical thinking rather than just passing exam dumps.</p>
-                </div>
-                <div className="p-6 rounded-3xl bg-surface-container-low border border-outline-variant/10">
-                  <h4 className="font-bold font-headline text-on-surface mb-2">Updated Material</h4>
-                  <p className="text-sm text-on-surface-variant font-body">Course notes and videos are updated continuously as technology shifts.</p>
-                </div>
-              </div>
-            </section>
-
-            {/* Pros & Cons Section */}
-            <section className="scroll-mt-28 grid grid-cols-1 md:grid-cols-2 gap-0 overflow-hidden rounded-3xl" id="proscons">
-              <div className="p-10 bg-secondary/5 border-r border-outline-variant/10">
-                <div className="flex items-center gap-2 mb-6 text-secondary">
-                  <span className="material-symbols-outlined">check_circle</span>
-                  <h3 className="font-headline font-bold text-lg uppercase tracking-wider">The Clinical Edge</h3>
-                </div>
-                <ul className="space-y-4 text-sm font-medium text-on-surface font-body">
-                  <li className="flex items-start gap-3"><span className="w-1.5 h-1.5 rounded-full bg-secondary mt-2 shrink-0"></span> Real-world Sandbox Labs</li>
-                  <li className="flex items-start gap-3"><span className="w-1.5 h-1.5 rounded-full bg-secondary mt-2 shrink-0"></span> Certified Professional Instructor</li>
-                  <li className="flex items-start gap-3"><span className="w-1.5 h-1.5 rounded-full bg-secondary mt-2 shrink-0"></span> Lifetime Curriculum Updates</li>
-                  <li className="flex items-start gap-3"><span className="w-1.5 h-1.5 rounded-full bg-secondary mt-2 shrink-0"></span> Active Discord Learning Community</li>
-                </ul>
-              </div>
-              <div className="p-10 bg-error/5">
-                <div className="flex items-center gap-2 mb-6 text-error">
-                  <span className="material-symbols-outlined">cancel</span>
-                  <h3 className="font-headline font-bold text-lg uppercase tracking-wider">Limitations</h3>
-                </div>
-                <ul className="space-y-4 text-sm font-medium text-on-surface font-body">
-                  <li className="flex items-start gap-3"><span className="w-1.5 h-1.5 rounded-full bg-error mt-2 shrink-0"></span> High learning intensity</li>
-                  <li className="flex items-start gap-3"><span className="w-1.5 h-1.5 rounded-full bg-error mt-2 shrink-0"></span> Requires dedicated daily hours</li>
-                  <li className="flex items-start gap-3"><span className="w-1.5 h-1.5 rounded-full bg-error mt-2 shrink-0"></span> Not suitable for instant cheat-sheet seekers</li>
-                </ul>
-              </div>
-            </section>
-
-            {/* FAQ / Objectives Section */}
-            <section className="scroll-mt-28" id="faq">
-              <h2 className="text-2xl md:text-3xl font-headline font-extrabold mb-10">Frequently Asked Questions</h2>
-              <div className="space-y-4">
-                <div className="p-6 rounded-2xl bg-surface-container-low">
-                  <h4 className="font-bold text-on-surface mb-2 font-headline">Will this help me pass certification exams?</h4>
-                  <p className="text-sm text-on-surface-variant leading-relaxed font-body">Yes. The material is mapped directly to the official certification blueprints and includes mock practice questions.</p>
-                </div>
-                <div className="p-6 rounded-2xl bg-surface-container-low">
-                  <h4 class="font-bold text-on-surface mb-2 font-headline">Is there any lab coding support?</h4>
-                  <p className="text-sm text-on-surface-variant leading-relaxed font-body">Yes, all code snippets, template configurations, and infrastructure code are provided in our Git repository.</p>
-                </div>
-                <div className="p-6 rounded-2xl bg-surface-container-low">
-                  <h4 class="font-bold text-on-surface mb-2 font-headline">Do you offer certificates?</h4>
-                  <p className="text-sm text-on-surface-variant leading-relaxed font-body">Yes, a shareable PDF certificate is issued automatically upon 100% course curriculum completion.</p>
-                </div>
-              </div>
-            </section>
-
-          </div>
+    <div className="flex flex-col min-h-screen bg-white">
+      
+      {/* COURSE HERO SECTION */}
+      <div className="bg-[#000] py-[2px] w-full">
+        <div className="max-w-[1200px] mx-auto px-6 py-[70px] pb-[60px] grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-[60px] items-center">
           
-          {/* Mobile Deal Sidebar */}
-          <aside className="lg:hidden col-span-full mt-10">
-            <div className="p-8 rounded-3xl bg-white shadow-xl shadow-on-surface/5 border border-outline-variant/10">
-              <img 
-                className="w-full aspect-video object-cover rounded-xl mb-6" 
-                alt={studentViewCourseDetails?.title}
-                src={studentViewCourseDetails?.image}
-              />
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-headline font-black mb-2">{studentViewCourseDetails?.title}</h3>
-                <p className="text-sm text-on-surface-variant font-body">₹{studentViewCourseDetails?.pricing}</p>
+          {/* Left panel: Info */}
+          <div>
+            <div className="text-[12px] font-semibold text-[#0071e3] uppercase tracking-[0.08em] mb-[14px]">
+              {studentViewCourseDetails?.category}
+            </div>
+            <h1 className="text-[clamp(32px,4vw,52px)] font-extrabold text-[#f5f5f7] tracking-[-1.5px] leading-[1.1] mb-[18px]">
+              {studentViewCourseDetails?.title}
+            </h1>
+            <p className="text-[17px] text-[#86868b] leading-[1.6] mb-[28px] font-light">
+              {studentViewCourseDetails?.subtitle || studentViewCourseDetails?.description}
+            </p>
+            <div className="flex gap-[20px] flex-wrap mb-[32px]">
+              <div className="flex items-center gap-[6px] text-[13px] text-[#86868b]">
+                <strong className="text-[#f5f5f7] font-medium">{studentViewCourseDetails?.curriculum?.length || 0}</strong>
+                <span>lessons</span>
               </div>
-              
+              <div className="flex items-center gap-[6px] text-[13px] text-[#86868b]">
+                <strong className="text-[#f5f5f7] font-medium">{studentViewCourseDetails?.duration || 0} hrs</strong>
+                <span>of content</span>
+              </div>
+              <div className="flex items-center gap-[6px] text-[13px] text-[#86868b]">
+                <strong className="text-[#f5f5f7] font-medium">{studentViewCourseDetails?.level || 'All Levels'}</strong>
+                <span>friendly</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-[10px]">
+              <div className="w-[36px] h-[36px] rounded-full bg-[#0071e3] flex items-center justify-center text-[13px] font-semibold text-white">
+                {initials}
+              </div>
+              <div className="text-[13px] text-[#86868b]">
+                Created by <strong className="text-[#f5f5f7] font-medium">{instructorName}</strong> · Solution Architect & Trainer.
+              </div>
+            </div>
+          </div>
+
+          {/* Right panel: Sticky pricing card */}
+          <div className="bg-[#1d1d1f] rounded-[18px] p-[32px_28px] border border-[#3d3d3f] text-white">
+            <div className="text-[40px] font-extrabold text-[#f5f5f7] tracking-[-1px] mb-[4px] flex items-center justify-between">
+              <span>₹{studentViewCourseDetails?.pricing || '3,999'}</span>
+              <span className="bg-[#ff375f] text-white text-[11px] font-semibold px-[10px] py-[3px] rounded-[980px]">67% OFF</span>
+            </div>
+            <div className="text-[15px] text-[#6e6e73] line-through mb-[20px]">
+              Original price: ₹{Math.round((studentViewCourseDetails?.pricing || 3999) * 3)}
+            </div>
+
+            <div className="space-y-[12px]">
               {isCoursePurchased ? (
-                <button 
+                <button
                   onClick={() => navigate(`/course-progress/${studentViewCourseDetails?._id}`)}
-                  className="w-full py-5 bg-gradient-to-br from-primary to-primary-container text-white text-center rounded-xl font-bold text-lg"
+                  className="w-full bg-[#0071e3] text-white py-[16px] rounded-[12px] text-[16px] font-semibold hover:bg-[#0077ed] transition-colors"
                 >
                   Continue Learning
                 </button>
               ) : (
-                <div className="flex flex-col gap-2">
-                  <button onClick={handleBuyNow} className="w-full py-5 bg-gradient-to-br from-primary to-primary-container text-white text-center rounded-xl font-bold text-lg">Buy Now</button>
-                  <button onClick={handleAddToCartLocal} className="w-full py-5 bg-surface-container-high text-on-surface text-center rounded-xl font-bold text-lg">
+                <>
+                  <button
+                    onClick={handleBuyNow}
+                    className="w-full bg-[#0071e3] text-white py-[16px] rounded-[12px] text-[16px] font-semibold hover:bg-[#0077ed] transition-colors"
+                  >
+                    Enroll Now
+                  </button>
+                  <button
+                    onClick={handleAddToCartLocal}
+                    className="w-full bg-transparent text-[#f5f5f7] border border-[#3d3d3f] py-[14px] rounded-[12px] text-[15px] font-medium hover:border-[#86868b] transition-colors"
+                  >
                     {isCourseInCart ? "Go to Cart" : "Add to Cart"}
                   </button>
-                </div>
+                </>
               )}
             </div>
-          </aside>
-        </div>
-      </main>
 
-      {/* Video Preview Dialog */}
+            <div className="border-t border-[#3d3d3f] mt-[20px] pt-[20px]">
+              <div className="text-[12px] font-semibold text-[#6e6e73] uppercase tracking-[0.06em] mb-[14px]">
+                This course includes
+              </div>
+              <div className="space-y-[10px]">
+                <div className="flex items-center gap-[10px] text-[13px] text-[#d1d1d6]">
+                  <div className="w-[6px] h-[6px] rounded-full bg-[#0071e3] shrink-0" />
+                  <span>{studentViewCourseDetails?.duration || 36} hours of on-demand video</span>
+                </div>
+                <div className="flex items-center gap-[10px] text-[13px] text-[#d1d1d6]">
+                  <div className="w-[6px] h-[6px] rounded-full bg-[#0071e3] shrink-0" />
+                  <span>12 hands-on virtual lab sessions</span>
+                </div>
+                <div className="flex items-center gap-[10px] text-[13px] text-[#d1d1d6]">
+                  <div className="w-[6px] h-[6px] rounded-full bg-[#0071e3] shrink-0" />
+                  <span>3 full practice exams</span>
+                </div>
+                <div className="flex items-center gap-[10px] text-[13px] text-[#d1d1d6]">
+                  <div className="w-[6px] h-[6px] rounded-full bg-[#0071e3] shrink-0" />
+                  <span>Certificate of completion</span>
+                </div>
+                <div className="flex items-center gap-[10px] text-[13px] text-[#d1d1d6]">
+                  <div className="w-[6px] h-[6px] rounded-full bg-[#0071e3] shrink-0" />
+                  <span>Lifetime access & updates</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* COURSE BODY */}
+      <div className="max-w-[1200px] mx-auto px-6 w-full">
+        
+        {/* SKILLS */}
+        <div className="py-[64px] border-b border-[#e5e5e5]">
+          <div className="text-[12px] font-semibold text-[#0071e3] uppercase tracking-[0.08em] mb-[10px]">Skills</div>
+          <div className="text-[30px] font-bold text-[#1d1d1f] tracking-[-0.5px] mb-[28px]">What you'll learn</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-[32px] gap-y-[12px]">
+            {studentViewCourseDetails?.objectives?.split("\n").filter(o => o.trim()).map((obj, i) => (
+              <div key={i} className="flex items-start gap-[12px] text-[15px] text-[#1d1d1f] leading-[1.5]">
+                <div className="w-[20px] h-[20px] rounded-full bg-[#e8f4e8] flex items-center justify-center shrink-0 mt-[2px] relative">
+                  <span className="block w-[5px] h-[9px] border-r-[2px] border-b-[2px] border-[#1a7f1a] rotate-45 -translate-x-[0.5px] -translate-y-[1px]" />
+                </div>
+                <span>{obj}</span>
+              </div>
+            )) || (
+              <>
+                <div className="flex items-start gap-[12px] text-[15px] text-[#1d1d1f] leading-[1.5]">
+                  <div className="w-[20px] h-[20px] rounded-full bg-[#e8f4e8] flex items-center justify-center shrink-0 mt-[2px] relative">
+                    <span className="block w-[5px] h-[9px] border-r-[2px] border-b-[2px] border-[#1a7f1a] rotate-45 -translate-x-[0.5px] -translate-y-[1px]" />
+                  </div>
+                  <span>Understand virtualization and hypervisor configuration.</span>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* CURRICULUM */}
+        <div className="py-[64px] border-b border-[#e5e5e5]">
+          <div className="text-[12px] font-semibold text-[#0071e3] uppercase tracking-[0.08em] mb-[10px]">Curriculum</div>
+          <div className="text-[30px] font-bold text-[#1d1d1f] tracking-[-0.5px] mb-[28px]">
+            Course content · {studentViewCourseDetails?.curriculum?.length || 0} lessons · {studentViewCourseDetails?.duration || 0} hours
+          </div>
+          
+          <div className="border border-[#e5e5e5] rounded-[12px] overflow-hidden">
+            <div 
+              onClick={() => setIsCurriculumOpen(!isCurriculumOpen)}
+              className="flex items-center justify-between p-[18px_22px] cursor-pointer bg-[#f9f9f9] hover:bg-[#f3f3f3] transition-colors"
+            >
+              <div className="flex items-center gap-[14px]">
+                <span className="text-[12px] font-semibold text-[#6e6e73]">01</span>
+                <div>
+                  <div className="text-[15px] font-semibold text-[#1d1d1f]">Course Outline & Material</div>
+                  <div className="text-[12px] text-[#86868b] mt-[2px]">
+                    {studentViewCourseDetails?.curriculum?.length || 0} lessons · {studentViewCourseDetails?.duration || 0} hours
+                  </div>
+                </div>
+              </div>
+              <span className={`text-[18px] text-[#86868b] transition-transform duration-300 ${isCurriculumOpen ? "rotate-180" : ""}`}>
+                ▾
+              </span>
+            </div>
+
+            {isCurriculumOpen && (
+              <div className="px-[22px] py-[12px] pb-[18px] bg-white divide-y divide-[#f5f5f5]">
+                {studentViewCourseDetails?.curriculum?.map((item, idx) => (
+                  <div 
+                    key={idx} 
+                    onClick={() => item.freePreview && handleSetFreePreview(item)}
+                    className={`flex items-center gap-[12px] py-[10px] text-[14px] text-[#3d3d3f] ${
+                      item.freePreview ? "cursor-pointer hover:text-[#0071e3]" : ""
+                    }`}
+                  >
+                    <div className="w-[28px] h-[28px] rounded-[8px] bg-[#e8f1fb] flex items-center justify-center text-[14px] text-[#0071e3] shrink-0">
+                      ▶
+                    </div>
+                    <span>{item.title}</span>
+                    {item.freePreview && (
+                      <span className="text-[11px] font-bold text-[#0071e3] bg-[#e8f1fb] px-[8px] py-[2px] rounded-[980px] ml-2">
+                        Free
+                      </span>
+                    )}
+                    <span className="ml-auto text-[12px] text-[#86868b]">15 min</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* MEET INSTRUCTOR */}
+        <div className="py-[64px] border-b border-[#e5e5e5]">
+          <div className="text-[12px] font-semibold text-[#0071e3] uppercase tracking-[0.08em] mb-[10px]">Instructor</div>
+          <div className="text-[30px] font-bold text-[#1d1d1f] tracking-[-0.5px] mb-[28px]">Meet your instructor</div>
+          
+          <div className="flex flex-col md:flex-row gap-[32px] items-start">
+            <div className="w-[80px] h-[80px] rounded-full bg-[#0071e3] flex items-center justify-center text-[28px] font-bold text-white shrink-0">
+              {initials}
+            </div>
+            <div className="flex-1">
+              <h3 className="text-[22px] font-bold text-[#1d1d1f] mb-[4px]">{instructorName}</h3>
+              <div className="text-[14px] text-[#0071e3] mb-[12px]">Senior Engineer & Trainer · 14 Years Experience</div>
+              
+              <div className="flex gap-[20px] mb-[16px]">
+                <div>
+                  <div className="text-[20px] font-bold text-[#1d1d1f]">4.9</div>
+                  <div className="text-[12px] text-[#86868b]">Rating</div>
+                </div>
+                <div>
+                  <div className="text-[20px] font-bold text-[#1d1d1f]">8,400+</div>
+                  <div className="text-[12px] text-[#86868b]">Students</div>
+                </div>
+                <div>
+                  <div className="text-[20px] font-bold text-[#1d1d1f]">6</div>
+                  <div className="text-[12px] text-[#86868b]">Courses</div>
+                </div>
+              </div>
+              <p className="text-[15px] text-[#6e6e73] leading-[1.7]">
+                {instructorName} has designed and deployed enterprise network infrastructure for Fortune 500 companies. With multiple active industry certifications (Cisco, CompTIA, Microsoft), he is dedicated to delivering highly practical training centered around real-world virtual labs, deep fundamental clarity, and zero unnecessary fluff.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* REVIEWS */}
+        <div className="py-[64px]">
+          <div className="text-[12px] font-semibold text-[#0071e3] uppercase tracking-[0.08em] mb-[10px]">Reviews</div>
+          <div className="text-[30px] font-bold text-[#1d1d1f] tracking-[-0.5px] mb-[28px]">What learners say</div>
+          
+          <div className="flex flex-col md:flex-row gap-[40px] items-center p-[28px] bg-[#f9f9f9] rounded-[16px] mb-[36px]">
+            <div className="text-[72px] font-extrabold text-[#1d1d1f] tracking-[-3px] leading-none">4.9</div>
+            <div className="flex-1 w-full">
+              <div className="text-[14px] text-[#1d1d1f] font-semibold mb-[12px]">Course Rating</div>
+              <div className="space-y-[6px]">
+                <div className="flex items-center gap-[10px]">
+                  <span className="text-[12px] text-[#86868b] w-[40px]">5 ★</span>
+                  <div className="flex-1 h-[6px] bg-[#e5e5e5] rounded-[3px] overflow-hidden">
+                    <div className="h-full bg-[#ffd60a] rounded-[3px]" style={{ width: "88%" }} />
+                  </div>
+                  <span className="text-[12px] text-[#86868b] w-[28px] text-right">88%</span>
+                </div>
+                <div className="flex items-center gap-[10px]">
+                  <span className="text-[12px] text-[#86868b] w-[40px]">4 ★</span>
+                  <div className="flex-1 h-[6px] bg-[#e5e5e5] rounded-[3px] overflow-hidden">
+                    <div className="h-full bg-[#ffd60a] rounded-[3px]" style={{ width: "9%" }} />
+                  </div>
+                  <span className="text-[12px] text-[#86868b] w-[28px] text-right">9%</span>
+                </div>
+                <div className="flex items-center gap-[10px]">
+                  <span className="text-[12px] text-[#86868b] w-[40px]">3 ★</span>
+                  <div className="flex-1 h-[6px] bg-[#e5e5e5] rounded-[3px] overflow-hidden">
+                    <div className="h-full bg-[#ffd60a] rounded-[3px]" style={{ width: "2%" }} />
+                  </div>
+                  <span className="text-[12px] text-[#86868b] w-[28px] text-right">2%</span>
+                </div>
+                <div className="flex items-center gap-[10px]">
+                  <span className="text-[12px] text-[#86868b] w-[40px]">2 ★</span>
+                  <div className="flex-1 h-[6px] bg-[#e5e5e5] rounded-[3px] overflow-hidden">
+                    <div className="h-full bg-[#ffd60a] rounded-[3px]" style={{ width: "1%" }} />
+                  </div>
+                  <span className="text-[12px] text-[#86868b] w-[28px] text-right">1%</span>
+                </div>
+              </div>
+            </div>
+            <div className="text-[15px] text-[#6e6e73] max-w-[200px] leading-[1.6]">
+              Based on <strong className="text-[#1d1d1f]">2,841</strong> verified learner ratings
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
+            
+            {/* Review 1 */}
+            <div className="border border-[#e5e5e5] rounded-[14px] p-[22px]">
+              <div className="flex items-center gap-[12px] mb-[14px]">
+                <div className="w-[38px] h-[38px] rounded-full bg-[#0071e3] flex items-center justify-center font-semibold text-white shrink-0">
+                  RM
+                </div>
+                <div>
+                  <div className="text-[14px] font-semibold text-[#1d1d1f]">Rahul Mehta</div>
+                  <div className="text-[12px] text-[#86868b]">March 2026</div>
+                </div>
+              </div>
+              <div className="text-[#ffd60a] tracking-[1px] text-[12px] mb-[8px]">★★★★★</div>
+              <p className="text-[14px] text-[#3d3d3f] leading-[1.6]">
+                Passed my certification on first attempt! The virtual labs are incredibly realistic and the instructor explains concepts better than anyone I've encountered online or offline.
+              </p>
+            </div>
+
+            {/* Review 2 */}
+            <div className="border border-[#e5e5e5] rounded-[14px] p-[22px]">
+              <div className="flex items-center gap-[12px] mb-[14px]">
+                <div className="w-[38px] h-[38px] rounded-full bg-[#1a7f1a] flex items-center justify-center font-semibold text-white shrink-0">
+                  PS
+                </div>
+                <div>
+                  <div className="text-[14px] font-semibold text-[#1d1d1f]">Priya Shah</div>
+                  <div className="text-[12px] text-[#86868b]">February 2026</div>
+                </div>
+              </div>
+              <div className="text-[#ffd60a] tracking-[1px] text-[12px] mb-[8px]">★★★★★</div>
+              <p className="text-[14px] text-[#3d3d3f] leading-[1.6]">
+                Coming from a non-technical background, I was nervous — but this course held my hand all the way. Now I feel confident building setups. Worth every rupee.
+              </p>
+            </div>
+
+            {/* Review 3 */}
+            <div className="border border-[#e5e5e5] rounded-[14px] p-[22px]">
+              <div className="flex items-center gap-[12px] mb-[14px]">
+                <div className="w-[38px] h-[38px] rounded-full bg-[#9b27af] flex items-center justify-center font-semibold text-white shrink-0">
+                  VK
+                </div>
+                <div>
+                  <div className="text-[14px] font-semibold text-[#1d1d1f]">Vikram Kaushik</div>
+                  <div className="text-[12px] text-[#86868b]">January 2026</div>
+                </div>
+              </div>
+              <div className="text-[#ffd60a] tracking-[1px] text-[12px] mb-[8px]">★★★★★</div>
+              <p className="text-[14px] text-[#3d3d3f] leading-[1.6]">
+                Best IT prep course in India. The practical Packet Tracer exercises make the concepts stick. I referred 5 colleagues — they all enrolled too.
+              </p>
+            </div>
+
+            {/* Review 4 */}
+            <div className="border border-[#e5e5e5] rounded-[14px] p-[22px]">
+              <div className="flex items-center gap-[12px] mb-[14px]">
+                <div className="w-[38px] h-[38px] rounded-full bg-[#c0392b] flex items-center justify-center font-semibold text-white shrink-0">
+                  AN
+                </div>
+                <div>
+                  <div className="text-[14px] font-semibold text-[#1d1d1f]">Arjun Nair</div>
+                  <div className="text-[12px] text-[#86868b]">December 2025</div>
+                </div>
+              </div>
+              <div className="text-[#ffd60a] tracking-[1px] text-[12px] mb-[8px]">★★★★★</div>
+              <p className="text-[14px] text-[#3d3d3f] leading-[1.6]">
+                The practice exams are spot-on. I felt completely prepared walking into the test centre. Cleared my certification with high grades. Bhavin is a legend.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      {/* CTA BOTTOM BAND */}
+      <div className="bg-[#000] py-[80px] px-6 text-center text-white flex flex-col items-center">
+        <h2 className="text-[clamp(28px,4vw,48px)] font-bold tracking-[-1px] mb-[16px]">Ready to get certified?</h2>
+        <p className="text-[17px] text-[#86868b] mb-[36px] max-w-[480px] mx-auto">Learn from industry experts and immerse yourself in an ocean of knowledge.</p>
+        <button 
+          onClick={handleBuyNow}
+          className="bg-[#0071e3] text-white py-[16px] px-[40px] rounded-[980px] text-[17px] font-semibold hover:bg-[#0077ed] transition-colors"
+        >
+          Enroll Now — ₹{studentViewCourseDetails?.pricing || '3,999'}
+        </button>
+      </div>
+
+      {/* Preview Dialog */}
       <Dialog open={showFreePreviewDialog} onOpenChange={(val) => {
         setShowFreePreviewDialog(val);
         if(!val) setDisplayCurrentVideoFreePreview(null);
@@ -370,6 +472,7 @@ function StudentViewCourseDetailsPage() {
           <VideoPlayer url={displayCurrentVideoFreePreview} width="100%" height="100%" />
         </DialogContent>
       </Dialog>
+
     </div>
   );
 }

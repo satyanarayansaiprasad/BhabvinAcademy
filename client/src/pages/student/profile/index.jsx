@@ -1,35 +1,8 @@
 import React, { useState, useContext, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { 
-    LayoutDashboard, 
-    BookOpen, 
-    Route, 
-    FileText, 
-    TrendingUp, 
-    Settings, 
-    Bell, 
-    ShoppingCart, 
-    ChevronLeft,
-    CheckCircle2,
-    Trophy,
-    Award,
-    Mail,
-    Phone,
-    MapPin,
-    Globe,
-    CreditCard,
-    Shield,
-    Trash2,
-    Lock,
-    Save,
-    MoreVertical,
-    Download,
-    Star
-} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { AuthContext } from "@/context/auth-context";
 import { StudentContext } from "@/context/student-context";
-import { getCourseImageUrl } from "@/utils/course-images";
 import { updateUserProfileService } from "@/services";
 
 function StudentProfilePage() {
@@ -40,11 +13,22 @@ function StudentProfilePage() {
     const [activeTab, setActiveTab] = useState("profile");
     const [showToast, setShowToast] = useState(false);
 
+    // Profile state
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
-    const [headline, setHeadline] = useState("");
+    const [phone, setPhone] = useState("+91 98765 43210");
     const [bio, setBio] = useState("");
-    const [profileImage, setProfileImage] = useState("");
+    
+    // Preferences state
+    const [country, setCountry] = useState("India");
+    const [city, setCity] = useState("Mumbai");
+    const [language, setLanguage] = useState("English");
+    const [timezone, setTimezone] = useState("IST (UTC +5:30)");
+
+    // Change password state
+    const [currentPassword, setCurrentPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
 
     useEffect(() => {
         if (auth?.user?._id) {
@@ -57,9 +41,7 @@ function StudentProfilePage() {
             const nameParts = (auth.user.userFullName || auth.user.userName || "").trim().split(" ");
             setFirstName(nameParts[0] || "");
             setLastName(nameParts.slice(1).join(" ") || "");
-            setHeadline(auth.user.userHeadline || "");
-            setBio(auth.user.userBio || "");
-            setProfileImage(auth.user.profileImage || "");
+            setBio(auth.user.userBio || "IT enthusiast working toward MCSA certification. Passionate about Windows Server and networking.");
         }
     }, [auth?.user]);
 
@@ -74,9 +56,9 @@ function StudentProfilePage() {
             const response = await updateUserProfileService({
                 userId: auth?.user?._id,
                 userFullName: updatedFullName,
-                userHeadline: headline,
+                userHeadline: auth?.user?.userHeadline || "Student",
                 userBio: bio,
-                profileImage: profileImage
+                profileImage: auth?.user?.profileImage || ""
             });
             if (response?.success) {
                 setAuth({
@@ -84,9 +66,7 @@ function StudentProfilePage() {
                     user: {
                         ...auth.user,
                         userFullName: updatedFullName,
-                        userHeadline: headline,
-                        userBio: bio,
-                        profileImage: profileImage
+                        userBio: bio
                     }
                 });
                 triggerToast("Profile updated successfully!");
@@ -99,13 +79,7 @@ function StudentProfilePage() {
         }
     };
 
-    const reveal = {
-        initial: { opacity: 0, y: 15 },
-        animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.4 }
-    };
-
-    const userFullName = auth?.user?.userFullName || auth?.user?.userName || "Student";
+    const userFullName = auth?.user?.userFullName || auth?.user?.userName || "Arjun Mehta";
     const userInitials = userFullName
         .split(" ")
         .map(n => n[0])
@@ -114,9 +88,10 @@ function StudentProfilePage() {
         .toUpperCase();
 
     const sidebarNav = [
-        { icon: <LayoutDashboard size={18} />, label: "Dashboard", path: "/dashboard" },
-        { icon: <BookOpen size={18} />, label: "My Courses", path: "/student-courses", badge: studentBoughtCoursesList?.length?.toString() },
-        { icon: <FileText size={18} />, label: "Practice Exams", path: "/exams" },
+        { label: "Dashboard", path: "/dashboard", icon: "📊" },
+        { label: "My Courses", path: "/student-courses", icon: "📚", badge: studentBoughtCoursesList?.length?.toString() },
+        { label: "Learning Paths", path: "/courses", icon: "🗺️" },
+        { label: "Practice Exams", path: "/exams", icon: "📝" },
     ];
 
     const tabs = [
@@ -127,448 +102,773 @@ function StudentProfilePage() {
         { id: "security", label: "Security" },
     ];
 
+    const heatmapData = [
+        0,0,0,1,0,2,3,1,0,1,2,4,3,1,0,0,1,3,4,2,1,0,0,2,3,1,4,2,0,1,
+        2,3,1,0,1,4,3,2,1,0,0,1,2,4,3,1,2,3,0,1,4,2,1,0,0,2,3,4,1,0,
+        1,2,3,0,1,2,4,3,1,0,0,1,2,3,4,2,1,0,1,3,4,2,1,0,0,1,2,3,4,1
+    ];
+
+    const getHeatmapColorClass = (level) => {
+        switch (level) {
+            case 1: return "bg-[#bfdbfe]";
+            case 2: return "bg-[#60a5fa]";
+            case 3: return "bg-[#2563eb]";
+            case 4: return "bg-[#0071e3]";
+            default: return "bg-[#f0f0f0]";
+        }
+    };
+
     return (
-        <div className="flex min-h-screen bg-[#f5f5f7] font-['Inter']">
+        <div className="flex min-h-screen bg-[#f5f5f7] font-sans text-[#1d1d1f] text-left">
+            
             {/* SIDEBAR */}
-            <aside className="w-[240px] bg-black text-white flex flex-col fixed inset-y-0 left-0 z-50">
-                <div className="p-6 border-b border-white/10">
-                    <Link to="/" className="text-[22px] font-bold tracking-tight">Bhavin<span className="text-[#0071e3]">Academy</span></Link>
+            <aside className="w-[240px] min-h-screen bg-black text-[#f5f5f7] flex flex-col fixed top-0 left-0 z-50 py-6 overflow-y-auto no-scrollbar border-r border-white/5">
+                <div className="px-6 pb-4 border-b border-white/[0.08] mb-0">
+                    <Link to="/dashboard" className="text-[22px] font-bold tracking-tight text-[#f5f5f7] no-underline">
+                        Bhavin<span>Academy</span>
+                    </Link>
                 </div>
 
+                {/* User Profile */}
                 <div 
                     onClick={() => navigate("/profile")}
-                    className="p-4 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer group"
+                    className="p-[12px_16px_14px] border-b border-white/[0.08] mb-2 cursor-pointer hover:bg-white/5 transition-all"
                 >
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0071e3] to-[#00d4ff] flex items-center justify-center font-bold text-[12px] text-white">
-                            {auth?.user?.profileImage ? (
-                                <img src={auth.user.profileImage} className="w-full h-full rounded-full object-cover" />
-                            ) : (
-                                userInitials
-                            )}
+                    <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0071e3] to-[#00d4ff] flex items-center justify-center font-bold text-[12px] text-white shrink-0">
+                            {userInitials}
                         </div>
                         <div className="min-w-0 flex-1">
-                            <div className="text-[14px] font-bold truncate">{userFullName}</div>
-                            <div className="text-[11px] text-[#86868b]">View Account ›</div>
+                            <div className="text-[15px] font-semibold text-white truncate">{userFullName}</div>
+                            <div className="text-[12px] text-[#6e6e73] mt-[1px]">Pro Plan · View Account ›</div>
                         </div>
-                        <MoreVertical size={14} className="text-[#86868b] group-hover:text-white" />
+                        <span className="text-[13px] text-[#0071e3] shrink-0">●</span>
                     </div>
                 </div>
 
-                <nav className="flex-1 p-4 space-y-8 overflow-y-auto no-scrollbar">
-                    <div>
-                        <p className="text-[10px] font-black text-[#86868b] uppercase tracking-widest px-3 mb-4">Main</p>
-                        <ul className="space-y-1">
-                            {sidebarNav.map((item, i) => (
-                                <li key={i}>
-                                    <Link to={item.path} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] font-semibold transition-all text-[#86868b] hover:bg-white/5 hover:text-white`}>
-                                        {item.icon}
-                                        {item.label}
-                                        {item.badge && <span className="ml-auto bg-[#0071e3] text-white text-[10px] font-black px-2 py-0.5 rounded-full">{item.badge}</span>}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                    <div>
-                        <p className="text-[10px] font-black text-[#86868b] uppercase tracking-widest px-3 mb-4">Track</p>
-                        <ul className="space-y-1">
-                            <li><Link to="/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] font-semibold text-[#86868b] hover:bg-white/5 hover:text-white transition-all"><TrendingUp size={18} /> Progress</Link></li>
-                        </ul>
-                    </div>
-                    <div className="mt-auto pt-8">
-                        <p className="text-[10px] font-black text-[#86868b] uppercase tracking-widest px-3 mb-4">Settings</p>
-                        <ul className="space-y-1">
-                            <li><Link to="/profile" className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] font-semibold transition-all bg-[#0071e3]/20 text-[#40a9ff]`}><Settings size={18} /> Account Settings</Link></li>
-                        </ul>
-                    </div>
-                </nav>
+                <p className="px-[24px] py-[8px] text-[12px] font-semibold uppercase tracking-[0.1em] text-[#6e6e73] mt-2">Main</p>
+                <ul className="list-none px-4 space-y-1">
+                    {sidebarNav.map((item, idx) => (
+                        <li key={idx}>
+                            <Link 
+                                to={item.path} 
+                                className="flex items-center gap-2.5 p-[9px_12px] rounded-[10px] text-[15px] font-medium text-[#86868b] hover:bg-white/5 hover:text-[#f5f5f7] transition-all no-underline"
+                            >
+                                <span className="w-[18px] text-center">{item.icon}</span> {item.label}
+                                {item.badge && (
+                                    <span className="ml-auto bg-[#0071e3] text-white text-[10px] font-bold p-[2px_7px] rounded-full">
+                                        {item.badge}
+                                    </span>
+                                )}
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+
+                <p className="px-[24px] py-[8px] text-[12px] font-semibold uppercase tracking-[0.1em] text-[#6e6e73] mt-2">Track</p>
+                <ul className="list-none px-4 space-y-1">
+                    <li>
+                        <Link to="/profile" className="flex items-center gap-2.5 p-[9px_12px] rounded-[10px] text-[15px] font-medium text-[#86868b] hover:bg-white/5 hover:text-[#f5f5f7] transition-all no-underline">
+                            <span className="w-[18px] text-center">📈</span> Progress
+                        </Link>
+                    </li>
+                </ul>
+
+                <p className="px-[24px] py-[8px] text-[12px] font-semibold uppercase tracking-[0.1em] text-[#6e6e73] mt-2">Settings</p>
+                <ul className="list-none px-4 space-y-1">
+                    <li>
+                        <Link to="/contact" className="flex items-center gap-2.5 p-[9px_12px] rounded-[10px] text-[15px] font-medium text-[#86868b] hover:bg-white/5 hover:text-[#f5f5f7] transition-all no-underline">
+                            <span className="w-[18px] text-center">💬</span> Support
+                        </Link>
+                    </li>
+                </ul>
             </aside>
 
-            {/* MAIN CONTENT */}
+            {/* MAIN CONTENT AREA */}
             <main className="ml-[240px] flex-1 flex flex-col min-h-screen">
+                
                 {/* TOPBAR */}
-                <header className="h-[58px] bg-white/80 backdrop-blur-xl border-b border-[#000]/5 sticky top-0 z-40 px-8 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <Link to="/dashboard" className="flex items-center gap-2 px-3 py-1.5 border border-[#d2d2d7] rounded-lg bg-white text-[13px] font-semibold text-[#6e6e73] hover:border-[#0071e3] hover:text-[#0071e3] transition-all">
-                            <ChevronLeft size={14} /> Back
+                <header className="bg-[#f5f5f7]/90 backdrop-blur-[20px] border-b border-black/7 px-8 h-[58px] flex items-center justify-between sticky top-0 z-40 shrink-0">
+                    <div className="flex items-center gap-2.5">
+                        <Link 
+                            to="/dashboard" 
+                            className="flex items-center gap-1.5 text-[13px] font-medium text-[#6e6e73] no-underline p-[6px_12px] rounded-[8px] border border-[#d2d2d7] bg-white cursor-pointer hover:border-[#0071e3] hover:text-[#0071e3] transition-all"
+                        >
+                            ← Back
                         </Link>
-                        <div className="text-[13px] text-[#86868b]">Dashboard › <span className="text-[#1d1d1f] font-bold">Account</span></div>
+                        <div className="text-[13px] text-[#86868b]">
+                            Dashboard &rsaquo; <span className="text-[#1d1d1f] font-semibold">Account</span>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                        <button className="w-9 h-9 border border-[#d2d2d7] rounded-lg flex items-center justify-center text-[#1d1d1f] hover:border-[#0071e3] transition-all relative"><Bell size={18} /></button>
-                        <button className="w-9 h-9 border border-[#d2d2d7] rounded-lg flex items-center justify-center text-[#1d1d1f] hover:border-[#0071e3] transition-all"><ShoppingCart size={18} /></button>
+                    <div className="flex items-center gap-3">
+                        <button className="w-[34px] h-[34px] rounded-[8px] border border-[#d2d2d7] bg-white flex items-center justify-center cursor-pointer text-[15px] relative transition-colors hover:border-[#0071e3]">
+                            🔔
+                            <div className="absolute top-[6px] right-[6px] w-[7px] h-[7px] bg-[#0071e3] rounded-full border-[1.5px] border-[#f5f5f7]" />
+                        </button>
+                        <button className="w-[34px] h-[34px] rounded-[8px] border border-[#d2d2d7] bg-white flex items-center justify-center cursor-pointer text-[15px] transition-colors hover:border-[#0071e3]">
+                            🛒
+                        </button>
                     </div>
                 </header>
 
-                <div className="p-8 pb-20 max-w-[1000px]">
-                    <div className="text-[11px] font-black text-[#0071e3] uppercase tracking-widest mb-1">My Account</div>
-                    <h1 className="text-[26px] font-extrabold tracking-tight text-[#1d1d1f] mb-8">Account Details</h1>
+                {/* CONTENT WRAPPER */}
+                <div className="p-[28px_32px_60px] flex-1">
+                    
+                    <div className="text-[11px] font-bold text-[#0071e3] uppercase tracking-wider mb-[4px]">
+                        My Account
+                    </div>
+                    <h1 className="text-[26px] font-extrabold tracking-tight text-[#1d1d1f] mb-[24px]">
+                        Account Details
+                    </h1>
 
                     {/* PROFILE HERO */}
-                    <div className="bg-black rounded-[24px] p-8 mb-8 relative overflow-hidden flex items-center gap-8">
-                        <div className="absolute left-[-40px] top-[-40px] w-64 h-64 rounded-full bg-[#0071e3]/20 blur-[100px] pointer-events-none" />
-                        <div className="relative z-10 w-22 h-22 rounded-full bg-gradient-to-br from-[#0071e3] to-[#00d4ff] flex items-center justify-center text-[30px] font-black text-white border-4 border-white/10 shadow-2xl shrink-0 overflow-hidden">
-                            {auth?.user?.profileImage ? (
-                                <img src={auth.user.profileImage} className="w-full h-full object-cover" />
-                            ) : (
-                                userInitials
-                            )}
+                    <div className="bg-black border border-white/8 rounded-[22px] p-[32px_36px] flex items-center gap-[28px] mb-[20px] relative overflow-hidden shrink-0">
+                        <div className="absolute left-[-40px] top-[-40px] w-[260px] h-[260px] rounded-full bg-[radial-gradient(circle,rgba(0,113,227,0.2)_0%,transparent_70%)] pointer-events-none" />
+                        <div className="relative z-10 w-[88px] h-[88px] rounded-full bg-gradient-to-br from-[#0071e3] to-[#00d4ff] flex items-center justify-center text-[30px] font-extrabold text-white shrink-0 border-3 border-white/12">
+                            {userInitials}
                         </div>
-                        <div className="relative z-10 flex-1 min-w-0">
-                            <h2 className="text-[26px] font-black text-[#f5f5f7] leading-none mb-2">{userFullName}</h2>
-                            <div className="flex flex-wrap items-center gap-4 mb-4">
-                                <span className="text-[13px] text-[#86868b]">{auth?.user?.userEmail || "student@email.com"}</span>
-                                <span className="bg-[#0071e3]/20 border border-[#40a9ff]/30 text-[#40a9ff] text-[11px] font-black px-3 py-0.5 rounded-full uppercase tracking-widest">Student</span>
+                        <div className="relative z-10 flex-1 min-w-0 text-left">
+                            <h2 className="text-[26px] font-extrabold tracking-tight text-[#f5f5f7] mb-[4px] leading-[1]">
+                                {userFullName}
+                            </h2>
+                            <div className="flex items-center gap-4 flex-wrap mt-[4px]">
+                                <span className="text-[13px] text-[#86868b]">{auth?.user?.userEmail || "arjun.mehta@email.com"}</span>
+                                <span className="inline-flex items-center bg-[#0071e3]/20 border border-[#0071e3]/35 text-[#4da3ff] text-[11px] font-bold p-[3px_12px] rounded-full tracking-wider uppercase">
+                                    Pro Plan
+                                </span>
+                                <span className="text-[12px] text-[#6e6e73]">Member since Jan 2025</span>
                             </div>
-                            <div className="flex gap-6">
-                                {[
-                                    { v: "47.5", l: "Hours" },
-                                    { v: studentBoughtCoursesList?.length?.toString() || "0", l: "Courses" },
-                                    { v: "12", l: "Streak" },
-                                    { v: studentBoughtCoursesList?.filter(c => c.progress === 100)?.length?.toString() || "0", l: "Cert" },
-                                ].map((s, i) => (
-                                    <div key={i} className="flex flex-col">
-                                        <div className="text-[20px] font-black text-white leading-none">{s.v}</div>
-                                        <div className="text-[10px] font-bold text-[#6e6e73] uppercase mt-1 tracking-tighter">{s.l}</div>
+                            <div className="flex gap-6 mt-[18px]">
+                                <div className="flex flex-col">
+                                    <div className="text-[22px] font-bold text-[#f5f5f7] leading-[1]">47.5</div>
+                                    <div className="text-[11px] text-[#6e6e73] mt-[3px] font-medium">Hours Learned</div>
+                                </div>
+                                <div className="w-[1px] bg-white/10" />
+                                <div className="flex flex-col">
+                                    <div className="text-[22px] font-bold text-[#f5f5f7] leading-[1]">
+                                        {studentBoughtCoursesList?.length || 3}
                                     </div>
-                                ))}
+                                    <div className="text-[11px] text-[#6e6e73] mt-[3px] font-medium">Courses</div>
+                                </div>
+                                <div className="w-[1px] bg-white/10" />
+                                <div className="flex flex-col">
+                                    <div className="text-[22px] font-bold text-[#f5f5f7] leading-[1]">12</div>
+                                    <div className="text-[11px] text-[#6e6e73] mt-[3px] font-medium">Day Streak</div>
+                                </div>
+                                <div className="w-[1px] bg-white/10" />
+                                <div className="flex flex-col">
+                                    <div className="text-[22px] font-bold text-[#f5f5f7] leading-[1]">1</div>
+                                    <div className="text-[11px] text-[#6e6e73] mt-[3px] font-medium">Certificate</div>
+                                </div>
                             </div>
                         </div>
                         <div className="relative z-10 flex flex-col gap-2 shrink-0">
-                            <button className="bg-[#0071e3] text-white text-[13px] font-black px-6 py-2.5 rounded-full hover:bg-[#0077ed] transition-all" onClick={() => setActiveTab("profile")}>Edit Profile</button>
-                            <button className="bg-white/10 text-white text-[13px] font-bold px-6 py-2.5 rounded-full border border-white/15 hover:bg-white/20 transition-all">Manage Plan</button>
+                            <button 
+                                onClick={() => setActiveTab("profile")}
+                                className="bg-[#0071e3] text-white border-none p-[10px_22px] rounded-[980px] text-[13px] font-semibold cursor-pointer hover:bg-[#0077ed] transition-colors"
+                            >
+                                Edit Profile
+                            </button>
+                            <button 
+                                onClick={() => setActiveTab("billing")}
+                                className="bg-white/8 text-[#f5f5f7] border border-white/15 p-[10px_22px] rounded-[980px] text-[13px] font-semibold cursor-pointer hover:bg-white/14 transition-colors"
+                            >
+                                Manage Plan
+                            </button>
                         </div>
                     </div>
 
-                    {/* TABS */}
-                    <div className="bg-white border border-[#e8e8ed] rounded-xl p-1 inline-flex gap-1 mb-6">
+                    {/* TABS ROW */}
+                    <div className="flex gap-[4px] bg-white border border-[#e8e8ed] rounded-[12px] p-[4px] w-fit mb-5">
                         {tabs.map(tab => (
                             <button 
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`px-5 py-1.5 rounded-lg text-[13px] font-bold transition-all ${activeTab === tab.id ? 'bg-[#0071e3] text-white shadow-lg' : 'text-[#6e6e73] hover:text-[#1d1d1f]'}`}
+                                className={`p-[8px_18px] rounded-[9px] text-[13px] font-medium cursor-pointer border-none bg-transparent transition-all ${activeTab === tab.id ? 'bg-[#0071e3] text-white font-semibold shadow-[0_2px_8px_rgba(0,113,227,0.3)]' : 'text-[#6e6e73] hover:text-[#1d1d1f]'}`}
                             >
                                 {tab.label}
                             </button>
                         ))}
                     </div>
 
-                    {/* TAB CONTENT */}
-                    <AnimatePresence mode="wait">
+                    {/* TAB PANELS */}
+                    <div>
                         {activeTab === "profile" && (
-                            <motion.div key="profile" {...reveal} className="space-y-4">
-                                <div className="bg-white rounded-2xl p-8 border border-black/5 shadow-sm">
-                                    <h3 className="text-[15px] font-black text-[#1d1d1f] mb-1">Personal Information</h3>
-                                    <p className="text-[12px] text-[#86868b] mb-6">Update your name, bio and contact details.</p>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-black text-[#86868b] uppercase tracking-widest">First Name</label>
+                            <div className="space-y-3.5">
+                                {/* Personal Info */}
+                                <div className="bg-white border border-black/6 rounded-[18px] p-[24px_24px_20px]">
+                                    <h3 className="text-[15px] font-bold text-[#1d1d1f] mb-[2px]">Personal Information</h3>
+                                    <p className="text-[12px] text-[#86868b] mb-[20px]">Update your name, bio and contact details.</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-[11px] font-bold uppercase tracking-wider text-[#86868b]">First Name</label>
                                             <input 
                                                 type="text" 
-                                                className="w-full bg-[#f5f5f7] border border-[#e8e8ed] rounded-xl px-4 py-2.5 text-[14px] outline-none focus:border-[#0071e3] focus:bg-white transition-all" 
-                                                value={firstName} 
-                                                onChange={(e) => setFirstName(e.target.value)} 
+                                                className="font-sans text-[14px] text-[#1d1d1f] bg-[#f5f5f7] border border-[#e8e8ed] rounded-[10px] p-[10px_13px] outline-none focus:border-[#0071e3] focus:bg-white transition-all"
+                                                value={firstName}
+                                                onChange={(e) => setFirstName(e.target.value)}
                                             />
                                         </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-black text-[#86868b] uppercase tracking-widest">Last Name</label>
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-[11px] font-bold uppercase tracking-wider text-[#86868b]">Last Name</label>
                                             <input 
                                                 type="text" 
-                                                className="w-full bg-[#f5f5f7] border border-[#e8e8ed] rounded-xl px-4 py-2.5 text-[14px] outline-none focus:border-[#0071e3] focus:bg-white transition-all" 
-                                                value={lastName} 
-                                                onChange={(e) => setLastName(e.target.value)} 
+                                                className="font-sans text-[14px] text-[#1d1d1f] bg-[#f5f5f7] border border-[#e8e8ed] rounded-[10px] p-[10px_13px] outline-none focus:border-[#0071e3] focus:bg-white transition-all"
+                                                value={lastName}
+                                                onChange={(e) => setLastName(e.target.value)}
                                             />
                                         </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-black text-[#86868b] uppercase tracking-widest">Email Address</label>
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-[11px] font-bold uppercase tracking-wider text-[#86868b]">Email Address</label>
                                             <input 
                                                 type="email" 
-                                                disabled 
-                                                className="w-full bg-[#f5f5f7] border border-[#e8e8ed] rounded-xl px-4 py-2.5 text-[14px] outline-none opacity-60 cursor-not-allowed" 
-                                                value={auth?.user?.userEmail || ""} 
+                                                className="font-sans text-[14px] text-[#86868b] bg-[#f5f5f7] border border-[#e8e8ed] rounded-[10px] p-[10px_13px] outline-none cursor-default"
+                                                value={auth?.user?.userEmail || "arjun.mehta@email.com"}
+                                                readOnly
                                             />
                                         </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-black text-[#86868b] uppercase tracking-widest">Headline</label>
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-[11px] font-bold uppercase tracking-wider text-[#86868b]">Phone Number</label>
                                             <input 
-                                                type="text" 
-                                                className="w-full bg-[#f5f5f7] border border-[#e8e8ed] rounded-xl px-4 py-2.5 text-[14px] outline-none focus:border-[#0071e3] focus:bg-white transition-all" 
-                                                value={headline} 
-                                                placeholder="e.g. Cybersecurity Student" 
-                                                onChange={(e) => setHeadline(e.target.value)} 
+                                                type="tel" 
+                                                className="font-sans text-[14px] text-[#1d1d1f] bg-[#f5f5f7] border border-[#e8e8ed] rounded-[10px] p-[10px_13px] outline-none focus:border-[#0071e3] focus:bg-white transition-all"
+                                                value={phone}
+                                                onChange={(e) => setPhone(e.target.value)}
                                             />
                                         </div>
-                                        <div className="space-y-1.5 md:col-span-2">
-                                            <label className="text-[11px] font-black text-[#86868b] uppercase tracking-widest">Avatar Image URL</label>
-                                            <input 
-                                                type="text" 
-                                                className="w-full bg-[#f5f5f7] border border-[#e8e8ed] rounded-xl px-4 py-2.5 text-[14px] outline-none focus:border-[#0071e3] focus:bg-white transition-all" 
-                                                value={profileImage} 
-                                                placeholder="https://images.unsplash.com/photo-..." 
-                                                onChange={(e) => setProfileImage(e.target.value)} 
-                                            />
-                                        </div>
-                                        <div className="space-y-1.5 md:col-span-2">
-                                            <label className="text-[11px] font-black text-[#86868b] uppercase tracking-widest">Bio</label>
+                                        <div className="flex flex-col gap-1 md:col-span-2">
+                                            <label className="text-[11px] font-bold uppercase tracking-wider text-[#86868b]">Bio</label>
                                             <textarea 
                                                 rows="3" 
-                                                className="w-full bg-[#f5f5f7] border border-[#e8e8ed] rounded-xl px-4 py-2.5 text-[14px] outline-none focus:border-[#0071e3] focus:bg-white transition-all resize-none" 
-                                                value={bio} 
-                                                onChange={(e) => setBio(e.target.value)} 
+                                                className="font-sans text-[14px] text-[#1d1d1f] bg-[#f5f5f7] border border-[#e8e8ed] rounded-[10px] p-[10px_13px] outline-none focus:border-[#0071e3] focus:bg-white transition-all resize-none"
+                                                value={bio}
+                                                onChange={(e) => setBio(e.target.value)}
+                                                placeholder="Tell us a little about yourself…"
                                             />
                                         </div>
                                     </div>
-                                    <div className="mt-8 pt-6 border-t border-[#f0f0f0] flex justify-end gap-3">
+                                    <div className="flex items-center justify-end gap-2.5 mt-[18px] pt-4 border-t border-[#f0f0f0]">
                                         <button 
-                                            className="px-5 py-2 rounded-full border border-[#d2d2d7] text-[13px] font-bold text-[#6e6e73] hover:border-[#1d1d1f] hover:text-[#1d1d1f] transition-all"
+                                            className="bg-transparent text-[#6e6e73] border border-[#d2d2d7] p-[10px_20px] rounded-[980px] text-[13px] font-medium cursor-pointer hover:border-[#1d1d1f] hover:text-[#1d1d1f] transition-all"
                                             onClick={() => {
                                                 if (auth?.user) {
                                                     const nameParts = (auth.user.userFullName || auth.user.userName || "").trim().split(" ");
                                                     setFirstName(nameParts[0] || "");
                                                     setLastName(nameParts.slice(1).join(" ") || "");
-                                                    setHeadline(auth.user.userHeadline || "");
                                                     setBio(auth.user.userBio || "");
-                                                    setProfileImage(auth.user.profileImage || "");
                                                 }
                                             }}
                                         >
                                             Cancel
                                         </button>
-                                        <button onClick={handleSaveChanges} className="px-6 py-2 rounded-full bg-[#0071e3] text-white text-[13px] font-black hover:bg-[#0077ed] transition-all shadow-lg active:scale-95">Save Changes</button>
+                                        <button 
+                                            className="bg-[#0071e3] text-white border-none p-[10px_24px] rounded-[980px] text-[13px] font-semibold cursor-pointer hover:bg-[#0077ed] transition-colors"
+                                            onClick={handleSaveChanges}
+                                        >
+                                            Save Changes
+                                        </button>
                                     </div>
                                 </div>
 
-                                <div className="bg-white rounded-2xl p-8 border border-black/5 shadow-sm">
-                                    <h3 className="text-[15px] font-black text-[#1d1d1f] mb-1">Location & Preferences</h3>
-                                    <p className="text-[12px] text-[#86868b] mb-6">Set your region, language and timezone.</p>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-black text-[#86868b] uppercase tracking-widest">Country</label>
-                                            <select className="w-full bg-[#f5f5f7] border border-[#e8e8ed] rounded-xl px-4 py-2.5 text-[14px] outline-none focus:border-[#0071e3] focus:bg-white transition-all">
+                                {/* Location & Preferences */}
+                                <div className="bg-white border border-black/6 rounded-[18px] p-[24px_24px_20px]">
+                                    <h3 className="text-[15px] font-bold text-[#1d1d1f] mb-[2px]">Location & Preferences</h3>
+                                    <p className="text-[12px] text-[#86868b] mb-[20px]">Set your region, language and timezone.</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-[11px] font-bold uppercase tracking-wider text-[#86868b]">Country</label>
+                                            <select 
+                                                className="font-sans text-[14px] text-[#1d1d1f] bg-[#f5f5f7] border border-[#e8e8ed] rounded-[10px] p-[10px_13px] outline-none focus:border-[#0071e3] focus:bg-white cursor-pointer transition-all"
+                                                value={country}
+                                                onChange={(e) => setCountry(e.target.value)}
+                                            >
                                                 <option>India</option>
                                                 <option>United States</option>
+                                                <option>United Kingdom</option>
+                                                <option>Canada</option>
+                                                <option>Australia</option>
                                             </select>
                                         </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[11px] font-black text-[#86868b] uppercase tracking-widest">Language</label>
-                                            <select className="w-full bg-[#f5f5f7] border border-[#e8e8ed] rounded-xl px-4 py-2.5 text-[14px] outline-none focus:border-[#0071e3] focus:bg-white transition-all">
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-[11px] font-bold uppercase tracking-wider text-[#86868b]">City</label>
+                                            <input 
+                                                type="text" 
+                                                className="font-sans text-[14px] text-[#1d1d1f] bg-[#f5f5f7] border border-[#e8e8ed] rounded-[10px] p-[10px_13px] outline-none focus:border-[#0071e3] focus:bg-white transition-all"
+                                                value={city}
+                                                onChange={(e) => setCity(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-[11px] font-bold uppercase tracking-wider text-[#86868b]">Language</label>
+                                            <select 
+                                                className="font-sans text-[14px] text-[#1d1d1f] bg-[#f5f5f7] border border-[#e8e8ed] rounded-[10px] p-[10px_13px] outline-none focus:border-[#0071e3] focus:bg-white cursor-pointer transition-all"
+                                                value={language}
+                                                onChange={(e) => setLanguage(e.target.value)}
+                                            >
                                                 <option>English</option>
                                                 <option>Hindi</option>
+                                                <option>Gujarati</option>
+                                            </select>
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-[11px] font-bold uppercase tracking-wider text-[#86868b]">Timezone</label>
+                                            <select 
+                                                className="font-sans text-[14px] text-[#1d1d1f] bg-[#f5f5f7] border border-[#e8e8ed] rounded-[10px] p-[10px_13px] outline-none focus:border-[#0071e3] focus:bg-white cursor-pointer transition-all"
+                                                value={timezone}
+                                                onChange={(e) => setTimezone(e.target.value)}
+                                            >
+                                                <option>IST (UTC +5:30)</option>
+                                                <option>UTC</option>
+                                                <option>EST (UTC -5)</option>
                                             </select>
                                         </div>
                                     </div>
-                                    <div className="mt-8 pt-6 border-t border-[#f0f0f0] flex justify-end">
-                                        <button onClick={() => triggerToast("Preferences saved")} className="px-6 py-2 rounded-full bg-[#0071e3] text-white text-[13px] font-black">Save Changes</button>
+                                    <div className="flex items-center justify-end gap-2.5 mt-[18px] pt-4 border-t border-[#f0f0f0]">
+                                        <button className="bg-transparent text-[#6e6e73] border border-[#d2d2d7] p-[10px_20px] rounded-[980px] text-[13px] font-medium cursor-pointer hover:border-[#1d1d1f] hover:text-[#1d1d1f] transition-all">Cancel</button>
+                                        <button 
+                                            onClick={() => triggerToast("Preferences saved successfully!")}
+                                            className="bg-[#0071e3] text-white border-none p-[10px_24px] rounded-[980px] text-[13px] font-semibold cursor-pointer hover:bg-[#0077ed] transition-colors"
+                                        >
+                                            Save Changes
+                                        </button>
                                     </div>
                                 </div>
-                            </motion.div>
+
+                                {/* Account Info readonly */}
+                                <div className="bg-white border border-black/6 rounded-[18px] p-[24px_24px_20px]">
+                                    <h3 className="text-[15px] font-bold text-[#1d1d1f] mb-[2px]">Account Info</h3>
+                                    <p className="text-[12px] text-[#86868b] mb-[20px]">Read-only details managed by BhavinAcademy.</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-[11px] font-bold uppercase tracking-wider text-[#86868b]">Student ID</label>
+                                            <input type="text" className="font-sans text-[14px] text-[#86868b] bg-[#f5f5f7] border border-[#e8e8ed] rounded-[10px] p-[10px_13px] cursor-default outline-none" value="SL-2025-00481" readOnly />
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-[11px] font-bold uppercase tracking-wider text-[#86868b]">Member Since</label>
+                                            <input type="text" className="font-sans text-[14px] text-[#86868b] bg-[#f5f5f7] border border-[#e8e8ed] rounded-[10px] p-[10px_13px] cursor-default outline-none" value="January 14, 2025" readOnly />
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-[11px] font-bold uppercase tracking-wider text-[#86868b]">Current Plan</label>
+                                            <input type="text" className="font-sans text-[14px] text-[#86868b] bg-[#f5f5f7] border border-[#e8e8ed] rounded-[10px] p-[10px_13px] cursor-default outline-none" value="Pro Plan (Active)" readOnly />
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-[11px] font-bold uppercase tracking-wider text-[#86868b]">Last Login</label>
+                                            <input type="text" className="font-sans text-[14px] text-[#86868b] bg-[#f5f5f7] border border-[#e8e8ed] rounded-[10px] p-[10px_13px] cursor-default outline-none" value="Today, 9:14 AM" readOnly />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         )}
 
                         {activeTab === "progress" && (
-                            <motion.div key="progress" {...reveal} className="space-y-4">
+                            <div className="space-y-3.5">
+                                {/* Mini Stats */}
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                    <div className="bg-white p-6 rounded-2xl border border-black/5">
-                                        <div className="text-[24px] font-black">
-                                            {studentBoughtCoursesList?.length ? (studentBoughtCoursesList.length * 12.5).toFixed(1) : "0.0"}
-                                        </div>
-                                        <div className="text-[12px] text-[#86868b]">Total Hours</div>
-                                        <div className="mt-2 text-[10px] font-black text-[#1d6f42] bg-[#e6f4ea] px-2 py-0.5 rounded-full inline-block">↑ +3.2 this week</div>
+                                    <div className="bg-white p-4.5 rounded-[14px] border border-black/6">
+                                        <div className="text-[24px] font-extrabold tracking-tight leading-none text-[#1d1d1f]">47.5</div>
+                                        <div className="text-[12px] text-[#86868b] font-medium mt-1">Total Hours Learned</div>
+                                        <div className="mt-2 text-[10px] font-bold text-[#1d6f42] bg-[#e6f4ea] px-2 py-0.5 rounded-full inline-block">↑ +3.2 this week</div>
                                     </div>
-                                    <div className="bg-white p-6 rounded-2xl border border-black/5">
-                                        <div className="text-[24px] font-black">12</div>
-                                        <div className="text-[12px] text-[#86868b]">Day Streak</div>
-                                        <div className="mt-2 text-[10px] font-black text-[#1d6f42] bg-[#e6f4ea] px-2 py-0.5 rounded-full inline-block">↑ Best: 21 days</div>
+                                    <div className="bg-white p-4.5 rounded-[14px] border border-black/6">
+                                        <div className="text-[24px] font-extrabold tracking-tight leading-none text-[#1d1d1f]">12</div>
+                                        <div className="text-[12px] text-[#86868b] font-medium mt-1">Current Streak</div>
+                                        <div className="mt-2 text-[10px] font-bold text-[#1d6f42] bg-[#e6f4ea] px-2 py-0.5 rounded-full inline-block">↑ Best: 21 days</div>
                                     </div>
-                                    <div className="bg-white p-6 rounded-2xl border border-black/5">
-                                        <div className="text-[24px] font-black">
-                                            {studentBoughtCoursesList?.reduce((acc, curr) => acc + (curr.progress > 0 ? Math.ceil(curr.progress / 5) : 0), 0) || 0}
-                                        </div>
-                                        <div className="text-[12px] text-[#86868b]">Lessons Done</div>
-                                        <div className="mt-2 text-[10px] font-black text-[#86868b] bg-[#f5f5f7] px-2 py-0.5 rounded-full inline-block">Across {studentBoughtCoursesList?.length || 0} courses</div>
+                                    <div className="bg-white p-4.5 rounded-[14px] border border-black/6">
+                                        <div className="text-[24px] font-extrabold tracking-tight leading-none text-[#1d1d1f]">86</div>
+                                        <div className="text-[12px] text-[#86868b] font-medium mt-1">Lessons Completed</div>
+                                        <div className="mt-2 text-[10px] font-bold text-[#6e6e73] bg-[#f5f5f7] px-2 py-0.5 rounded-full inline-block">Across 3 courses</div>
                                     </div>
                                 </div>
 
-                                <div className="bg-white rounded-2xl p-8 border border-black/5 shadow-sm">
-                                    <h3 className="text-[15px] font-black text-[#1d1d1f] mb-1">Course Progress</h3>
-                                    <p className="text-[12px] text-[#86868b] mb-6">Track your progress across all enrolled courses.</p>
-                                    <div className="space-y-3">
-                                        {studentBoughtCoursesList && studentBoughtCoursesList.length > 0 ? (
-                                            studentBoughtCoursesList.map((c, i) => (
-                                                <div 
-                                                    key={c.courseId} 
-                                                    onClick={() => navigate(`/course-progress/${c.courseId}`)}
-                                                    className="flex items-center gap-4 p-4 rounded-xl bg-[#f5f5f7] hover:bg-[#ebebeb] transition-all cursor-pointer"
-                                                >
-                                                    <div className="w-11 h-11 rounded-xl overflow-hidden bg-[#f5f5f7] flex items-center justify-center shrink-0">
-                                                        <img src={getCourseImageUrl(c)} className="w-full h-full object-cover" />
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <div className="text-[14px] font-bold text-[#1d1d1f] truncate">{c.title}</div>
-                                                        <div className="flex items-center gap-3 mt-1.5">
-                                                            <div className="flex-1 h-1.5 bg-[#e8e8ed] rounded-full overflow-hidden">
-                                                                <div className="h-full bg-gradient-to-r from-[#0071e3] to-[#00d4ff]" style={{ width: `${c.progress || 0}%` }} />
-                                                            </div>
-                                                            <span className="text-[12px] font-black text-[#0071e3]">{c.progress || 0}%</span>
+                                {/* Course Progress */}
+                                <div className="bg-white border border-black/6 rounded-[18px] p-[24px_24px_20px]">
+                                    <h3 className="text-[15px] font-bold text-[#1d1d1f] mb-[2px]">Course Progress</h3>
+                                    <p className="text-[12px] text-[#86868b] mb-[20px]">Track your progress across all enrolled courses.</p>
+                                    <div className="flex flex-col gap-3">
+                                        {[
+                                            { title: "Windows Server Administration", pct: 50, meta: "Lesson 28 of 56 · 22 hrs total", color: "from-[#0078d4] to-[#005a9e]", icon: "🪟" },
+                                            { title: "Cisco CCNA Bootcamp", pct: 24, meta: "Lesson 18 of 74 · 36 hrs total", color: "from-[#1ba1e2] to-[#0050ef]", icon: "🌐" },
+                                            { title: "Azure Fundamentals AZ-900", pct: 16, meta: "Lesson 6 of 38 · 18 hrs total", color: "from-[#0089d6] to-[#00bcf2]", icon: "☁️" }
+                                        ].map((item, idx) => (
+                                            <div 
+                                                key={idx}
+                                                onClick={() => navigate("/dashboard")}
+                                                className="flex items-center gap-[14px] p-[14px_16px] bg-[#f5f5f7] rounded-[13px] hover:bg-[#ebebeb] transition-all cursor-pointer"
+                                            >
+                                                <div className="w-[42px] h-[42px] rounded-[11px] bg-gradient-to-br from-[#0071e3] to-[#00d4ff] flex items-center justify-center text-[20px] shrink-0 text-white">
+                                                    {item.icon}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="text-[14px] font-semibold text-[#1d1d1f] truncate mb-[5px]">{item.title}</div>
+                                                    <div className="flex items-center gap-[10px]">
+                                                        <div className="flex-1 h-[5px] bg-[#e8e8ed] rounded-full overflow-hidden">
+                                                            <div className="h-full bg-gradient-to-r from-[#0071e3] to-[#00d4ff] rounded-full" style={{ width: `${item.pct}%` }} />
                                                         </div>
-                                                        <div className="text-[11px] text-[#86868b] mt-1.5">Instructor: {c.instructorName || "Instructor"}</div>
+                                                        <span className="text-[12px] font-bold text-[#0071e3] shrink-0">{item.pct}%</span>
                                                     </div>
-                                                    <span className="text-[11px] font-black px-3 py-1 rounded-full bg-[#e8f1fb] text-[#0071e3]">
-                                                        {c.progress === 100 ? "Completed" : "In Progress"}
-                                                    </span>
+                                                    <div className="text-[11px] text-[#86868b] mt-[3px]">{item.meta}</div>
                                                 </div>
-                                            ))
-                                        ) : (
-                                            <div className="text-center py-8 text-[#86868b] text-[13px]">
-                                                No course progress to display. Explore courses to begin!
+                                                <span className="text-[11px] font-semibold bg-[#e8f1fb] text-[#0071e3] p-[3px_10px] rounded-full shrink-0">
+                                                    In Progress
+                                                </span>
                                             </div>
-                                        )}
+                                        ))}
                                     </div>
                                 </div>
 
-                                <div className="bg-white rounded-2xl p-8 border border-black/5 shadow-sm">
-                                    <h3 className="text-[15px] font-black text-[#1d1d1f] mb-1">Certificates Earned</h3>
-                                    <div className="space-y-3 mt-6">
-                                        {studentBoughtCoursesList && studentBoughtCoursesList.filter(c => c.progress === 100).length > 0 ? (
-                                            studentBoughtCoursesList.filter(c => c.progress === 100).map((c, i) => (
-                                                <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-[#f5f5f7]">
-                                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#ffd60a] to-[#ff9f0a] flex items-center justify-center text-xl">🏆</div>
-                                                    <div className="flex-1">
-                                                        <div className="text-[13px] font-bold">{c.title} — Certificate</div>
-                                                        <div className="text-[11px] text-[#86868b]">Issued Mar 10, 2025 · Verified</div>
-                                                    </div>
-                                                    <button className="text-[12px] font-black text-[#0071e3] hover:underline" onClick={() => triggerToast("Certificate downloaded")}>⬇ Download</button>
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <div className="text-[#86868b] text-[12px]">Complete any course to earn your verified certificate.</div>
-                                        )}
+                                {/* Certificates */}
+                                <div className="bg-white border border-black/6 rounded-[18px] p-[24px_24px_20px]">
+                                    <h3 className="text-[15px] font-bold text-[#1d1d1f] mb-[2px]">Certificates Earned</h3>
+                                    <p className="text-[12px] text-[#86868b] mb-[20px]">Download or share your achievements.</p>
+                                    <div className="flex flex-col gap-2.5">
+                                        <div className="flex items-center gap-[14px] p-[14px_16px] bg-[#f5f5f7] rounded-[13px]">
+                                            <div className="w-[40px] h-[40px] rounded-[10px] bg-gradient-to-br from-[#ffd60a] to-[#ff9f0a] flex items-center justify-center text-[20px] shrink-0">🏆</div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="text-[13px] font-semibold text-[#1d1d1f] truncate">Windows Fundamentals — Completion Certificate</div>
+                                                <div className="text-[11px] text-[#86868b] mt-[2px]">Issued March 10, 2025 · BhavinAcademy Certified</div>
+                                            </div>
+                                            <button 
+                                                onClick={() => triggerToast("Certificate downloaded successfully!")}
+                                                className="text-[12px] font-semibold text-[#0071e3] bg-transparent border-none cursor-pointer hover:underline"
+                                            >
+                                                ⬇ Download
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </motion.div>
+
+                                {/* Study Activity Heatmap */}
+                                <div className="bg-white border border-black/6 rounded-[18px] p-[24px_24px_20px]">
+                                    <h3 className="text-[15px] font-bold text-[#1d1d1f] mb-[2px]">Study Activity</h3>
+                                    <p className="text-[12px] text-[#86868b] mb-[20px]">Your learning activity over the last 3 months.</p>
+                                    
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {heatmapData.map((level, i) => (
+                                            <div 
+                                                key={i}
+                                                className={`w-[12px] h-[12px] rounded-[2px] cursor-pointer hover:scale-130 transition-transform ${getHeatmapColorClass(level)}`}
+                                                title={`${level === 0 ? 'No activity' : level + ' lesson' + (level > 1 ? 's' : '')} studied`}
+                                            />
+                                        ))}
+                                    </div>
+
+                                    <div className="flex items-center gap-1.5 mt-2 justify-end select-none">
+                                        <span className="text-[10px] text-[#86868b]">Less</span>
+                                        <div className="flex gap-[3px]">
+                                            {["bg-[#f0f0f0]", "bg-[#bfdbfe]", "bg-[#60a5fa]", "bg-[#2563eb]", "bg-[#0071e3]"].map((color, i) => (
+                                                <div key={i} className={`w-[10px] h-[10px] rounded-[2px] ${color}`} />
+                                            ))}
+                                        </div>
+                                        <span className="text-[10px] text-[#86868b]">More</span>
+                                    </div>
+                                </div>
+                            </div>
                         )}
 
                         {activeTab === "billing" && (
-                            <motion.div key="billing" {...reveal} className="space-y-4">
-                                <div className="bg-black rounded-2xl p-8 relative overflow-hidden">
-                                    <div className="absolute right-[-30px] top-[-30px] w-48 h-48 rounded-full bg-[#0071e3]/20 blur-[60px] pointer-events-none" />
-                                    <div className="text-[11px] font-black text-[#40a9ff] uppercase tracking-widest mb-1">Current Plan</div>
-                                    <h3 className="text-[22px] font-black text-white mb-2">Pro Plan</h3>
-                                    <p className="text-[13px] text-[#86868b] max-w-sm mb-6">Full access to all courses, labs, practice exams and certificates.</p>
-                                    <div className="flex flex-wrap gap-4 mb-8">
-                                        {["Unlimited access", "Virtual labs", "Certificates"].map((f, i) => (
-                                            <div key={i} className="flex items-center gap-2 text-[13px] text-[#d2d2d7]">
-                                                <CheckCircle2 size={14} className="text-[#0071e3]" /> {f}
+                            <div className="space-y-3.5">
+                                {/* Plan Card */}
+                                <div className="bg-black border border-white/8 rounded-[18px] p-6 relative overflow-hidden text-left text-white shrink-0">
+                                    <div className="absolute right-[-30px] top-[-30px] w-[180px] h-[180px] rounded-full bg-[radial-gradient(circle,rgba(0,113,227,0.25)_0%,transparent_70%)] pointer-events-none" />
+                                    <div className="text-[11px] font-bold text-[#4da3ff] uppercase tracking-wider mb-[6px]">Current Plan</div>
+                                    <h3 className="text-[22px] font-black text-[#f5f5f7] mb-[4px] leading-[1]">Pro Plan</h3>
+                                    <p className="text-[13px] text-[#86868b] mb-[18px] leading-[1.5] max-w-[400px]">
+                                        Full access to all courses, labs, practice exams and certificates.
+                                    </p>
+                                    <div className="flex flex-col gap-1.5 mb-[20px]">
+                                        {[
+                                            "Unlimited course access",
+                                            "All virtual labs & practice exams",
+                                            "Downloadable certificates",
+                                            "Priority support"
+                                        ].map((feat, idx) => (
+                                            <div key={idx} className="flex items-center gap-2 text-[13px] text-[#d2d2d7]">
+                                                <div className="w-[18px] h-[18px] rounded-full bg-[#0071e3]/25 flex items-center justify-center text-[10px] text-[#4da3ff] font-bold">✓</div>
+                                                <span>{feat}</span>
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="text-[12px] text-[#6e6e73] mb-6">Next renewal: <strong className="text-[#86868b]">January 14, 2026</strong> · ₹2,499/year</div>
-                                    <div className="flex gap-3">
-                                        <button className="bg-[#0071e3] text-white text-[13px] font-black px-6 py-2 rounded-full hover:bg-[#0077ed]">Upgrade Plan</button>
-                                        <button className="bg-white/10 text-white text-[13px] font-bold px-6 py-2 rounded-full border border-white/15 hover:bg-white/20 transition-all">Manage Billing</button>
+                                    <div className="text-[12px] text-[#6e6e73] mb-[16px]">Next renewal: <strong className="text-[#86868b]">January 14, 2026</strong> · ₹2,499/year</div>
+                                    <div className="flex gap-[10px]">
+                                        <button 
+                                            onClick={() => triggerToast("Redirecting to upgrade options…")}
+                                            className="bg-[#0071e3] text-white border-none p-[10px_20px] rounded-[980px] text-[13px] font-semibold cursor-pointer hover:bg-[#0077ed] transition-colors"
+                                        >
+                                            Upgrade Plan
+                                        </button>
+                                        <button 
+                                            onClick={() => triggerToast("Opening billing portal…")}
+                                            className="bg-white/8 text-[#f5f5f7] border border-white/15 p-[10px_18px] rounded-[980px] text-[13px] font-semibold cursor-pointer hover:bg-white/14 transition-colors"
+                                        >
+                                            Manage Billing
+                                        </button>
                                     </div>
                                 </div>
 
-                                <div className="bg-white rounded-2xl p-8 border border-black/5 shadow-sm">
-                                    <div className="flex items-center justify-between mb-6">
+                                {/* Payment Method */}
+                                <div className="bg-white border border-black/6 rounded-[18px] p-[24px_24px_20px]">
+                                    <div className="flex items-start justify-between mb-[18px]">
                                         <div>
-                                            <h3 className="text-[15px] font-black text-[#1d1d1f] mb-1">Payment Method</h3>
+                                            <h3 className="text-[15px] font-bold text-[#1d1d1f] mb-[2px]">Payment Method</h3>
                                             <p className="text-[12px] text-[#86868b]">Your saved payment details.</p>
                                         </div>
-                                        <button className="text-[12px] font-black text-[#0071e3] hover:underline">+ Add New</button>
+                                        <button 
+                                            onClick={() => triggerToast("Opening payment editor…")}
+                                            className="text-[12px] font-semibold text-[#0071e3] hover:underline bg-none border-none cursor-pointer p-0"
+                                        >
+                                            + Add New
+                                        </button>
                                     </div>
-                                    <div className="flex items-center gap-4 p-4 bg-[#f5f5f7] rounded-xl">
-                                        <div className="w-11 h-8 bg-[#1a1f71] rounded flex items-center justify-center text-[11px] font-black text-white shrink-0">VISA</div>
-                                        <div className="flex-1">
-                                            <div className="text-[14px] font-bold">Visa ending in 4242</div>
-                                            <div className="text-[11px] text-[#86868b]">Expires 08 / 2027</div>
+                                    <div className="flex items-center gap-[14px] p-[14px_16px] bg-[#f5f5f7] rounded-[13px]">
+                                        <div className="w-[44px] h-[30px] bg-gradient-to-br from-[#1a1f71] to-[#1a1f71] rounded-[6px] flex items-center justify-center text-[11px] font-bold text-white shrink-0 tracking-wider">
+                                            VISA
                                         </div>
-                                        <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-[#e6f4ea] text-[#1d6f42]">Default</span>
+                                        <div className="flex-1">
+                                            <div className="text-[14px] font-semibold text-[#1d1d1f]">Visa ending in 4242</div>
+                                            <div className="text-[12px] text-[#86868b] mt-[2px]">Expires 08 / 2027</div>
+                                        </div>
+                                        <span className="text-[11px] font-semibold bg-[#e6f4ea] text-[#1d6f42] p-[3px_10px] rounded-full shrink-0">
+                                            Default
+                                        </span>
                                     </div>
                                 </div>
-                            </motion.div>
+
+                                {/* Billing History */}
+                                <div className="bg-white border border-black/6 rounded-[18px] p-[24px_24px_20px]">
+                                    <h3 className="text-[15px] font-bold text-[#1d1d1f] mb-[2px]">Billing History</h3>
+                                    <p className="text-[12px] text-[#86868b] mb-[20px]">Past payments and invoices.</p>
+                                    <div className="divide-y divide-[#f0f0f0]">
+                                        {[
+                                            { desc: "Pro Plan — Annual", date: "Jan 14, 2025", amount: "₹2,499" },
+                                            { desc: "Pro Plan — Annual", date: "Jan 14, 2024", amount: "₹1,999" }
+                                        ].map((invoice, i) => (
+                                            <div key={i} className="flex items-center justify-between py-[13px] first:pt-0 last:pb-0">
+                                                <div>
+                                                    <div className="text-[13px] font-semibold text-[#1d1d1f]">{invoice.desc}</div>
+                                                    <div className="text-[11px] text-[#86868b] mt-[2px]">{invoice.date}</div>
+                                                </div>
+                                                <div className="flex items-center gap-[12px]">
+                                                    <span className="text-[14px] font-bold text-[#1d1d1f]">{invoice.amount}</span>
+                                                    <button 
+                                                        onClick={() => triggerToast("Invoice downloading...")}
+                                                        className="text-[12px] font-semibold text-[#0071e3] border border-[#d2d2d7] bg-white p-[6px_14px] rounded-[980px] cursor-pointer hover:border-[#0071e3] transition-colors"
+                                                    >
+                                                        Invoice
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
                         )}
 
                         {activeTab === "notifications" && (
-                            <motion.div key="notifications" {...reveal}>
-                                <div className="bg-white rounded-2xl p-8 border border-black/5 shadow-sm">
-                                    <h3 className="text-[15px] font-black text-[#1d1d1f] mb-1">Email Notifications</h3>
-                                    <p className="text-[12px] text-[#86868b] mb-6">Choose which emails you want to receive.</p>
-                                    <div className="divide-y divide-[#f0f0f0]">
-                                        {[
-                                            { t: "Course Updates", d: "New lessons and content added to your courses.", c: true },
-                                            { t: "Lab Reminders", d: "Reminders before upcoming labs and exams.", c: true },
-                                            { t: "Streak Alerts", d: "Get notified if you're about to lose your streak.", c: true },
-                                            { t: "Weekly Progress", d: "Summary of your weekly activity.", c: false },
-                                        ].map((n, i) => (
-                                            <div key={i} className="flex items-center justify-between py-4">
-                                                <div>
-                                                    <div className="text-[14px] font-bold text-[#1d1d1f]">{n.t}</div>
-                                                    <div className="text-[12px] text-[#86868b] mt-0.5">{n.d}</div>
-                                                </div>
-                                                <label className="relative inline-flex items-center cursor-pointer">
-                                                    <input type="checkbox" className="sr-only peer" defaultChecked={n.c} />
-                                                    <div className="w-11 h-6 bg-[#d2d2d7] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0071e3]" />
-                                                </label>
+                            <div className="bg-white border border-black/6 rounded-[18px] p-[24px_24px_20px]">
+                                <h3 className="text-[15px] font-bold text-[#1d1d1f] mb-[2px]">Email Notifications</h3>
+                                <p className="text-[12px] text-[#86868b] mb-[20px]">Choose which emails you want to receive.</p>
+                                <div className="divide-y divide-[#f0f0f0]">
+                                    {[
+                                        { title: "Course Updates", desc: "New lessons and content added to your courses.", checked: true },
+                                        { title: "Lab Reminders", desc: "Reminders before upcoming labs and exams.", checked: true },
+                                        { title: "Streak Alerts", desc: "Get notified if you're about to lose your streak.", checked: true },
+                                        { title: "Weekly Progress Report", desc: "Summary of your weekly learning activity.", checked: false },
+                                        { title: "Promotions & Offers", desc: "New courses, discounts and special offers.", checked: false }
+                                    ].map((notif, idx) => (
+                                        <div key={idx} className="flex items-center justify-between py-[13px] first:pt-0 last:pb-0">
+                                            <div>
+                                                <div className="text-[14px] font-semibold text-[#1d1d1f]">{notif.title}</div>
+                                                <div className="text-[12px] text-[#86868b] mt-[2px]">{notif.desc}</div>
                                             </div>
-                                        ))}
-                                    </div>
-                                    <div className="mt-8 pt-6 border-t border-[#f0f0f0] flex justify-end">
-                                        <button onClick={() => triggerToast("Preferences saved")} className="px-6 py-2 rounded-full bg-[#0071e3] text-white text-[13px] font-black">Save Preferences</button>
-                                    </div>
+                                            <label className="relative inline-flex items-center cursor-pointer w-[40px] h-[22px] shrink-0">
+                                                <input type="checkbox" className="sr-only peer" defaultChecked={notif.checked} />
+                                                <div className="w-full h-full bg-[#d2d2d7] rounded-full transition-all peer peer-checked:bg-[#0071e3] after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-[18px] after:shadow-[0_1px_4px_rgba(0,0,0,0.15)]" />
+                                            </label>
+                                        </div>
+                                    ))}
                                 </div>
-                            </motion.div>
+                                <div className="flex justify-end mt-4 pt-3.5 border-t border-[#f0f0f0]">
+                                    <button 
+                                        onClick={() => triggerToast("Notification preferences saved successfully!")}
+                                        className="bg-[#0071e3] text-white border-none p-[10px_24px] rounded-[980px] text-[13px] font-semibold cursor-pointer hover:bg-[#0077ed] transition-colors"
+                                    >
+                                        Save Preferences
+                                    </button>
+                                </div>
+                            </div>
                         )}
 
                         {activeTab === "security" && (
-                            <motion.div key="security" {...reveal} className="space-y-4">
-                                <div className="bg-white rounded-2xl p-8 border border-black/5 shadow-sm">
-                                    <h3 className="text-[15px] font-black text-[#1d1d1f] mb-1">Security Overview</h3>
-                                    <p className="text-[12px] text-[#86868b] mb-6">Manage your password, 2FA and active sessions.</p>
+                            <div className="space-y-3.5">
+                                {/* Security Overview */}
+                                <div className="bg-white border border-black/6 rounded-[18px] p-[24px_24px_20px]">
+                                    <h3 className="text-[15px] font-bold text-[#1d1d1f] mb-[2px]">Security Overview</h3>
+                                    <p className="text-[12px] text-[#86868b] mb-[20px]">Manage your password, 2FA and active sessions.</p>
                                     <div className="divide-y divide-[#f0f0f0]">
-                                        {[
-                                            { t: "Password", d: "Last changed 3 months ago", s: "Strong", ok: true },
-                                            { t: "Two-Factor Auth", d: "Authenticator app enabled", s: "Active", ok: true },
-                                            { t: "Backup Email", d: "Not configured", s: "Missing", ok: false },
-                                        ].map((s, i) => (
-                                            <div key={i} className="flex items-center justify-between py-4">
-                                                <div>
-                                                    <div className="text-[14px] font-bold text-[#1d1d1f]">{s.t}</div>
-                                                    <div className="text-[12px] text-[#86868b] mt-0.5">{s.d}</div>
-                                                </div>
-                                                <div className="flex items-center gap-4">
-                                                    <div className={`flex items-center gap-1.5 text-[12px] font-bold ${s.ok ? 'text-[#1d6f42]' : 'text-[#b25000]'}`}>
-                                                        <div className={`w-1.5 h-1.5 rounded-full ${s.ok ? 'bg-green-500' : 'bg-orange-500'}`} /> {s.s}
-                                                    </div>
-                                                    <button className="px-4 py-1.5 border border-[#d2d2d7] rounded-full text-[12px] font-bold hover:border-[#0071e3] transition-all" onClick={() => triggerToast("Settings opened")}>Manage</button>
-                                                </div>
+                                        <div className="flex items-center justify-between py-3.5 first:pt-0">
+                                            <div>
+                                                <div className="text-[14px] font-semibold text-[#1d1d1f]">Password</div>
+                                                <div className="text-[12px] text-[#86868b] mt-[2px]">Last changed 3 months ago</div>
                                             </div>
-                                        ))}
+                                            <div className="flex items-center gap-[10px]">
+                                                <div className="flex items-center gap-1.5 text-[12px] font-semibold text-[#1d6f42]">
+                                                    <div className="w-[7px] h-[7px] bg-[#34c759] rounded-full shrink-0" />
+                                                    Strong
+                                                </div>
+                                                <button 
+                                                    onClick={() => triggerToast("Password reset link sent to your email")}
+                                                    className="bg-transparent border border-[#d2d2d7] text-[#0071e3] font-semibold p-[6px_14px] rounded-[980px] text-[12px] cursor-pointer hover:border-[#0071e3] transition-colors"
+                                                >
+                                                    Change
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="flex items-center justify-between py-3.5">
+                                            <div>
+                                                <div className="text-[14px] font-semibold text-[#1d1d1f]">Two-Factor Authentication</div>
+                                                <div className="text-[12px] text-[#86868b] mt-[2px]">Authenticator app (Google Authenticator)</div>
+                                            </div>
+                                            <div className="flex items-center gap-[10px]">
+                                                <div className="flex items-center gap-1.5 text-[12px] font-semibold text-[#1d6f42]">
+                                                    <div className="w-[7px] h-[7px] bg-[#34c759] rounded-full shrink-0" />
+                                                    Enabled
+                                                </div>
+                                                <button 
+                                                    onClick={() => triggerToast("Opening 2FA settings...")}
+                                                    className="bg-transparent border border-[#d2d2d7] text-[#0071e3] font-semibold p-[6px_14px] rounded-[980px] text-[12px] cursor-pointer hover:border-[#0071e3] transition-colors"
+                                                >
+                                                    Manage
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center justify-between py-3.5">
+                                            <div>
+                                                <div className="text-[14px] font-semibold text-[#1d1d1f]">Backup Email</div>
+                                                <div className="text-[12px] text-[#86868b] mt-[2px]">Not configured</div>
+                                            </div>
+                                            <div className="flex items-center gap-[10px]">
+                                                <div className="flex items-center gap-1.5 text-[12px] font-semibold text-[#b25000]">
+                                                    <div className="w-[7px] h-[7px] bg-[#ff9f0a] rounded-full shrink-0" />
+                                                    Missing
+                                                </div>
+                                                <button 
+                                                    onClick={() => triggerToast("Opening backup setup...")}
+                                                    className="bg-transparent border border-[#d2d2d7] text-[#0071e3] font-semibold p-[6px_14px] rounded-[980px] text-[12px] cursor-pointer hover:border-[#0071e3] transition-colors"
+                                                >
+                                                    Add
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center justify-between py-3.5 last:pb-0">
+                                            <div>
+                                                <div className="text-[14px] font-semibold text-[#1d1d1f]">Active Sessions</div>
+                                                <div className="text-[12px] text-[#86868b] mt-[2px]">2 devices — Chrome on Windows, iPhone 14</div>
+                                            </div>
+                                            <button 
+                                                onClick={() => triggerToast("Opening active sessions tracker...")}
+                                                className="bg-transparent border border-[#d2d2d7] text-[#0071e3] font-semibold p-[6px_14px] rounded-[980px] text-[12px] cursor-pointer hover:border-[#0071e3] transition-colors"
+                                            >
+                                                View All
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="bg-red-50/50 border border-red-200 rounded-2xl p-8">
-                                    <h3 className="text-[14px] font-black text-red-700 mb-1">⚠ Danger Zone</h3>
-                                    <p className="text-[12px] text-[#86868b] mb-6">Deleting your account is permanent. All your progress and data will be removed immediately.</p>
-                                    <button className="bg-red-600 text-white text-[13px] font-black px-6 py-2 rounded-full hover:bg-red-700 active:scale-95 transition-all">Delete Account</button>
+                                {/* Change Password Card */}
+                                <div className="bg-white border border-black/6 rounded-[18px] p-[24px_24px_20px]">
+                                    <h3 className="text-[15px] font-bold text-[#1d1d1f] mb-[2px]">Change Password</h3>
+                                    <p className="text-[12px] text-[#86868b] mb-[20px]">Use a strong password with at least 8 characters.</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                                        <div className="flex flex-col gap-1 md:col-span-2">
+                                            <label className="text-[11px] font-bold uppercase tracking-wider text-[#86868b]">Current Password</label>
+                                            <input 
+                                                type="password" 
+                                                placeholder="Enter current password" 
+                                                className="font-sans text-[14px] text-[#1d1d1f] bg-[#f5f5f7] border border-[#e8e8ed] rounded-[10px] p-[10px_13px] outline-none focus:border-[#0071e3] focus:bg-white transition-all"
+                                                value={currentPassword}
+                                                onChange={(e) => setCurrentPassword(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-[11px] font-bold uppercase tracking-wider text-[#86868b]">New Password</label>
+                                            <input 
+                                                type="password" 
+                                                placeholder="Min. 8 characters" 
+                                                className="font-sans text-[14px] text-[#1d1d1f] bg-[#f5f5f7] border border-[#e8e8ed] rounded-[10px] p-[10px_13px] outline-none focus:border-[#0071e3] focus:bg-white transition-all"
+                                                value={newPassword}
+                                                onChange={(e) => setNewPassword(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-[11px] font-bold uppercase tracking-wider text-[#86868b]">Confirm New Password</label>
+                                            <input 
+                                                type="password" 
+                                                placeholder="Repeat new password" 
+                                                className="font-sans text-[14px] text-[#1d1d1f] bg-[#f5f5f7] border border-[#e8e8ed] rounded-[10px] p-[10px_13px] outline-none focus:border-[#0071e3] focus:bg-white transition-all"
+                                                value={confirmPassword}
+                                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center justify-end gap-2.5 mt-[18px] pt-4 border-t border-[#f0f0f0]">
+                                        <button className="bg-transparent text-[#6e6e73] border border-[#d2d2d7] p-[10px_20px] rounded-[980px] text-[13px] font-medium cursor-pointer hover:border-[#1d1d1f] hover:text-[#1d1d1f] transition-all">Cancel</button>
+                                        <button 
+                                            onClick={() => {
+                                                if (newPassword !== confirmPassword) {
+                                                    triggerToast("Passwords do not match!");
+                                                    return;
+                                                }
+                                                triggerToast("Password updated successfully!");
+                                                setCurrentPassword("");
+                                                setNewPassword("");
+                                                setConfirmPassword("");
+                                            }}
+                                            className="bg-[#0071e3] text-white border-none p-[10px_24px] rounded-[980px] text-[13px] font-semibold cursor-pointer hover:bg-[#0077ed] transition-colors"
+                                        >
+                                            Update Password
+                                        </button>
+                                    </div>
                                 </div>
-                            </motion.div>
+
+                                {/* Danger Zone */}
+                                <div className="bg-[#fff5f5] border border-[#fecaca] rounded-[18px] p-[22px_24px]">
+                                    <h3 className="text-[14px] font-bold text-[#b71c1c] mb-[4px]">⚠ Danger Zone</h3>
+                                    <p className="text-[12px] text-[#86868b] mb-[14px] leading-[1.5]">
+                                        Deleting your account is permanent and cannot be undone. All your progress, certificates and data will be removed immediately.
+                                    </p>
+                                    <button 
+                                        onClick={() => {
+                                            if (confirm("Are you sure? This cannot be undone. All your data will be permanently deleted.")) {
+                                                triggerToast("Account deletion request submitted!");
+                                            }
+                                        }}
+                                        className="bg-[#ff3b30] text-white border-none p-[9px_18px] rounded-[980px] text-[13px] font-semibold cursor-pointer hover:bg-[#d92b20] transition-colors"
+                                    >
+                                        Delete Account
+                                    </button>
+                                </div>
+                            </div>
                         )}
-                    </AnimatePresence>
+                    </div>
+
                 </div>
             </main>
 
-            {/* TOAST SYSTEM */}
+            {/* TOAST NOTIFICATION SYSTEM */}
             <AnimatePresence>
                 {showToast && (
                     <motion.div 
-                        initial={{ opacity: 0, y: 100 }}
+                        initial={{ opacity: 0, y: 80 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 100 }}
-                        className="fixed bottom-8 right-8 z-[100] bg-[#1d1d1f] text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/10"
+                        exit={{ opacity: 0, y: 80 }}
+                        className="fixed bottom-[28px] right-[28px] bg-[#1d1d1f] text-[#f5f5f7] p-[12px_20px] rounded-[12px] text-[13px] font-medium flex items-center gap-[8px] z-[999] shadow-[0_8px_24px_rgba(0,0,0,0.3)]"
                     >
-                        <div className="w-5 h-5 rounded-full bg-[#34c759] flex items-center justify-center text-[10px] font-black text-white">✓</div>
-                        <span className="text-[14px] font-bold">{showToast}</span>
+                        <div className="w-[20px] h-[20px] rounded-full bg-[#34c759] flex items-center justify-center text-[11px] font-bold shrink-0 text-white">✓</div>
+                        <span>{showToast}</span>
                     </motion.div>
                 )}
             </AnimatePresence>

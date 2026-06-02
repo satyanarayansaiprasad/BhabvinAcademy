@@ -1,279 +1,403 @@
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { filterOptions, sortOptions, courseCategories } from "@/config";
+import { useContext, useEffect, useState, useMemo } from "react";
 import { StudentContext } from "@/context/student-context";
 import { fetchStudentViewCourseListService } from "@/services";
-import { useContext, useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { Search, Grid, List } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Search } from "lucide-react";
 import CourseCard from "@/components/student-view/course-card";
 
-function createSearchParamsHelper(filterParams) {
-  const queryParams = [];
-  for (const [key, value] of Object.entries(filterParams)) {
-    if (Array.isArray(value) && value.length > 0) {
-      const paramValue = value.join(",");
-      queryParams.push(`${key}=${encodeURIComponent(paramValue)}`);
-    }
-  }
-  return queryParams.join("&");
-}
-
 function StudentViewCoursesPage() {
-  const [sort, setSort] = useState("price-lowtohigh");
-  const [filters, setFilters] = useState({});
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [viewType, setViewType] = useState("grid"); // grid | list
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const {
-    studentViewCoursesList,
-    setStudentViewCoursesList,
-    loadingState,
-    setLoadingState,
-  } = useContext(StudentContext);
-  
   const navigate = useNavigate();
+  const { studentViewCoursesList, setStudentViewCoursesList, loadingState, setLoadingState } = useContext(StudentContext);
 
-  function handleFilterOnChange(getSectionId, getCurrentOptionId) {
-    let cpyFilters = { ...filters };
-    if (getCurrentOptionId === null) {
-      delete cpyFilters[getSectionId];
-    } else {
-      if (!cpyFilters[getSectionId]) {
-        cpyFilters[getSectionId] = [getCurrentOptionId];
-      } else {
-        const index = cpyFilters[getSectionId].indexOf(getCurrentOptionId);
-        if (index === -1) cpyFilters[getSectionId].push(getCurrentOptionId);
-        else cpyFilters[getSectionId].splice(index, 1);
-      }
-    }
-    setFilters(cpyFilters);
-  }
+  // States
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [activeLevels, setActiveLevels] = useState([]);
+  const [activeDurs, setActiveDurs] = useState([]);
+  const [activeCerts, setActiveCerts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sort, setSort] = useState("default");
+  const [viewType, setViewType] = useState("grid"); // grid | list
 
-  async function fetchAllCourses(filters, sort) {
+  async function fetchAllCourses() {
     setLoadingState(true);
-    const buildQueryStringForFilters = createSearchParamsHelper(filters);
-    const query = new URLSearchParams(buildQueryStringForFilters);
-    if (sort) query.set("sortBy", sort);
-    const response = await fetchStudentViewCourseListService(query.toString());
-    if (response?.success) setStudentViewCoursesList(response?.data);
+    const response = await fetchStudentViewCourseListService("");
+    if (response?.success) {
+      setStudentViewCoursesList(response?.data);
+    }
     setLoadingState(false);
   }
 
   useEffect(() => {
-    const buildQueryStringForFilters = createSearchParamsHelper(filters);
-    const query = new URLSearchParams(buildQueryStringForFilters);
-    if (sort) query.set("sortBy", sort);
-    setSearchParams(query);
-  }, [filters, sort]);
-
-  useEffect(() => {
-    const initialFilters = {};
-    const queryParams = new URLSearchParams(window.location.search);
-    for (const [key, value] of queryParams.entries()) {
-      if (key !== "sortBy") initialFilters[key] = value.split(",");
-    }
-    setFilters(initialFilters);
-    setSort(queryParams.get("sortBy") || "price-lowtohigh");
-    
-    const searchFromUrl = queryParams.get("search");
-    if (searchFromUrl) {
-      setSearchTerm(searchFromUrl);
-    }
+    fetchAllCourses();
   }, []);
 
-  useEffect(() => {
-    fetchAllCourses(filters, sort);
-  }, [filters, sort]);
+  // Total stats derived from the whole catalog
+  const totalVideoLessons = 600;
+  const totalHours = 280;
+  const totalCategoriesCount = 5;
 
-  // Derived filtered list for local search
-  const filteredCourses = studentViewCoursesList?.filter(course => 
-    course.title.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  // Toggle helpers
+  function toggleLevel(level) {
+    setActiveLevels(prev =>
+      prev.includes(level) ? prev.filter(l => l !== level) : [...prev, level]
+    );
+  }
+
+  function toggleDur(dur) {
+    setActiveDurs(prev =>
+      prev.includes(dur) ? prev.filter(d => d !== dur) : [...prev, dur]
+    );
+  }
+
+  function toggleCert(cert) {
+    setActiveCerts(prev =>
+      prev.includes(cert) ? prev.filter(c => c !== cert) : [...prev, cert]
+    );
+  }
+
+  // Duration matcher function
+  function durMatch(hours) {
+    if (activeDurs.length === 0) return true;
+    const h = Number(hours || 0);
+    if (activeDurs.includes("short") && h < 20) return true;
+    if (activeDurs.includes("medium") && h >= 20 && h <= 30) return true;
+    if (activeDurs.includes("long") && h > 30) return true;
+    return false;
+  }
+
+  // Certification matcher function
+  function certMatch(course) {
+    if (activeCerts.length === 0) return true;
+    const cat = String(course?.category || '').toLowerCase();
+    const title = String(course?.title || '').toLowerCase();
+
+    if (activeCerts.includes("mcp") && (cat.includes("microsoft") || title.includes("windows") || title.includes("active directory") || title.includes("m365") || title.includes("hyper-v"))) {
+      return true;
+    }
+    if (activeCerts.includes("comptia") && title.includes("security+") || title.includes("network+")) {
+      return true;
+    }
+    if (activeCerts.includes("ccna") && title.includes("ccna")) {
+      return true;
+    }
+    if (activeCerts.includes("lpic") && (cat.includes("linux") || title.includes("linux") || title.includes("bash"))) {
+      return true;
+    }
+    if (activeCerts.includes("aws_azure") && (cat.includes("cloud") || title.includes("aws") || title.includes("azure"))) {
+      return true;
+    }
+    return false;
+  }
+
+  // Apply filters client-side to ensure perfect responsive interaction
+  const filteredCourses = useMemo(() => {
+    let result = [...(studentViewCoursesList || [])];
+
+    // Filter by Category tab
+    if (activeCategory !== "all") {
+      result = result.filter(c => String(c.category || '').toLowerCase() === activeCategory);
+    }
+
+    // Filter by Level check
+    if (activeLevels.length > 0) {
+      result = result.filter(c => activeLevels.includes(c.level));
+    }
+
+    // Filter by Duration
+    result = result.filter(c => durMatch(c.duration));
+
+    // Filter by Certification
+    result = result.filter(c => certMatch(c));
+
+    // Filter by Search Query
+    if (searchTerm.trim() !== "") {
+      const q = searchTerm.toLowerCase().trim();
+      result = result.filter(c => String(c.title || '').toLowerCase().includes(q) || String(c.subtitle || '').toLowerCase().includes(q));
+    }
+
+    // Apply Sorting
+    if (sort === "lessons-high") {
+      result.sort((a, b) => (b.curriculum?.length || 0) - (a.curriculum?.length || 0));
+    } else if (sort === "hours-high") {
+      result.sort((a, b) => Number(b.duration || 0) - Number(a.duration || 0));
+    } else if (sort === "newest") {
+      // Seed courses labeled as New first
+      result.sort((a, b) => {
+        const aNew = String(a.title || '').toLowerCase().includes("virtualization") || String(a.title || '').toLowerCase().includes("aws") || String(a.title || '').toLowerCase().includes("bash") ? 1 : 0;
+        const bNew = String(b.title || '').toLowerCase().includes("virtualization") || String(b.title || '').toLowerCase().includes("aws") || String(b.title || '').toLowerCase().includes("bash") ? 1 : 0;
+        return bNew - aNew;
+      });
+    }
+
+    return result;
+  }, [studentViewCoursesList, activeCategory, activeLevels, activeDurs, activeCerts, searchTerm, sort]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-surface font-body text-on-surface">
+    <div className="flex flex-col min-h-screen bg-white">
       {/* PAGE HEADER */}
-      <section className="bg-surface-container-low py-16 px-6 text-center relative overflow-hidden border-b border-transparent">
-        <div className="max-w-4xl mx-auto z-10 relative">
-          <p className="text-[12px] font-headline font-bold text-primary uppercase tracking-[0.08em] mb-3">Clinical Database</p>
-          <h1 className="text-[clamp(32px,5vw,48px)] font-headline font-extrabold tracking-tight text-on-surface mb-4">
-            Expert Product <span className="text-primary">Reviews & Ratings</span>
-          </h1>
-          <p className="text-[16px] text-on-surface-variant max-w-[600px] mx-auto leading-[1.6] font-body">
-            Unbiased analysis of wellness products and dietary supplements. We grade safety, purity, and clinical dosing guidelines.
-          </p>
-        </div>
+      <section className="bg-[linear-gradient(160deg,#000_0%,#1a1a2e_50%,#000_100%)] p-[64px_24px_56px] text-center relative overflow-hidden">
+        <div className="absolute w-[500px] h-[300px] rounded-full bg-[radial-gradient(circle,rgba(0,113,227,0.22)_0%,transparent_70%)] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+        <p className="text-[12px] font-semibold text-[#0071e3] uppercase tracking-[0.08em] mb-3">Course Catalog</p>
+        <h1 className="text-[clamp(32px,5vw,58px)] font-extrabold tracking-[-1.5px] text-[#f5f5f7] mb-3">
+          All <span className="bg-gradient-to-r from-[#0071e3] to-[#00d4ff] bg-clip-text text-transparent">Courses</span>
+        </h1>
+        <p className="text-[16px] text-[#86868b] max-w-[480px] mx-auto leading-[1.6] font-light">
+          Expert-led IT training across Microsoft, Linux, Cloud, Networking and Security - to help you build your skillset.
+        </p>
       </section>
 
       {/* STATS ROW */}
-      <div className="bg-surface py-6 px-6 border-b border-slate-100">
-        <div className="max-w-[1080px] mx-auto flex items-center justify-center gap-12 flex-wrap">
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-primary text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-            <div className="flex flex-col text-left">
-              <span className="text-xl font-headline font-bold text-on-surface">{studentViewCoursesList?.length || 0}</span>
-              <span className="text-[11px] text-slate-500 font-label">Active Reviews</span>
-            </div>
+      <div className="bg-[#f5f5f7] border-b border-[#d2d2d7] py-[20px] px-6">
+        <div className="max-w-[1080px] mx-auto flex items-center gap-[40px] flex-wrap justify-start">
+          <div className="flex flex-col">
+            <span className="text-[22px] font-bold text-[#1d1d1f] leading-none">{studentViewCoursesList?.length || 12}</span>
+            <span className="text-[12px] text-[#86868b] mt-1">Courses</span>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-primary text-3xl">clinical_notes</span>
-            <div className="flex flex-col text-left">
-              <span className="text-xl font-headline font-bold text-on-surface">600+</span>
-              <span className="text-[11px] text-slate-500 font-label">Tested Ingredients</span>
-            </div>
+          <div className="w-[1px] height-[36px] bg-[#d2d2d7] self-stretch hidden sm:block"></div>
+          <div className="flex flex-col">
+            <span className="text-[22px] font-bold text-[#1d1d1f] leading-none">{totalVideoLessons}+</span>
+            <span className="text-[12px] text-[#86868b] mt-1">Video Lessons</span>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-primary text-3xl">verified_user</span>
-            <div className="flex flex-col text-left">
-              <span className="text-xl font-headline font-bold text-on-surface">100%</span>
-              <span className="text-[11px] text-slate-500 font-label">Independent Lab Reports</span>
-            </div>
+          <div className="w-[1px] height-[36px] bg-[#d2d2d7] self-stretch hidden sm:block"></div>
+          <div className="flex flex-col">
+            <span className="text-[22px] font-bold text-[#1d1d1f] leading-none">{totalHours} hrs</span>
+            <span className="text-[12px] text-[#86868b] mt-1">Total Content</span>
+          </div>
+          <div className="w-[1px] height-[36px] bg-[#d2d2d7] self-stretch hidden sm:block"></div>
+          <div className="flex flex-col">
+            <span className="text-[22px] font-bold text-[#1d1d1f] leading-none">{totalCategoriesCount} Topics</span>
+            <span className="text-[12px] text-[#86868b] mt-1">Categories</span>
           </div>
         </div>
       </div>
 
-      {/* CONTROLS BAR (Sticky below header) */}
-      <div className="sticky top-[56px] z-30 bg-surface-container-lowest/85 backdrop-blur-xl border-b border-slate-100 py-4 px-6 overflow-x-auto overflow-y-hidden">
-        <div className="max-w-[1080px] mx-auto flex items-center gap-4 min-w-max">
-          <div className="relative w-[280px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-outline w-4 h-4" />
+      {/* CONTROLS BAR (Sticky) */}
+      <div className="sticky top-[52px] z-50 bg-white border-b border-[#d2d2d7] py-4 px-6">
+        <div className="max-w-[1080px] mx-auto flex items-center gap-[16px] flex-wrap justify-between">
+          {/* Search */}
+          <div className="relative flex-1 min-w-[200px] max-w-[340px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#86868b] w-4 h-4 pointer-events-none" />
             <input 
               type="text" 
-              placeholder="Search reviews..." 
+              placeholder="Search courses…" 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary/20 rounded-xl py-2 pl-9 pr-3 text-xs text-on-surface outline-none transition-colors"
+              className="w-full bg-[#f5f5f7] border border-[#d2d2d7] rounded-[10px] py-[9px] pl-9 pr-3 text-[14px] outline-none focus:border-[#0071e3] focus:bg-white transition-colors"
             />
           </div>
-          
-          <div className="flex gap-2">
-            <button
-              onClick={() => handleFilterOnChange("category", null)}
-              className={`px-4 py-2 rounded-full text-xs font-headline font-bold whitespace-nowrap transition-all ${
-                (!filters.category || filters.category.length === 0)
-                  ? "bg-primary text-white shadow-sm"
-                  : "bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high"
-              }`}
-            >
-              All Categories
-            </button>
-            {courseCategories.map((cat) => {
-              const isActive = filters.category?.includes(cat.id);
-              return (
-                <button 
-                  key={cat.id}
-                  onClick={() => handleFilterOnChange("category", cat.id)}
-                  className={`px-4 py-2 rounded-full text-xs font-headline font-bold whitespace-nowrap transition-all ${
-                    isActive
-                      ? "bg-primary text-white shadow-sm"
-                      : "bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high"
-                  }`}
-                >
-                  {cat.label}
-                </button>
-              );
-            })}
+
+          {/* Filter tabs */}
+          <div className="flex gap-[6px] flex-wrap">
+            {["all", "microsoft", "linux", "networking", "cloud", "security"].map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-[16px] py-[7px] border rounded-[980px] text-[13px] font-medium transition-all ${
+                  activeCategory === cat
+                    ? "bg-[#0071e3] border-[#0071e3] text-white"
+                    : "bg-white border-[#d2d2d7] text-[#6e6e73] hover:border-[#0071e3] hover:text-[#0071e3]"
+                }`}
+              >
+                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+              </button>
+            ))}
           </div>
-          
+
+          {/* Sort select */}
           <div className="ml-auto">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high border-none rounded-xl text-xs font-headline font-bold h-auto py-2.5 px-4 shadow-none">
-                  Sort: {sortOptions.find(s => s.id === sort)?.label || "Featured"}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="rounded-xl border-slate-100">
-                <DropdownMenuRadioGroup value={sort} onValueChange={setSort}>
-                  {sortOptions.map((opt) => (
-                    <DropdownMenuRadioItem key={opt.id} value={opt.id} className="text-xs font-body font-semibold">
-                      {opt.label}
-                    </DropdownMenuRadioItem>
-                  ))}
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <select 
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="px-3 py-2 border border-[#d2d2d7] rounded-[10px] text-[13px] text-[#1d1d1f] bg-white outline-none cursor-pointer"
+            >
+              <option value="default">Sort: Featured</option>
+              <option value="newest">Newest First</option>
+              <option value="lessons-high">Most Lessons</option>
+              <option value="hours-high">Longest</option>
+            </select>
           </div>
         </div>
       </div>
 
-      {/* MAIN CONTENT AREA */}
-      <div className="max-w-[1128px] mx-auto w-full px-6 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-8">
+      {/* MAIN LAYOUT */}
+      <div className="max-w-[1080px] mx-auto w-full px-6 py-[40px] pb-[80px]">
+        <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-[32px] items-start">
+          
           {/* SIDEBAR FILTERS */}
-          <aside className="hidden lg:block space-y-8 text-left">
-            {Object.keys(filterOptions).map((key) => (
-              <div key={key} className="flex flex-col">
-                <h3 className="text-[11px] font-headline font-bold text-slate-500 uppercase tracking-wider mb-4">{key}</h3>
-                <div className="flex flex-col gap-2">
-                  {filterOptions[key].map((opt) => {
-                    const isChecked = filters[key]?.includes(opt.id);
-                    return (
-                      <div 
-                        key={opt.id} 
-                        className="flex items-center justify-between group cursor-pointer py-1.5"
-                        onClick={() => handleFilterOnChange(key, opt.id)}
-                      >
-                        <div className="flex items-center gap-3 text-sm text-on-surface font-body">
-                          <div className={`w-4 h-4 rounded-md border flex items-center justify-center transition-all ${
-                            isChecked 
-                              ? "bg-primary border-primary text-white" 
-                              : "border-outline-variant bg-surface-container-lowest group-hover:border-primary"
-                          }`}>
-                            {isChecked && (
-                              <span className="material-symbols-outlined text-[10px] font-extrabold">check</span>
-                            )}
-                          </div>
-                          <span className="group-hover:text-primary transition-colors text-xs font-medium">{opt.label}</span>
+          <aside className="space-y-[28px] sticky top-[116px]">
+            
+            {/* Level Filter */}
+            <div className="flex flex-col pb-4 border-b border-[#f5f5f7]">
+              <div className="text-[12px] font-semibold text-[#86868b] uppercase tracking-[0.06em] mb-[12px]">Level</div>
+              <div className="flex flex-col gap-2">
+                {[
+                  { label: "Beginner", count: 4 },
+                  { label: "Intermediate", count: 4 },
+                  { label: "Advanced", count: 2 },
+                  { label: "All Levels", count: 2 }
+                ].map((levelItem) => {
+                  const checked = activeLevels.includes(levelItem.label);
+                  return (
+                    <div 
+                      key={levelItem.label} 
+                      onClick={() => toggleLevel(levelItem.label)}
+                      className="flex items-center justify-between py-[4px] cursor-pointer"
+                    >
+                      <div className="flex items-center gap-[8px] text-[13px] text-[#1d1d1f] select-none">
+                        <div className={`w-[16px] h-[16px] rounded-[4px] border-[1.5px] flex items-center justify-center transition-all ${
+                          checked ? "bg-[#0071e3] border-[#0071e3] text-white" : "border-[#d2d2d7]"
+                        }`}>
+                          {checked && <span className="text-[10px] font-bold">✓</span>}
                         </div>
+                        {levelItem.label}
                       </div>
-                    );
-                  })}
-                </div>
+                      <span className="text-[12px] text-[#86868b] bg-[#f5f5f7] px-[7px] py-[2px] rounded-[980px]">
+                        {levelItem.count}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
-            <button 
-              onClick={() => setFilters({})} 
-              className="text-xs text-primary font-headline font-bold hover:underline p-0 mt-2 block"
-            >
-              Clear all filters
-            </button>
+              <button 
+                onClick={() => setActiveLevels([])}
+                className="text-[12px] text-[#0071e3] text-left hover:underline bg-none border-none p-0 mt-[10px] font-medium"
+              >
+                Clear
+              </button>
+            </div>
+
+            {/* Duration Filter */}
+            <div className="flex flex-col pb-4 border-b border-[#f5f5f7]">
+              <div className="text-[12px] font-semibold text-[#86868b] uppercase tracking-[0.06em] mb-[12px]">Duration</div>
+              <div className="flex flex-col gap-2">
+                {[
+                  { label: "Under 20 hrs", value: "short", count: 3 },
+                  { label: "20 – 30 hrs", value: "medium", count: 6 },
+                  { label: "30 hrs+", value: "long", count: 3 }
+                ].map((durItem) => {
+                  const checked = activeDurs.includes(durItem.value);
+                  return (
+                    <div 
+                      key={durItem.value} 
+                      onClick={() => toggleDur(durItem.value)}
+                      className="flex items-center justify-between py-[4px] cursor-pointer"
+                    >
+                      <div className="flex items-center gap-[8px] text-[13px] text-[#1d1d1f] select-none">
+                        <div className={`w-[16px] h-[16px] rounded-[4px] border-[1.5px] flex items-center justify-center transition-all ${
+                          checked ? "bg-[#0071e3] border-[#0071e3] text-white" : "border-[#d2d2d7]"
+                        }`}>
+                          {checked && <span className="text-[10px] font-bold">✓</span>}
+                        </div>
+                        {durItem.label}
+                      </div>
+                      <span className="text-[12px] text-[#86868b] bg-[#f5f5f7] px-[7px] py-[2px] rounded-[980px]">
+                        {durItem.count}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              <button 
+                onClick={() => setActiveDurs([])}
+                className="text-[12px] text-[#0071e3] text-left hover:underline bg-none border-none p-0 mt-[10px] font-medium"
+              >
+                Clear
+              </button>
+            </div>
+
+            {/* Certification Filter */}
+            <div className="flex flex-col">
+              <div className="text-[12px] font-semibold text-[#86868b] uppercase tracking-[0.06em] mb-[12px]">Certification</div>
+              <div className="flex flex-col gap-2">
+                {[
+                  { label: "Microsoft (MCP)", value: "mcp", count: 4 },
+                  { label: "CompTIA", value: "comptia", count: 3 },
+                  { label: "Cisco (CCNA)", value: "ccna", count: 2 },
+                  { label: "Linux (LPIC)", value: "lpic", count: 2 },
+                  { label: "AWS / Azure", value: "aws_azure", count: 2 }
+                ].map((certItem) => {
+                  const checked = activeCerts.includes(certItem.value);
+                  return (
+                    <div 
+                      key={certItem.value} 
+                      onClick={() => toggleCert(certItem.value)}
+                      className="flex items-center justify-between py-[4px] cursor-pointer"
+                    >
+                      <div className="flex items-center gap-[8px] text-[13px] text-[#1d1d1f] select-none">
+                        <div className={`w-[16px] h-[16px] rounded-[4px] border-[1.5px] flex items-center justify-center transition-all ${
+                          checked ? "bg-[#0071e3] border-[#0071e3] text-white" : "border-[#d2d2d7]"
+                        }`}>
+                          {checked && <span className="text-[10px] font-bold">✓</span>}
+                        </div>
+                        {certItem.label}
+                      </div>
+                      <span className="text-[12px] text-[#86868b] bg-[#f5f5f7] px-[7px] py-[2px] rounded-[980px]">
+                        {certItem.count}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              <button 
+                onClick={() => setActiveCerts([])}
+                className="text-[12px] text-[#0071e3] text-left hover:underline bg-none border-none p-0 mt-[10px] font-medium"
+              >
+                Clear
+              </button>
+            </div>
+
           </aside>
 
           {/* MAIN GRID */}
-          <main>
-            <div className="flex items-center justify-between mb-6">
-              <p className="text-sm text-slate-500">
-                Showing <strong className="text-on-surface font-semibold">{filteredCourses.length}</strong> reviews
+          <main className="flex-1">
+            <div className="flex items-center justify-between mb-[20px]">
+              <p className="text-[14px] text-[#6e6e73]">
+                <strong className="text-[#1d1d1f]">{filteredCourses.length}</strong> courses found
               </p>
-              <div className="flex gap-1">
+              <div className="flex gap-[4px]">
                 <button 
                   onClick={() => setViewType("grid")}
-                  className={`p-2 rounded-xl border border-transparent transition-all ${viewType === "grid" ? "bg-surface-container-low text-primary" : "bg-transparent text-slate-400 hover:bg-surface-container-low"}`}
+                  title="Grid view"
+                  className={`w-[32px] h-[32px] rounded-[8px] border flex items-center justify-center transition-all ${
+                    viewType === "grid" 
+                      ? "bg-[#f5f5f7] border-[#b0b0b5]" 
+                      : "bg-white border-[#d2d2d7] hover:bg-[#f5f5f7]"
+                  }`}
                 >
-                  <Grid className="w-4 h-4" />
+                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                  </svg>
                 </button>
                 <button 
-                   onClick={() => setViewType("list")}
-                   className={`p-2 rounded-xl border border-transparent transition-all ${viewType === "list" ? "bg-surface-container-low text-primary" : "bg-transparent text-slate-400 hover:bg-surface-container-low"}`}
+                  onClick={() => setViewType("list")}
+                  title="2-column view"
+                  className={`w-[32px] h-[32px] rounded-[8px] border flex items-center justify-center transition-all ${
+                    viewType === "list" 
+                      ? "bg-[#f5f5f7] border-[#b0b0b5]" 
+                      : "bg-white border-[#d2d2d7] hover:bg-[#f5f5f7]"
+                  }`}
                 >
-                  <List className="w-4 h-4" />
+                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="18" height="4" rx="1" />
+                    <rect x="3" y="10" width="18" height="4" rx="1" />
+                    <rect x="3" y="17" width="18" height="4" rx="1" />
+                  </svg>
                 </button>
               </div>
             </div>
 
-            {/* Catalog Grid/List Container */}
-            <div className={`grid gap-6 ${viewType === "grid" ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 md:grid-cols-2"}`}>
+            {/* Courses listing */}
+            <div className={`grid gap-[16px] ${
+              viewType === "grid" 
+                ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3" 
+                : "grid-cols-1 md:grid-cols-2"
+            }`}>
               {loadingState ? (
                 [...Array(6)].map((_, i) => (
-                  <div key={i} className="h-[280px] bg-surface-container-low rounded-2xl animate-pulse shadow-sm" />
+                  <div key={i} className="h-[280px] bg-[#f5f5f7] rounded-[18px] animate-pulse" />
                 ))
               ) : filteredCourses.length > 0 ? (
                 filteredCourses.map((course) => (
@@ -284,16 +408,44 @@ function StudentViewCoursesPage() {
                   />
                 ))
               ) : (
-                <div className="col-span-full py-20 text-center bg-surface-container-lowest rounded-2xl p-8 shadow-atmospheric">
-                  <span className="material-symbols-outlined text-slate-300 text-5xl mb-4">search</span>
-                  <h3 className="font-headline text-[18px] font-bold text-on-surface mb-2">No reviews found</h3>
-                  <p className="text-slate-500 text-sm max-w-xs mx-auto">Try adjusting your filters or search terms.</p>
+                <div className="col-span-full text-center py-[80px]">
+                  <div className="text-[48px] mb-[16px]">🔍</div>
+                  <h3 className="text-[20px] font-semibold text-[#1d1d1f] mb-[8px]">No courses found</h3>
+                  <p className="text-[14px] text-[#86868b]">Try adjusting your search or filters.</p>
                 </div>
               )}
             </div>
           </main>
+
         </div>
       </div>
+
+      {/* PROMO BAND */}
+      <div className="px-6 pb-[48px]">
+        <div className="promo-band max-w-[1080px] mx-auto bg-gradient-to-r from-[#1d1d1f] to-[#1a1a2e] rounded-[20px] p-[36px_40px] flex flex-col sm:flex-row items-center justify-between gap-[24px] relative overflow-hidden">
+          <div className="absolute right-[-60px] top-[-60px] w-[240px] h-[240px] rounded-full bg-[radial-gradient(circle,rgba(0,113,227,0.3)_0%,transparent_70%)] pointer-events-none" />
+          <div className="promo-text z-10">
+            <h3 className="text-[22px] font-bold text-[#f5f5f7] tracking-[-0.5px] mb-[6px]">🎓 Not sure where to start?</h3>
+            <p className="text-[14px] text-[#86868b] leading-[1.5]">Take our 2-minute quiz and we'll recommend the perfect learning path for your goals and experience level.</p>
+          </div>
+          <button onClick={() => navigate('/courses')} className="bg-[#0071e3] text-white font-medium py-[12px] px-[24px] rounded-[980px] hover:bg-[#0077ed] transition-colors whitespace-nowrap z-10">
+            Find My Path →
+          </button>
+        </div>
+      </div>
+
+      {/* CTA BAND */}
+      <section className="bg-[#0071e3] py-[80px] px-6 text-center flex flex-col items-center">
+        <h2 className="text-[clamp(28px,4vw,52px)] font-extrabold text-white tracking-[-1.5px] mb-[16px] leading-[1.15]">
+          Ready to start<br />your IT journey?
+        </h2>
+        <p className="text-[17px] text-[rgba(255,255,255,0.75)] mb-[36px] max-w-[480px] mx-auto">
+          Learn from industry experts and immerse yourself in an ocean of knowledge.
+        </p>
+        <button onClick={() => navigate('/auth')} className="bg-white text-[#0071e3] border-none py-[14px] px-[32px] rounded-[980px] text-[16px] font-semibold cursor-pointer transition-opacity duration-200 hover:opacity-90">
+          Get Started
+        </button>
+      </section>
     </div>
   );
 }

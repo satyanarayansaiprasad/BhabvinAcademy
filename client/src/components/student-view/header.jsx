@@ -25,193 +25,135 @@ function StudentViewCommonHeader() {
   }
 
   const navLinks = [
-    { label: "Home", path: "/home" },
-    { label: "Reviews", path: "/courses" },
-    { label: "About Authority", path: "/about" },
+    { label: "Courses", path: "/courses" },
+    { label: "Paths", path: "/#paths" },
+    { label: "Instructor", path: "/about" },
     { label: "Blog", path: "/blog" },
-    { label: "Contact Clinical", path: "/contact" },
+    { label: "About", path: "/about" },
+    { label: "Contact", path: "/contact" },
   ];
 
   return (
     <>
-      <header className="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-sm dark:shadow-none border-b border-transparent">
-        <div className="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto w-full">
-          {/* Logo / Branding */}
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
-              className="md:hidden flex items-center justify-center text-primary"
-            >
-              <span className="material-symbols-outlined text-blue-700">menu</span>
-            </button>
-            <Link to="/" className="flex items-center gap-2 no-underline">
-              <span className="material-symbols-outlined text-blue-700" style={{ fontVariationSettings: "'FILL' 1" }}>clinical_notes</span>
-              <span className="text-xl font-extrabold text-blue-800 dark:text-white font-headline tracking-tight">Editorial Health</span>
-            </Link>
-          </div>
+      <header className="fixed top-0 left-0 right-0 z-[1000] glass border-b border-[rgba(0,0,0,0.08)] h-[52px] flex items-center justify-center px-6">
+        <div className="max-w-[1080px] w-full flex items-center justify-between">
+          {/* Logo */}
+          <Link to="/" className="text-[18px] font-bold tracking-[-0.5px] text-[#1d1d1f] hover:opacity-80 transition-opacity">
+            Bhavin<span className="text-[#0071e3]">Academy</span>
+          </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex gap-8 items-center">
-            {navLinks.map((link) => {
-              const isActive = window.location.pathname === link.path;
-              return (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`${
-                    isActive 
-                      ? "text-blue-700 border-b-2 border-blue-700 font-semibold" 
-                      : "text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-colors font-semibold"
-                  } font-headline text-sm no-underline pb-0.5`}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-            {auth?.authenticate && (
-              <Link 
-                to="/dashboard" 
-                className={`${
-                  window.location.pathname === "/dashboard" 
-                    ? "text-blue-700 border-b-2 border-blue-700 font-semibold" 
-                    : "text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-colors font-semibold"
-                } font-headline text-sm no-underline pb-0.5`}
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex items-center gap-[20px]">
+            {navLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className="text-[13px] text-[#1d1d1f] opacity-70 hover:opacity-100 transition-opacity font-normal no-underline"
               >
-                Dashboard
+                {link.label}
               </Link>
-            )}
+            ))}
           </nav>
 
-          {/* Right Side Actions */}
+          {/* Right Actions */}
           <div className="flex items-center gap-4">
-            <span className="material-symbols-outlined text-slate-600 cursor-pointer" onClick={() => navigate("/courses")}>search</span>
-            
             {auth?.authenticate ? (
               <div className="flex items-center gap-4">
-                {/* Cart Icon */}
-                <Link to="/cart" className="relative text-slate-600 hover:text-blue-600 transition-colors flex items-center">
-                  <span className="material-symbols-outlined">shopping_cart</span>
+                <Link to="/cart" className="relative opacity-70 hover:opacity-100 transition-opacity">
+                  <ShoppingCart className="w-[18px] h-[18px]" />
                   {cartItems?.length > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-blue-700 text-white text-[10px] font-bold h-4 w-4 flex items-center justify-center rounded-full">
+                    <span className="absolute -top-2 -right-2 bg-[#0071e3] text-white text-[10px] font-bold h-4 w-4 flex items-center justify-center rounded-full">
                       {cartItems.length}
                     </span>
                   )}
                 </Link>
+                <div className="h-4 w-[1px] bg-black/10 mx-1 hidden sm:block"></div>
                 
-                {/* User Avatar */}
-                <Link to="/profile" className="h-9 w-9 rounded-full overflow-hidden bg-surface-container-high border-2 border-primary-fixed flex items-center justify-center shrink-0">
-                  {auth?.user?.profileImage ? (
-                    <img src={auth.user.profileImage} alt={auth.user.userName} className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-xs font-bold text-blue-800 uppercase">{auth.user.userName?.slice(0, 2)}</span>
-                  )}
-                </Link>
-
-                {/* Logout Button */}
-                <button onClick={handleLogout} className="text-slate-600 hover:text-blue-600 transition-colors flex items-center" title="Sign out">
-                  <span className="material-symbols-outlined">logout</span>
-                </button>
+                {/* User Menu Trigger (Simple for now) */}
+                <div className="flex items-center gap-3">
+                  <Link to="/profile" className="flex items-center gap-2 text-[13px] font-medium text-[#1d1d1f] opacity-70 hover:opacity-100 transition-opacity">
+                    {auth?.user?.profileImage ? (
+                      <img src={auth.user.profileImage} className="w-6 h-6 rounded-full object-cover" />
+                    ) : (
+                      <User className="w-[18px] h-[18px]" />
+                    )}
+                    <span className="hidden sm:inline">Account</span>
+                  </Link>
+                  <button onClick={handleLogout} className="opacity-70 hover:opacity-100 transition-opacity">
+                    <LogOut className="w-[18px] h-[18px]" />
+                  </button>
+                </div>
               </div>
             ) : (
-              <button 
-                onClick={() => navigate("/auth")} 
-                className="cta-gradient text-on-primary px-5 py-2 rounded-xl text-sm font-semibold transition-transform active:scale-95 duration-150"
-              >
-                Subscribe
-              </button>
+              <Link to="/auth" className="btn btn-blue py-[7px] px-[16px] text-[13px]">
+                Sign in
+              </Link>
             )}
+
+            {/* Mobile Menu Toggle */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden p-1 text-[#1d1d1f] opacity-70"
+            >
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
         </div>
       </header>
 
-      {/* Mobile Navigation Drawer */}
+      {/* Mobile Menu Drawer */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.4 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black z-40 md:hidden"
-            />
-            {/* Drawer */}
-            <motion.div
-              initial={{ x: "-100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ type: "tween", duration: 0.25 }}
-              className="fixed left-0 top-0 h-full w-64 bg-slate-50 dark:bg-slate-950 z-50 md:hidden flex flex-col pt-16 shadow-2xl"
-            >
-              <div className="p-6">
-                {auth?.authenticate && (
-                  <div className="flex items-center gap-3 mb-8 border-b border-slate-200/20 pb-6">
-                    <div className="w-10 h-10 rounded-full overflow-hidden bg-primary-fixed flex items-center justify-center shrink-0">
-                      {auth?.user?.profileImage ? (
-                        <img src={auth.user.profileImage} alt={auth.user.userName} className="w-full h-full object-cover" />
-                      ) : (
-                        <span className="text-sm font-bold text-blue-800 uppercase">{auth.user.userName?.slice(0, 2)}</span>
-                      )}
-                    </div>
-                    <div>
-                      <p className="font-manrope text-sm font-bold text-on-background">{auth.user.userName}</p>
-                      <p className="text-[10px] text-secondary font-bold uppercase tracking-wider">Expert Reader</p>
-                    </div>
-                  </div>
-                )}
-                
-                <nav className="flex flex-col gap-4">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.path}
-                      to={link.path}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="font-headline text-base font-semibold text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-colors no-underline py-1"
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                  {auth?.authenticate && (
-                    <>
-                      <Link
-                        to="/dashboard"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="font-headline text-base font-semibold text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-colors no-underline py-1"
-                      >
-                        Dashboard
-                      </Link>
-                      <Link
-                        to="/profile"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="font-headline text-base font-semibold text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-colors no-underline py-1"
-                      >
-                        Profile Settings
-                      </Link>
-                    </>
-                  )}
-                </nav>
-
-                <div className="mt-8 pt-6 border-t border-slate-200/20 flex flex-col gap-4">
-                  {auth?.authenticate ? (
-                    <button 
-                      onClick={() => { setIsMobileMenuOpen(false); handleLogout(); }} 
-                      className="w-full py-3 bg-surface-container-high text-on-surface font-bold rounded-xl text-sm"
-                    >
-                      Sign Out
-                    </button>
-                  ) : (
-                    <button 
-                      onClick={() => { setIsMobileMenuOpen(false); navigate("/auth"); }} 
-                      className="w-full py-3 cta-gradient text-white font-bold rounded-xl text-sm shadow-md"
-                    >
-                      Subscribe
-                    </button>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          </>
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="fixed inset-0 top-[52px] bg-white z-[999] md:hidden p-6 flex flex-col"
+          >
+            <nav className="flex flex-col gap-6">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-[20px] font-semibold text-[#1d1d1f] border-b border-black/5 pb-2"
+                >
+                  {link.label}
+                </Link>
+              ))}
+              {auth?.authenticate && (
+                <>
+                  <Link
+                    to="/student-courses"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-[20px] font-semibold text-[#1d1d1f] border-b border-black/5 pb-2"
+                  >
+                    My Learning
+                  </Link>
+                  <Link
+                    to="/profile"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-[20px] font-semibold text-[#1d1d1f] border-b border-black/5 pb-2"
+                  >
+                    Profile Settings
+                  </Link>
+                </>
+              )}
+            </nav>
+            
+            <div className="mt-auto pt-6 flex flex-col gap-4">
+              {!auth?.authenticate && (
+                <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)} className="btn btn-blue w-full h-[50px] text-[16px]">
+                  Sign in
+                </Link>
+              )}
+              {auth?.authenticate && (
+                <button onClick={handleLogout} className="btn btn-outline w-full h-[50px] text-[16px]">
+                  Log out
+                </button>
+              )}
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </>

@@ -3,347 +3,375 @@ const mongoose = require("mongoose");
 const Course = require("./models/Course");
 
 const courses = [
-    {
-        instructorId: "admin_123",
-        instructorName: "Bhavin Patel",
-        date: new Date(),
-        title: "100 Days of Code: The Complete Python Pro Bootcamp",
-        category: "Software Engineering",
-        level: "Beginner",
-        primaryLanguage: "English",
-        subtitle: "Master Python by building 100 projects in 100 days.",
-        description: "Learn Python from zero to hero. You will build games, web apps, and data science projects.",
-        image: "https://images.unsplash.com/photo-1526379095098-d400fd0bfce8?auto=format&fit=crop&q=80&w=800",
-        welcomeMessage: "Welcome to the ultimate Python bootcamp!",
-        pricing: 19.99,
-        objectives: "Build 100 software projects, master Python 3, learn web scraping, automation, and web development.",
-        students: [],
-        isPublished: true,
-        curriculum: [
-            {
-                title: "Introduction to Python",
-                videoUrl: "https://www.youtube.com/watch?v=kqtD5dpn9C8",
-                public_id: "ext_yt_1",
-                freePreview: true,
-            },
-        ],
-    },
-    {
-        instructorId: "admin_123",
-        instructorName: "John Doe",
-        date: new Date(),
-        title: "The Web Developer Bootcamp 2024",
-        category: "Web Development",
-        level: "Beginner",
-        primaryLanguage: "English",
-        subtitle: "The only course you need to learn web development - HTML, CSS, JS, Node.",
-        description: "Learn everything from HTML and CSS to advanced Node.js, Express, and MongoDB.",
-        image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800",
-        welcomeMessage: "Let's build the web together!",
-        pricing: 24.99,
-        objectives: "Build complex web applications, understand databases, and deploy your projects.",
-        students: [],
-        isPublished: true,
-        curriculum: [
-            {
-                title: "HTML5 Protocol basics",
-                videoUrl: "https://www.youtube.com/watch?v=kqtD5dpn9C8",
-                public_id: "",
-                freePreview: true,
-            },
-        ],
-    },
-    {
-        instructorId: "admin_123",
-        instructorName: "Jane Smith",
-        date: new Date(),
-        title: "Machine Learning A-Z: AI, Python & R",
-        category: "Machine Learning",
-        level: "Intermediate",
-        primaryLanguage: "English",
-        subtitle: "Learn to create Machine Learning Algorithms in Python and R.",
-        description: "Master Machine Learning on Python & R, build accurate models, and make powerful predictions.",
-        image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=800",
-        welcomeMessage: "Welcome to Machine Learning!",
-        pricing: 34.99,
-        objectives: "Build ML algorithms, handle missing data, use Scikit-Learn.",
-        students: [],
-        isPublished: true,
-        curriculum: [],
-    },
-    {
-        instructorId: "admin_123",
-        instructorName: "Sarah Davis",
-        date: new Date(),
-        title: "React - The Complete Guide (incl Hooks, React Router, Redux)",
-        category: "Web Development",
-        level: "Intermediate",
-        primaryLanguage: "English",
-        subtitle: "Dive in and learn React.js from scratch!",
-        description: "Learn React Context, React Router, Redux, Next.js and build scalable apps.",
-        image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&q=80&w=800",
-        welcomeMessage: "Welcome to modern React.",
-        pricing: 29.99,
-        objectives: "Build modern React apps, understand state management, and use hooks efficiently.",
-        students: [],
-        isPublished: true,
-        curriculum: [],
-    },
-    {
-        instructorId: "admin_123",
-        instructorName: "Bhavin Patel",
-        date: new Date(),
-        title: "AWS Certified Solutions Architect - Associate 2024",
-        category: "Cloud Computing",
-        level: "Advanced",
-        primaryLanguage: "English",
-        subtitle: "Pass the AWS Certified Solutions Architect Associate Certification.",
-        description: "Everything you need to pass the AWS Solutions Architect Associate exam.",
-        image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800",
-        welcomeMessage: "Let's conquer the cloud.",
-        pricing: 39.99,
-        objectives: "Pass the AWS CSA exam, build highly available cloud infrastructure.",
-        students: [],
-        isPublished: true,
-        curriculum: [],
-    },
-    {
-        instructorId: "admin_123",
-        instructorName: "Mike Lee",
-        date: new Date(),
-        title: "The Ultimate Drawing Course - Beginner to Advanced",
-        category: "Design",
-        level: "Beginner",
-        primaryLanguage: "English",
-        subtitle: "Learn the #1 most important building block of all art.",
-        description: "Create advanced art that will stand up as professional work.",
-        image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&q=80&w=800",
-        welcomeMessage: "Grab a pencil and let's draw.",
-        pricing: 14.99,
-        objectives: "Draw objects from imagination, understand perspective, and shadow.",
-        students: [],
-        isPublished: true,
-        curriculum: [],
-    },
-    {
-        instructorId: "admin_123",
-        instructorName: "Anna Williams",
-        date: new Date(),
-        title: "Complete Ethical Hacking Bootcamp 2024",
-        category: "Cyber Security",
-        level: "Intermediate",
-        primaryLanguage: "English",
-        subtitle: "Learn Ethical Hacking from Scratch!",
-        description: "Learn network penetration testing, web app hacking, and WiFi cracking.",
-        image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=800",
-        welcomeMessage: "Welcome to the world of ethical hacking.",
-        pricing: 44.99,
-        objectives: "Perform penetration testing, understand vulnerabilities, write custom exploits.",
-        students: [],
-        isPublished: true,
-        curriculum: [],
-    },
-    {
-        instructorId: "admin_123",
-        instructorName: "Alex Turner",
-        date: new Date(),
-        title: "iOS 17 & Swift 5 - The Complete iOS App Development Bootcamp",
-        category: "Mobile Development",
-        level: "Beginner",
-        primaryLanguage: "English",
-        subtitle: "From Beginner to iOS App Developer with Just One Course",
-        description: "Build clones of popular apps like WhatsApp and Tinder using Swift 5.",
-        image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=800",
-        welcomeMessage: "Let's build iOS apps!",
-        pricing: 24.99,
-        objectives: "Build iOS apps in Swift, use Xcode efficiently, design App layouts.",
-        students: [],
-        isPublished: true,
-        curriculum: [],
-    },
-    {
-        instructorId: "admin_123",
-        instructorName: "Elena Taylor",
-        date: new Date(),
-        title: "Data Science and Machine Learning Bootcamp with R",
-        category: "Data Science",
-        level: "Advanced",
-        primaryLanguage: "English",
-        subtitle: "Learn how to use the R programming language for data science.",
-        description: "Deep dive into R programming, data visualization, and statistical modeling.",
-        image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800",
-        welcomeMessage: "Welcome to Data Science with R.",
-        pricing: 29.99,
-        objectives: "Analyze large datasets, create data visualizations, build statistical models.",
-        students: [],
-        isPublished: true,
-        curriculum: [],
-    },
-    {
-        instructorId: "admin_123",
-        instructorName: "Chris Martin",
-        date: new Date(),
-        title: "The Complete Digital Marketing Course - 12 Courses in 1",
-        category: "Marketing",
-        level: "Beginner",
-        primaryLanguage: "English",
-        subtitle: "Master Digital Marketing Strategy, Social Media Marketing, SEO, YouTube, Email, Facebook Marketing, Analytics & More!",
-        description: "A comprehensive guide to growing a business online from scratch.",
-        image: "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?auto=format&fit=crop&q=80&w=800",
-        welcomeMessage: "Ready to market your business?",
-        pricing: 19.99,
-        objectives: "Grow an online business, master social media marketing, improve SEO ranking.",
-        students: [],
-        isPublished: true,
-        curriculum: [],
-    },
-    {
-        instructorId: "admin_123",
-        instructorName: "Thomas Anderson",
-        date: new Date(),
-        title: "Unreal Engine 5 C++ Developer: Learn C++ and Make Video Games",
-        category: "Game Development",
-        level: "Intermediate",
-        primaryLanguage: "English",
-        subtitle: "Created in collaboration with Epic Games.",
-        description: "Learn C++ from basics while making your first 4 video games in UE5.",
-        image: "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&q=80&w=800",
-        welcomeMessage: "Let's make some games!",
-        pricing: 34.99,
-        objectives: "Learn C++ from scratch, create games in Unreal Engine 5, understand object-oriented programming.",
-        students: [],
-        isPublished: true,
-        curriculum: [],
-    },
-    {
-        instructorId: "admin_123",
-        instructorName: "Jessica Lee",
-        date: new Date(),
-        title: "The Complete Node.js Developer Course (3rd Edition)",
-        category: "Backend Development",
-        level: "Intermediate",
-        primaryLanguage: "English",
-        subtitle: "Learn Node.js by building real-world applications with Express, Mongoose, MongoDB.",
-        description: "Master modern Backend Development using Node.js and its ecosystem.",
-        image: "https://images.unsplash.com/photo-1555099962-4199c345e5dd?auto=format&fit=crop&q=80&w=800",
-        welcomeMessage: "Welcome to backend engineering.",
-        pricing: 24.99,
-        objectives: "Build RESTful APIs, manage databases with Mongoose, deploy Node apps.",
-        students: [],
-        isPublished: true,
-        curriculum: [],
-    },
-    {
-        instructorId: "admin_123",
-        instructorName: "David Kim",
-        date: new Date(),
-        title: "Docker Mastery: with Kubernetes +Swarm",
-        category: "Cloud Computing",
-        level: "Advanced",
-        primaryLanguage: "English",
-        subtitle: "Build, test, deploy containers with the best mega-course on Docker, Kubernetes, CI/CD in pipelines.",
-        description: "Master containerization and orchestration.",
-        image: "https://images.unsplash.com/photo-1607706189992-eaa578640c02?auto=format&fit=crop&q=80&w=800",
-        welcomeMessage: "Time to containerize.",
-        pricing: 39.99,
-        objectives: "Master Docker CLI, deploy multi-container apps, understand Kubernetes clusters.",
-        students: [],
-        isPublished: true,
-        curriculum: [],
-    },
-    {
-        instructorId: "admin_123",
-        instructorName: "Michael Scott",
-        date: new Date(),
-        title: "Mastering TypeScript - 2024 Edition",
-        category: "Software Engineering",
-        level: "Intermediate",
-        primaryLanguage: "English",
-        subtitle: "Learn to build strongly typed large scale applications.",
-        description: "A deep dive into TypeScript features, generics, decorators and more.",
-        image: "https://images.unsplash.com/photo-1627398240411-8bbe31316b10?auto=format&fit=crop&q=80&w=800",
-        welcomeMessage: "Welcome to typed JavaScript.",
-        pricing: 22.99,
-        objectives: "Understand TS types & interfaces, integrate TS with React/Node, use advanced generics.",
-        students: [],
-        isPublished: true,
-        curriculum: [],
-    },
-    {
-        instructorId: "admin_123",
-        instructorName: "Bhavin Patel",
-        date: new Date(),
-        title: "Complete Guide to Elasticsearch",
-        category: "Data Science",
-        level: "Advanced",
-        primaryLanguage: "English",
-        subtitle: "Learn to build a search engine from scratch.",
-        description: "Master Elasticsearch concepts, queries, and aggregations for big data.",
-        image: "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&q=80&w=800",
-        welcomeMessage: "Let's search.",
-        pricing: 49.99,
-        objectives: "Build complex search queries, manage Elasticsearch clusters, visualize data with Kibana.",
-        students: [],
-        isPublished: true,
-        curriculum: [],
-    },
-    {
-        instructorId: "admin_123",
-        instructorName: "Rachel Green",
-        date: new Date(),
-        title: "The Ultimate Guide to 2D Animation",
-        category: "Design",
-        level: "Beginner",
-        primaryLanguage: "English",
-        subtitle: "Create professional 2D animations using standard industry tools.",
-        description: "Learn rigging, keyframing, and principles of animation.",
-        image: "https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&q=80&w=800",
-        welcomeMessage: "Bring characters to life.",
-        pricing: 29.99,
-        objectives: "Master animation software, understand the 12 principles of animation, rig 2D characters.",
-        students: [],
-        isPublished: true,
-        curriculum: [],
-    },
-    {
-        instructorId: "admin_123",
-        instructorName: "Walter White",
-        date: new Date(),
-        title: "Advanced Chemistry for Developers",
-        category: "Software Engineering",
-        level: "Advanced",
-        primaryLanguage: "English",
-        subtitle: "Simulating molecular structures in Python.",
-        description: "A niche course bridging coding and chemistry using Python libraries.",
-        image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&q=80&w=800",
-        welcomeMessage: "Let's cook... some code.",
-        pricing: 59.99,
-        objectives: "Use RDKit, simulate chemical reactions virtually, analyze molecular data.",
-        students: [],
-        isPublished: true,
-        curriculum: [],
-    }
+  {
+    instructorId: "admin_123",
+    instructorName: "Bhavin Patel",
+    date: new Date(),
+    title: "Windows Server Administration",
+    category: "microsoft",
+    level: "Intermediate",
+    primaryLanguage: "English",
+    subtitle: "Deploy, manage and troubleshoot Windows Server environments end-to-end.",
+    description: "Master Windows Server installation, Domain Services, DNS, DHCP, IIS, Active Directory and Group Policies.",
+    image: "",
+    welcomeMessage: "Welcome to the Windows Server Administration course!",
+    pricing: 29.99,
+    objectives: "Install and configure Windows Server, manage AD, configure networks, automate tasks.",
+    students: [],
+    isPublished: true,
+    curriculum: [
+      {
+        title: "Introduction to Windows Server",
+        videoUrl: "https://www.youtube.com/watch?v=kqtD5dpn9C8",
+        public_id: "ws_1",
+        freePreview: true,
+        videoSource: "youtube",
+        notes: "Introductory notes for Windows Server Administration."
+      },
+      {
+        title: "Installing Active Directory Domain Services",
+        videoUrl: "https://www.youtube.com/watch?v=kqtD5dpn9C8",
+        public_id: "ws_2",
+        freePreview: false,
+        videoSource: "youtube",
+        notes: "Guide to promoting Windows Server to AD DS."
+      }
+    ]
+  },
+  {
+    instructorId: "admin_123",
+    instructorName: "Bhavin Patel",
+    date: new Date(),
+    title: "Linux System Administration",
+    category: "linux",
+    level: "All Levels",
+    primaryLanguage: "English",
+    subtitle: "From CLI basics to system services, users and advanced configurations.",
+    description: "Learn Linux terminal command line, shell scripting, package managers, network configurations, and security audits.",
+    image: "",
+    welcomeMessage: "Welcome to Linux System Administration!",
+    pricing: 39.99,
+    objectives: "Master command line interface, edit configurations, manage users, audit system services.",
+    students: [],
+    isPublished: true,
+    curriculum: [
+      {
+        title: "Introduction to Linux & CLI",
+        videoUrl: "https://www.youtube.com/watch?v=kqtD5dpn9C8",
+        public_id: "lx_1",
+        freePreview: true,
+        videoSource: "youtube",
+        notes: "Welcome to the world of open source."
+      },
+      {
+        title: "Linux Permissions & User Control",
+        videoUrl: "https://www.youtube.com/watch?v=kqtD5dpn9C8",
+        public_id: "lx_2",
+        freePreview: false,
+        videoSource: "youtube",
+        notes: "How to use chmod, chown, sudo settings."
+      }
+    ]
+  },
+  {
+    instructorId: "admin_123",
+    instructorName: "Bhavin Patel",
+    date: new Date(),
+    title: "Cisco CCNA Bootcamp",
+    category: "networking",
+    level: "Beginner",
+    primaryLanguage: "English",
+    subtitle: "Routing, switching, subnetting and full CCNA 200-301 exam prep.",
+    description: "Pass the Cisco CCNA 200-301 certification exam. Gain fundamental skills in subnetting, switching, routing, firewalls and wireless connections.",
+    image: "",
+    welcomeMessage: "Ready to become a networking wizard? Welcome!",
+    pricing: 49.99,
+    objectives: "Understand IP subnetting, configure Cisco switches and routers, troubleshoot routing, prepare for CCNA.",
+    students: [],
+    isPublished: true,
+    curriculum: [
+      {
+        title: "Networking Basics & OSI Model",
+        videoUrl: "https://www.youtube.com/watch?v=kqtD5dpn9C8",
+        public_id: "cc_1",
+        freePreview: true,
+        videoSource: "youtube",
+        notes: "Explanation of the OSI 7 layer model."
+      },
+      {
+        title: "Understanding IP Addresses & Subnetting",
+        videoUrl: "https://www.youtube.com/watch?v=kqtD5dpn9C8",
+        public_id: "cc_2",
+        freePreview: false,
+        videoSource: "youtube",
+        notes: "Subnetting calculations made simple."
+      }
+    ]
+  },
+  {
+    instructorId: "admin_123",
+    instructorName: "Bhavin Patel",
+    date: new Date(),
+    title: "Azure Fundamentals AZ-900",
+    category: "cloud",
+    level: "Beginner",
+    primaryLanguage: "English",
+    subtitle: "Get cloud-certified with Microsoft Azure's entry-level exam prep.",
+    description: "Understand core cloud concepts, Azure resource managers, virtual networks, virtual machines, active directories and cost management.",
+    image: "",
+    welcomeMessage: "Welcome to cloud computing with Microsoft Azure!",
+    pricing: 19.99,
+    objectives: "Describe cloud concepts, Azure architectural components, core resources, and governance plans.",
+    students: [],
+    isPublished: true,
+    curriculum: [
+      {
+        title: "Introduction to Azure AZ-900",
+        videoUrl: "https://www.youtube.com/watch?v=kqtD5dpn9C8",
+        public_id: "az_1",
+        freePreview: true,
+        videoSource: "youtube",
+        notes: "Overview of AZ-900 syllabus and cloud basics."
+      }
+    ]
+  },
+  {
+    instructorId: "admin_123",
+    instructorName: "Bhavin Patel",
+    date: new Date(),
+    title: "CompTIA Security+ Prep",
+    category: "security",
+    level: "Advanced",
+    primaryLanguage: "English",
+    subtitle: "Threat analysis, cryptography, identity management and SY0-701 exam mastery.",
+    description: "Prepare for your Security+ exam. Learn incident responses, firewalls, network monitoring, security architectures, and security risks.",
+    image: "",
+    welcomeMessage: "Welcome to the cybersecurity frontline!",
+    pricing: 44.99,
+    objectives: "Analyze security threats, configure firewalls, explain cryptographic standards, pass Security+.",
+    students: [],
+    isPublished: true,
+    curriculum: [
+      {
+        title: "Threats, Attacks & Vulnerabilities",
+        videoUrl: "https://www.youtube.com/watch?v=kqtD5dpn9C8",
+        public_id: "sec_1",
+        freePreview: true,
+        videoSource: "youtube",
+        notes: "Introductory module for Security+."
+      }
+    ]
+  },
+  {
+    instructorId: "admin_123",
+    instructorName: "Bhavin Patel",
+    date: new Date(),
+    title: "Active Directory Mastery",
+    category: "microsoft",
+    level: "Intermediate",
+    primaryLanguage: "English",
+    subtitle: "Users, groups, GPOs, DNS integration and enterprise AD management.",
+    description: "Learn how to build, audit, and configure a secure Active Directory domain structure, trusts, group policy objects, and Entra ID synchronization.",
+    image: "",
+    welcomeMessage: "Let's master Active Directory together!",
+    pricing: 24.99,
+    objectives: "Build forests and domains, manage GPOs, integrate DNS, synchronize with Azure Entra ID.",
+    students: [],
+    isPublished: true,
+    curriculum: [
+      {
+        title: "AD Architecture Overview",
+        videoUrl: "https://www.youtube.com/watch?v=kqtD5dpn9C8",
+        public_id: "ad_1",
+        freePreview: true,
+        videoSource: "youtube",
+        notes: "Introduction to objects, schemas, domains and forests."
+      }
+    ]
+  },
+  {
+    instructorId: "admin_123",
+    instructorName: "Bhavin Patel",
+    date: new Date(),
+    title: "Bash Scripting & Automation",
+    category: "linux",
+    level: "Intermediate",
+    primaryLanguage: "English",
+    subtitle: "Write powerful shell scripts to automate tasks, manage files and schedule jobs.",
+    description: "Automate system administrations tasks. Learn shell syntax, loops, conditions, script structures, parameters and Cron scheduling.",
+    image: "",
+    welcomeMessage: "Welcome! Stop repeating yourself, write a Bash script.",
+    pricing: 29.99,
+    objectives: "Write shell scripts, handle variables and inputs, build custom cron jobs.",
+    students: [],
+    isPublished: true,
+    curriculum: [
+      {
+        title: "Writing your first Bash Script",
+        videoUrl: "https://www.youtube.com/watch?v=kqtD5dpn9C8",
+        public_id: "bash_1",
+        freePreview: true,
+        videoSource: "youtube",
+        notes: "Using shebang, echo and chmod +x."
+      }
+    ]
+  },
+  {
+    instructorId: "admin_123",
+    instructorName: "Bhavin Patel",
+    date: new Date(),
+    title: "AWS Solutions Architect",
+    category: "cloud",
+    level: "Advanced",
+    primaryLanguage: "English",
+    subtitle: "Design resilient, cost-efficient AWS architectures for the SAA-C03 exam.",
+    description: "Master AWS services including EC2, S3, RDS, Lambda, IAM, VPC, and Route 53 to pass the Solutions Architect Associate exam.",
+    image: "",
+    welcomeMessage: "Welcome to AWS Solutions Architect exam prep!",
+    pricing: 49.99,
+    objectives: "Design high-availability AWS systems, architect securing networks, optimize cloud costs.",
+    students: [],
+    isPublished: true,
+    curriculum: [
+      {
+        title: "AWS Global Infrastructure & IAM",
+        videoUrl: "https://www.youtube.com/watch?v=kqtD5dpn9C8",
+        public_id: "aws_1",
+        freePreview: true,
+        videoSource: "youtube",
+        notes: "Regions, AZs, users and policy rules."
+      }
+    ]
+  },
+  {
+    instructorId: "admin_123",
+    instructorName: "Bhavin Patel",
+    date: new Date(),
+    title: "CompTIA Network+ N10-009",
+    category: "networking",
+    level: "Beginner",
+    primaryLanguage: "English",
+    subtitle: "Network architecture, protocols, troubleshooting and full N+ exam prep.",
+    description: "Prepare for CompTIA Network+ certification. Covers network technologies, operations, security, troubleshooting, and cabling.",
+    image: "",
+    welcomeMessage: "Welcome to Network+ preparation course!",
+    pricing: 34.99,
+    objectives: "Understand ethernet standards, configure routing, implement basic firewalls.",
+    students: [],
+    isPublished: true,
+    curriculum: [
+      {
+        title: "Ethernet Cabling & Topologies",
+        videoUrl: "https://www.youtube.com/watch?v=kqtD5dpn9C8",
+        public_id: "nw_1",
+        freePreview: true,
+        videoSource: "youtube",
+        notes: "RJ45, fiber-optic, ring vs star layouts."
+      }
+    ]
+  },
+  {
+    instructorId: "admin_123",
+    instructorName: "Bhavin Patel",
+    date: new Date(),
+    title: "Microsoft 365 Administration",
+    category: "microsoft",
+    level: "Beginner",
+    primaryLanguage: "English",
+    subtitle: "Manage Exchange Online, Teams, SharePoint and MS-102 certification prep.",
+    description: "Configure Microsoft 365 services, manage licenses, create mailboxes, configure SharePoint sites, and administer Entra ID tenant.",
+    image: "",
+    welcomeMessage: "Welcome to Microsoft 365 Administration!",
+    pricing: 24.99,
+    objectives: "Administer user mailboxes, manage collaborative Teams channels, audit SharePoint security.",
+    students: [],
+    isPublished: true,
+    curriculum: [
+      {
+        title: "M365 Tenant Initial Setup",
+        videoUrl: "https://www.youtube.com/watch?v=kqtD5dpn9C8",
+        public_id: "m365_1",
+        freePreview: true,
+        videoSource: "youtube",
+        notes: "Buying licenses, configuring domain names."
+      }
+    ]
+  },
+  {
+    instructorId: "admin_123",
+    instructorName: "Bhavin Patel",
+    date: new Date(),
+    title: "Ethical Hacking & Penetration Testing",
+    category: "security",
+    level: "Intermediate",
+    primaryLanguage: "English",
+    subtitle: "Reconnaissance, exploitation, post-exploitation and CEH exam alignment.",
+    description: "Learn how hackers think and target systems. Master Kali Linux tools, network scanning with Nmap, metasploit framework, and SQL injection.",
+    image: "",
+    welcomeMessage: "Welcome to Ethical Hacking and Security Testing!",
+    pricing: 44.99,
+    objectives: "Execute passive scanning, exploit software vulnerabilities, compile security reports.",
+    students: [],
+    isPublished: true,
+    curriculum: [
+      {
+        title: "Introduction to Ethical Hacking",
+        videoUrl: "https://www.youtube.com/watch?v=kqtD5dpn9C8",
+        public_id: "hack_1",
+        freePreview: true,
+        videoSource: "youtube",
+        notes: "Rules of engagement, legal permissions."
+      }
+    ]
+  },
+  {
+    instructorId: "admin_123",
+    instructorName: "Bhavin Patel",
+    date: new Date(),
+    title: "Hyper-V & Virtualization",
+    category: "microsoft",
+    level: "All Levels",
+    primaryLanguage: "English",
+    subtitle: "Build, manage and snapshot virtual machines with Microsoft Hyper-V.",
+    description: "Master hypervisors, virtualization hardware, virtual switches, storage SANs, checkpoints, replicas, and clustering.",
+    image: "",
+    welcomeMessage: "Welcome to Hyper-V and Virtualization training!",
+    pricing: 24.99,
+    objectives: "Create virtual networks, configure nested virtualization, manage checkpoints.",
+    students: [],
+    isPublished: true,
+    curriculum: [
+      {
+        title: "Hyper-V Role Installation",
+        videoUrl: "https://www.youtube.com/watch?v=kqtD5dpn9C8",
+        public_id: "hyp_1",
+        freePreview: true,
+        videoSource: "youtube",
+        notes: "Enabling virtualization in BIOS and installing roles."
+      }
+    ]
+  }
 ];
 
 const run = async () => {
-    try {
-        console.log("Connecting to MongoDB...");
-        await mongoose.connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 5000 });
-        console.log("Connected successfully!");
+  try {
+    console.log("Connecting to MongoDB...");
+    await mongoose.connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 5000 });
+    console.log("Connected successfully!");
 
-        console.log("Clearing existing courses...");
-        await Course.deleteMany({});
+    console.log("Clearing existing courses...");
+    await Course.deleteMany({});
 
-        console.log(`Seeding ${courses.length} courses...`);
-        await Course.insertMany(courses);
-        console.log("✅ Courses seeded successfully!");
+    console.log(`Seeding ${courses.length} courses...`);
+    await Course.insertMany(courses);
+    console.log("✅ Courses seeded successfully!");
 
-    } catch (error) {
-        console.error("❌ Seed Error:", error.message);
-    } finally {
-        try { await mongoose.disconnect(); } catch (e) { }
-        process.exit(0);
-    }
+  } catch (error) {
+    console.error("❌ Seed Error:", error.message);
+  } finally {
+    try { await mongoose.disconnect(); } catch (e) { }
+    process.exit(0);
+  }
 };
 
 run();

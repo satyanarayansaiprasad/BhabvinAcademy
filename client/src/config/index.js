@@ -83,54 +83,28 @@ export const languageOptions = [
 export const languages = languageOptions;
 
 export const courseLevelOptions = [
-  { id: "beginner", label: "Beginner" },
-  { id: "intermediate", label: "Intermediate" },
-  { id: "advanced", label: "Advanced" },
+  { id: "Beginner", label: "Beginner" },
+  { id: "Intermediate", label: "Intermediate" },
+  { id: "Advanced", label: "Advanced" },
+  { id: "All Levels", label: "All Levels" },
 ];
 
 export const courseLevels = courseLevelOptions;
 
 export const courseCategories = [
-  { id: "microsoft-365", label: "Microsoft 365" },
-  { id: "microsoft-azure", label: "Microsoft Azure" },
-  { id: "copilot", label: "Copilot" },
-  { id: "open-source", label: "Open Source" },
-  { id: "networking-basics", label: "Networking Basics" },
-  { id: "yoga", label: "Yoga" },
-  { id: "health", label: "Health" },
-  { id: "lifestyle", label: "Lifestyle" },
-  { id: "personal-growth", label: "Personal Growth" },
-  { id: "art", label: "Art" },
-  { id: "books", label: "Books" },
+  { id: "microsoft", label: "Microsoft" },
+  { id: "linux", label: "Linux" },
+  { id: "networking", label: "Networking" },
+  { id: "cloud", label: "Cloud" },
+  { id: "security", label: "Security" },
 ];
 
 export const topLevelCategories = [
   { id: "technology", label: "Technology" },
-  { id: "well-being", label: "Well-being" },
-  { id: "personal-mastery", label: "Personal Mastery" },
-  { id: "creative-arts", label: "Creative Arts" },
 ];
 
 export const courseSubCategories = {
-  technology: [
-    { id: "microsoft-365", label: "Microsoft 365" },
-    { id: "microsoft-azure", label: "Microsoft Azure" },
-    { id: "copilot", label: "Copilot" },
-    { id: "open-source", label: "Open Source" },
-    { id: "networking-basics", label: "Networking Basics" },
-  ],
-  "well-being": [
-    { id: "yoga", label: "Yoga" },
-    { id: "health", label: "Health" },
-    { id: "lifestyle", label: "Lifestyle" },
-  ],
-  "personal-mastery": [
-    { id: "personal-growth", label: "Personal Growth" },
-  ],
-  "creative-arts": [
-    { id: "art", label: "Art" },
-    { id: "books", label: "Books" },
-  ],
+  technology: courseCategories,
 };
 
 export const courseLandingPageFormControls = [
