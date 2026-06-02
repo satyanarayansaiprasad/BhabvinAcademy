@@ -27,6 +27,11 @@ const ContactPage = lazy(() => import("./pages/student/contact"));
 const StudentExamPage = lazy(() => import("./pages/student/exam"));
 const StudentDashboardPage = lazy(() => import("./pages/student/dashboard"));
 const SuccessPage = lazy(() => import("./pages/student/success"));
+const StudentPathsPage = lazy(() => import("./pages/student/paths"));
+const StudentInstructorsPage = lazy(() => import("./pages/student/instructors"));
+const InstructorDashboardPage = lazy(() => import("./pages/instructor/dashboard"));
+const InstructorEditCoursePage = lazy(() => import("./pages/instructor/edit-course"));
+const InstructorBlogEditPage = lazy(() => import("./pages/instructor/blog-edit"));
 
 function App() {
   const { auth, isLoading } = useContext(AuthContext);
@@ -108,7 +113,25 @@ function App() {
                 <RouteGuard element={<PaymentReturnPage />} authenticated={auth?.authenticate} user={auth?.user} isLoading={isLoading} />
               }
             />
+            <Route path="paths" element={<StudentPathsPage />} />
+            <Route path="instructors" element={<StudentInstructorsPage />} />
           </Route>
+          <Route path="/instructor" element={
+              <RouteGuard element={<InstructorDashboardPage />} authenticated={auth?.authenticate} user={auth?.user} isLoading={isLoading} />
+            }
+          />
+          <Route path="/instructor/create-course" element={
+              <RouteGuard element={<InstructorEditCoursePage />} authenticated={auth?.authenticate} user={auth?.user} isLoading={isLoading} />
+            }
+          />
+          <Route path="/instructor/edit-course/:id" element={
+              <RouteGuard element={<InstructorEditCoursePage />} authenticated={auth?.authenticate} user={auth?.user} isLoading={isLoading} />
+            }
+          />
+          <Route path="/instructor/blog-edit" element={
+              <RouteGuard element={<InstructorBlogEditPage />} authenticated={auth?.authenticate} user={auth?.user} isLoading={isLoading} />
+            }
+          />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>

@@ -20,7 +20,8 @@ import {
     RotateCcw,
     Award,
     MoreVertical,
-    LayoutList
+    LayoutList,
+    Trophy
 } from "lucide-react";
 import { AuthContext } from "@/context/auth-context";
 import { StudentContext } from "@/context/student-context";
@@ -150,7 +151,7 @@ function StudentViewCourseProgressPage() {
 
                             <button className="flex items-center gap-1.5 px-6 py-1.5 rounded-lg bg-[#0071e3] text-white text-[13px] font-black hover:bg-[#0077ed] transition-all shadow-md" onClick={() => {
                                 const idx = studentCurrentCourseProgress?.courseDetails?.curriculum.indexOf(currentLecture);
-                                if(idx < studentCurrentCourseProgress?.courseDetails?.curriculum.length - 1) setCurrentLecture(studentCurrentCourseProgress.curriculum[idx+1]);
+                                if(idx < studentCurrentCourseProgress?.courseDetails?.curriculum.length - 1) setCurrentLecture(studentCurrentCourseProgress.courseDetails.curriculum[idx+1]);
                             }}>Next <ChevronRight size={16}/></button>
                         </div>
                     </div>
