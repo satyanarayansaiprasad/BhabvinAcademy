@@ -20,6 +20,7 @@ const LectureSchema = new mongoose.Schema({
       public_id: String,
     },
   ],
+  section: String,
 });
 
 const CourseSchema = new mongoose.Schema({

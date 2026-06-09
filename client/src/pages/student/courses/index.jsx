@@ -103,12 +103,6 @@ function StudentViewCoursesPage() {
       result = result.filter(c => activeLevels.includes(c.level));
     }
 
-    // Filter by Duration
-    result = result.filter(c => durMatch(c.duration));
-
-    // Filter by Certification
-    result = result.filter(c => certMatch(c));
-
     // Filter by Search Query
     if (searchTerm.trim() !== "") {
       const q = searchTerm.toLowerCase().trim();
@@ -130,7 +124,7 @@ function StudentViewCoursesPage() {
     }
 
     return result;
-  }, [studentViewCoursesList, activeCategory, activeLevels, activeDurs, activeCerts, searchTerm, sort]);
+  }, [studentViewCoursesList, activeCategory, activeLevels, searchTerm, sort]);
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -227,7 +221,7 @@ function StudentViewCoursesPage() {
           <aside className="space-y-[28px] sticky top-[116px]">
             
             {/* Level Filter */}
-            <div className="flex flex-col pb-4 border-b border-[#f5f5f7]">
+            <div className="flex flex-col">
               <div className="text-[12px] font-semibold text-[#86868b] uppercase tracking-[0.06em] mb-[12px]">Level</div>
               <div className="flex flex-col gap-2">
                 {[
@@ -260,86 +254,6 @@ function StudentViewCoursesPage() {
               </div>
               <button 
                 onClick={() => setActiveLevels([])}
-                className="text-[12px] text-[#0071e3] text-left hover:underline bg-none border-none p-0 mt-[10px] font-medium"
-              >
-                Clear
-              </button>
-            </div>
-
-            {/* Duration Filter */}
-            <div className="flex flex-col pb-4 border-b border-[#f5f5f7]">
-              <div className="text-[12px] font-semibold text-[#86868b] uppercase tracking-[0.06em] mb-[12px]">Duration</div>
-              <div className="flex flex-col gap-2">
-                {[
-                  { label: "Under 20 hrs", value: "short", count: 3 },
-                  { label: "20 – 30 hrs", value: "medium", count: 6 },
-                  { label: "30 hrs+", value: "long", count: 3 }
-                ].map((durItem) => {
-                  const checked = activeDurs.includes(durItem.value);
-                  return (
-                    <div 
-                      key={durItem.value} 
-                      onClick={() => toggleDur(durItem.value)}
-                      className="flex items-center justify-between py-[4px] cursor-pointer"
-                    >
-                      <div className="flex items-center gap-[8px] text-[13px] text-[#1d1d1f] select-none">
-                        <div className={`w-[16px] h-[16px] rounded-[4px] border-[1.5px] flex items-center justify-center transition-all ${
-                          checked ? "bg-[#0071e3] border-[#0071e3] text-white" : "border-[#d2d2d7]"
-                        }`}>
-                          {checked && <span className="text-[10px] font-bold">✓</span>}
-                        </div>
-                        {durItem.label}
-                      </div>
-                      <span className="text-[12px] text-[#86868b] bg-[#f5f5f7] px-[7px] py-[2px] rounded-[980px]">
-                        {durItem.count}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-              <button 
-                onClick={() => setActiveDurs([])}
-                className="text-[12px] text-[#0071e3] text-left hover:underline bg-none border-none p-0 mt-[10px] font-medium"
-              >
-                Clear
-              </button>
-            </div>
-
-            {/* Certification Filter */}
-            <div className="flex flex-col">
-              <div className="text-[12px] font-semibold text-[#86868b] uppercase tracking-[0.06em] mb-[12px]">Certification</div>
-              <div className="flex flex-col gap-2">
-                {[
-                  { label: "Microsoft (MCP)", value: "mcp", count: 4 },
-                  { label: "CompTIA", value: "comptia", count: 3 },
-                  { label: "Cisco (CCNA)", value: "ccna", count: 2 },
-                  { label: "Linux (LPIC)", value: "lpic", count: 2 },
-                  { label: "AWS / Azure", value: "aws_azure", count: 2 }
-                ].map((certItem) => {
-                  const checked = activeCerts.includes(certItem.value);
-                  return (
-                    <div 
-                      key={certItem.value} 
-                      onClick={() => toggleCert(certItem.value)}
-                      className="flex items-center justify-between py-[4px] cursor-pointer"
-                    >
-                      <div className="flex items-center gap-[8px] text-[13px] text-[#1d1d1f] select-none">
-                        <div className={`w-[16px] h-[16px] rounded-[4px] border-[1.5px] flex items-center justify-center transition-all ${
-                          checked ? "bg-[#0071e3] border-[#0071e3] text-white" : "border-[#d2d2d7]"
-                        }`}>
-                          {checked && <span className="text-[10px] font-bold">✓</span>}
-                        </div>
-                        {certItem.label}
-                      </div>
-                      <span className="text-[12px] text-[#86868b] bg-[#f5f5f7] px-[7px] py-[2px] rounded-[980px]">
-                        {certItem.count}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-              <button 
-                onClick={() => setActiveCerts([])}
                 className="text-[12px] text-[#0071e3] text-left hover:underline bg-none border-none p-0 mt-[10px] font-medium"
               >
                 Clear

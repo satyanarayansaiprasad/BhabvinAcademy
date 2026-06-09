@@ -30,7 +30,7 @@ function AboutUsPage() {
           <div className="flex flex-col">
             <p className="text-[13px] font-semibold text-[#0071e3] uppercase tracking-[0.06em] mb-[10px]">The Story</p>
             <h2 className="text-[clamp(30px,4vw,48px)] font-extrabold tracking-[-1.5px] text-[#1d1d1f] leading-[1.1] mb-[28px]">
-              Not just a teacher.<br />A career <em className="not-italic text-[#0071e3]">witness</em>.
+              Not just a coach.<br />A career <em className="not-italic text-[#0071e3]">witness</em>.
             </h2>
             <p className="text-[16px] text-[#6e6e73] leading-[1.8] mb-[18px]">
               I started my IT career the hard way. I was self-taught - studying late into the night after a full-time job, chasing technologies that felt impossibly distant, and implementing everything I learned. Every lab mistake, every exam I failed before I passed, and every concept that finally "clicked" is woven into the DNA of BhavinAcademy today.

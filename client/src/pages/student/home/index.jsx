@@ -46,7 +46,7 @@ function StudentHomePage() {
       </section>
 
       {/* TICKER */}
-      <div className="bg-[#f5f5f7] py-[28px] border-t border-b border-[#d2d2d7] overflow-hidden">
+      <div className="bg-[#f5f5f7] py-[12px] border-t border-b border-[#d2d2d7] overflow-hidden">
         <div className="flex gap-[120px] animate-marquee w-max">
           {tickerItems.map((item, i) => (
             <div key={i} className="text-[20px] font-medium text-[#6e6e73] whitespace-nowrap">
@@ -188,7 +188,7 @@ function StudentHomePage() {
 
       {/* CTA */}
       <section className="bg-[#0071e3] py-[80px] px-6 text-center flex flex-col items-center">
-        <h2 className="text-[clamp(28px,4vw,52px)] font-extrabold text-white tracking-[-1.5px] mb-[16px] leading-[1.15]">
+        <h2 className="text-[clamp(28px,4vw,52px)] font-extrabold text-white tracking-[-1.5px] mb-[16px] leading-[1.05]">
           Ready to start<br />your IT journey?
         </h2>
         <p className="text-[17px] text-[rgba(255,255,255,0.75)] mb-[36px] max-w-[480px] mx-auto">

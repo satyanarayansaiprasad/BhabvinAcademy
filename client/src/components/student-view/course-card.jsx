@@ -96,11 +96,6 @@ function CourseCard({ course, onClick }) {
         <div className="text-[12px] text-[#86868b] line-clamp-2 mb-[10px] leading-[1.5]">
           {course?.subtitle || course?.description}
         </div>
-        <div className="flex items-center gap-[4px] text-[12px] text-[#86868b] mb-[8px]">
-          <span className="text-[#ff9f0a] tracking-[1px] text-[11px]">★★★★★</span>
-          <span className="font-semibold text-[#1d1d1f]">{rating}</span>
-          <span>({reviewsCount} ratings)</span>
-        </div>
         <div className="text-[12px] text-[#86868b] flex gap-[10px] items-center mb-[10px]">
           <span>{course?.curriculum?.length || 0} lessons</span>
           <span className="w-[3px] h-[3px] rounded-full bg-[#d2d2d7]"></span>

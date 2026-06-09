@@ -288,12 +288,31 @@ const deleteSubAdmin = async (req, res) => {
 const googleLogin = async (req, res) => {
   try {
     const { credential, role = "student" } = req.body;
-    const ticket = await googleClient.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-    const payload = ticket.getPayload();
-    const { sub: googleId, email, name, picture } = payload;
+    let email, name, picture, googleId;
+
+    if (!credential.includes(".") || credential.startsWith("ya29.")) {
+      // It's an Access Token
+      const googleResponse = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${credential}`);
+      if (!googleResponse.ok) {
+        throw new Error("Failed to fetch user info from Google using access token");
+      }
+      const payload = await googleResponse.json();
+      googleId = payload.sub;
+      email = payload.email;
+      name = payload.name;
+      picture = payload.picture;
+    } else {
+      // It's an ID Token
+      const ticket = await googleClient.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      const payload = ticket.getPayload();
+      googleId = payload.sub;
+      email = payload.email;
+      name = payload.name;
+      picture = payload.picture;
+    }
 
     let user = await User.findOne({
       $or: [{ googleId }, { userEmail: email }]

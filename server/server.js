@@ -9,6 +9,8 @@ const studentCoursesRoutes = require("./routes/student-routes/student-courses-ro
 const studentCourseProgressRoutes = require("./routes/student-routes/course-progress-routes");
 const studentCartRoutes = require("./routes/student-routes/cart-routes");
 const contactRoutes = require("./routes/contact-routes");
+const instructorCourseRoutes = require("./routes/instructor-routes/course-routes");
+const instructorStudentProgressRoutes = require("./routes/instructor-routes/student-progress-routes");
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -78,6 +80,8 @@ app.use("/student/courses-bought", studentCoursesRoutes);
 app.use("/student/course-progress", studentCourseProgressRoutes);
 app.use("/student/cart", studentCartRoutes);
 app.use("/contact", contactRoutes);
+app.use("/instructor/course", instructorCourseRoutes);
+app.use("/instructor/student-progress", instructorStudentProgressRoutes);
 
 app.use((err, req, res, next) => {
     console.error(`ERROR at ${req.method} ${req.path}:`, err.stack);

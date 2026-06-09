@@ -24,7 +24,7 @@ function ContactPage() {
     },
     {
       q: "How long do I have access to a course after purchasing?",
-      a: "Lifetime access. Once you purchase a course, it's yours forever — including all future updates we make to the content. You can revisit it anytime from any device."
+      a: "Enjoy 2 years of uninterrupted access to your course, along with all future content updates at no extra cost. Need more time? You can extend your access anytime by paying a small extension fee."
     },
     {
       q: "Are the courses suitable for complete beginners?",
@@ -114,20 +114,6 @@ function ContactPage() {
               </div>
             </div>
 
-            {/* Live chat card */}
-            <div className="bg-white rounded-[16px] p-[24px_28px] flex items-start gap-[16px] transition-shadow duration-200 hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
-              <div className="w-[42px] h-[42px] rounded-[12px] bg-[#e8f1fb] flex items-center justify-center text-[20px] shrink-0">
-                💬
-              </div>
-              <div className="info-content">
-                <h4 className="text-[14px] font-semibold text-[#1d1d1f] mb-[3px]">Live Chat</h4>
-                <p className="text-[13px] text-[#6e6e73]">Available Mon–Fri, 9 AM – 6 PM IST</p>
-                <button onClick={() => navigate("/")} className="text-[13px] text-[#0071e3] font-medium hover:underline text-left bg-none border-none p-0 mt-[3px]">
-                  Start a chat session →
-                </button>
-              </div>
-            </div>
-
             {/* Corporate card */}
             <div className="bg-white rounded-[16px] p-[24px_28px] flex items-start gap-[16px] transition-shadow duration-200 hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
               <div className="w-[42px] h-[42px] rounded-[12px] bg-[#e8f1fb] flex items-center justify-center text-[20px] shrink-0">
@@ -157,7 +143,7 @@ function ContactPage() {
             {/* Typical response note */}
             <div className="bg-white rounded-[16px] p-[20px_24px] border-l-[3px] border-[#0071e3] mt-[8px]">
               <p className="text-[13px] text-[#6e6e73] leading-[1.6]">
-                ⏱ <strong className="text-[#1d1d1f] font-semibold">Typical response time:</strong> We aim to reply to all messages within 24 hours on business days. For urgent queries, use Live Chat.
+                ⏱ <strong className="text-[#1d1d1f] font-semibold">Typical response time:</strong> We aim to reply to all messages within 24 hours on business days.
               </p>
             </div>
           </div>

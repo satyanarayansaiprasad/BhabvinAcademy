@@ -27,6 +27,7 @@ const ContactPage = lazy(() => import("./pages/student/contact"));
 const StudentExamPage = lazy(() => import("./pages/student/exam"));
 const StudentDashboardPage = lazy(() => import("./pages/student/dashboard"));
 const SuccessPage = lazy(() => import("./pages/student/success"));
+const InstructorPage = lazy(() => import("./pages/instructor"));
 
 function App() {
   const { auth, isLoading } = useContext(AuthContext);
@@ -109,6 +110,14 @@ function App() {
               }
             />
           </Route>
+          <Route path="/instructor" element={
+              <RouteGuard element={<InstructorPage />} authenticated={auth?.authenticate} user={auth?.user} isLoading={isLoading} />
+            }
+          />
+          <Route path="/instructor/course/edit/:id" element={
+              <RouteGuard element={<InstructorPage />} authenticated={auth?.authenticate} user={auth?.user} isLoading={isLoading} />
+            }
+          />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>

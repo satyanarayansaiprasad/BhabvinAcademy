@@ -51,6 +51,14 @@ function StudentViewCommonHeader() {
                 {link.label}
               </Link>
             ))}
+            {(auth?.user?.role === "instructor" || auth?.user?.role === "sub-admin") && (
+              <Link
+                to="/instructor"
+                className="text-[13px] text-[#0071e3] font-semibold hover:opacity-100 transition-opacity no-underline"
+              >
+                Instructor Panel
+              </Link>
+            )}
           </nav>
 
           {/* Right Actions */}
@@ -121,6 +129,15 @@ function StudentViewCommonHeader() {
               ))}
               {auth?.authenticate && (
                 <>
+                  {(auth?.user?.role === "instructor" || auth?.user?.role === "sub-admin") && (
+                    <Link
+                      to="/instructor"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="text-[20px] font-semibold text-[#0071e3] border-b border-black/5 pb-2"
+                    >
+                      Instructor Panel
+                    </Link>
+                  )}
                   <Link
                     to="/student-courses"
                     onClick={() => setIsMobileMenuOpen(false)}
