@@ -275,8 +275,7 @@ function BlogPage() {
                   type="email" 
                   placeholder="Email address" 
                   required
-                  style={{ color: "#f5f5f7" }}
-                  className="w-full px-[14px] py-[10px] border border-white/12 rounded-[10px] bg-white/7 text-[#f5f5f7] text-[13px] outline-none focus:border-[#0071e3] transition-colors placeholder:text-gray-500"
+                  className="w-full px-[14px] py-[10px] border border-gray-300 rounded-[10px] bg-white text-gray-900 text-[13px] outline-none focus:border-[#0071e3] transition-colors placeholder:text-gray-400"
                 />
                 <button type="submit" className="w-full bg-[#0071e3] text-white py-[10px] rounded-[10px] text-[13px] font-semibold hover:bg-[#0077ed] transition-colors">
                   Subscribe
