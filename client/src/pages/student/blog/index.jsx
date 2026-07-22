@@ -351,7 +351,7 @@ function BlogPage() {
       <section className="bg-black py-[80px] px-6 text-center text-white relative overflow-hidden">
         <div className="max-w-[700px] mx-auto">
           <p className="text-[clamp(20px,3vw,34px)] font-light text-[#f5f5f7] leading-[1.55] tracking-[-0.5px] mb-[24px]">
-            "While technology shifts with every decade, your value remains constant through two rules: <strong>Master the fundamentals</strong>, as they are timeless; and <strong>keep learning</strong>, for the world never stops turning."
+            "While technology shifts with every decade, your value remains constant through two rules: <strong className="font-bold italic">Master the fundamentals</strong>, as they are timeless; and <strong className="font-bold italic">keep learning</strong>, for the world never stops turning."
           </p>
           <div className="text-[14px] text-[#86868b]">· Bhavin Khatri ·</div>
         </div>

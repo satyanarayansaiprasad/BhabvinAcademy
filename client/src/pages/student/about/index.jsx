@@ -174,7 +174,7 @@ function AboutUsPage() {
         <div className="max-w-[800px] mx-auto relative z-10 flex flex-col items-center">
           <span className="text-[120px] line-height-[0.6] text-[#0071e3]/20 font-black mb-[28px] block font-serif leading-none">“</span>
           <p className="text-[clamp(20px,3vw,32px)] font-light text-[#f5f5f7] leading-[1.6] tracking-[-0.5px] mb-[36px]">
-            "While technology shifts with every decade, your value remains constant through two rules: <strong className="text-white">Master the fundamentals</strong>, as they are timeless; and <strong className="text-white">keep learning</strong>, for the world never stops turning."
+            "While technology shifts with every decade, your value remains constant through two rules: <strong className="font-bold italic text-white">Master the fundamentals</strong>, as they are timeless; and <strong className="font-bold italic text-white">keep learning</strong>, for the world never stops turning."
           </p>
           <div className="text-[14px] text-[#86868b] tracking-wider font-semibold">· Bhavin Khatri ·</div>
           <div className="text-[12px] text-[#86868b]/60 mt-1">Founder, BhavinAcademy</div>
