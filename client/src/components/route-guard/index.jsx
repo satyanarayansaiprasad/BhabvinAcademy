@@ -28,7 +28,7 @@ function RouteGuard({ authenticated, user, element, isLoading }) {
     return <Navigate to={redirectPath} replace />;
   }
 
-  if (authenticated && location.pathname.startsWith("/instructor") && user?.role !== "instructor" && user?.role !== "sub-admin") {
+  if (authenticated && location.pathname.startsWith("/instructor") && user?.role !== "instructor" && user?.role !== "admin" && user?.role !== "sub-admin") {
     return <Navigate to="/home" replace />;
   }
 

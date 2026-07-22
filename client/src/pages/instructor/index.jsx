@@ -14,6 +14,7 @@ import {
   addNewCategoryService,
   updateCategoryService,
   deleteCategoryService,
+  mediaUploadService,
 } from "@/services";
 import {
   TvMinimalPlay,
@@ -38,7 +39,12 @@ import {
   HelpCircle,
   Eye,
   AlertTriangle,
-  FolderKanban
+  FolderKanban,
+  Download,
+  FileSpreadsheet,
+  Upload,
+  Image as ImageIcon,
+  Loader2
 } from "lucide-react";
 
 // Banner gradients definitions matching the mockups
@@ -68,6 +74,46 @@ function InstructorPage() {
   const [studentsProgress, setStudentsProgress] = useState([]);
   const [categoriesList, setCategoriesList] = useState([]);
   const [loadingDashboard, setLoadingDashboard] = useState(true);
+
+  // Course Editor Form States
+  const [courseTitle, setCourseTitle] = useState("");
+  const [shortDesc, setShortDesc] = useState("");
+  const [fullDesc, setFullDesc] = useState("");
+  const [category, setCategory] = useState("Microsoft");
+  const [difficulty, setDifficulty] = useState("Intermediate");
+  const [language, setLanguage] = useState("English");
+  const [estimatedHours, setEstimatedHours] = useState(10);
+  const [welcomeMessage, setWelcomeMessage] = useState("");
+  
+  // Banner Emoji, Gradient & Custom Image URL
+  const [bannerIcon, setBannerIcon] = useState("🪟");
+  const [bannerGradient, setBannerGradient] = useState("linear-gradient(135deg,#0078d4,#005a9e)");
+  const [bannerMode, setBannerMode] = useState("gradient"); // 'gradient' or 'image'
+  const [bannerImageUrl, setBannerImageUrl] = useState("");
+  const [uploadingBannerImage, setUploadingBannerImage] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  // Curriculum Builder (Section -> Lessons)
+  const [sections, setSections] = useState([
+    {
+      id: "sec_1",
+      title: "Section 1 — Getting Started",
+      lessons: [
+        { id: "les_1", title: "Introduction to the course", type: "video", videoUrl: "", fileUrl: "", fileName: "", freePreview: true, notes: "" }
+      ]
+    }
+  ]);
+
+  // Pricing & Access
+  const [pricingType, setPricingType] = useState("free");
+  const [price, setPrice] = useState(0);
+
+  // Requirements & Outcomes
+  const [prerequisites, setPrerequisites] = useState("");
+  const [outcomes, setOutcomes] = useState("");
+  const [targetAudience, setTargetAudience] = useState("");
+
+  const [savingCourse, setSavingCourse] = useState(false);
 
   // Category Management Form State
   const [newCatName, setNewCatName] = useState("");
@@ -224,6 +270,93 @@ function InstructorPage() {
     }
   }
 
+  function handleDownloadStudentReport() {
+    if (!studentsProgress || studentsProgress.length === 0) {
+      toast({
+        title: "No Student Data",
+        description: "There are no student progress records available to export.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const headers = [
+      "Student Name",
+      "Student Email",
+      "Enrolled Course",
+      "Purchase Date",
+      "Paid Amount",
+      "Progress (%)",
+      "Completion Status",
+      "Performance Indicator",
+    ];
+
+    const rows = studentsProgress.map((item) => {
+      const pDate = item.dateOfPurchase ? new Date(item.dateOfPurchase).toLocaleDateString("en-IN") : "N/A";
+      const pAmt = item.paidAmount || "₹489.00";
+      const perf = item.performance || (item.progress >= 80 ? "High Performer" : item.progress >= 40 ? "Active Learner" : "Getting Started");
+      return [
+        `"${(item.studentName || "Student").replace(/"/g, '""')}"`,
+        `"${(item.studentEmail || "").replace(/"/g, '""')}"`,
+        `"${(item.courseTitle || "").replace(/"/g, '""')}"`,
+        `"${pDate}"`,
+        `"${pAmt}"`,
+        `"${item.progress || 0}%"`,
+        `"${item.completed ? "Completed" : "In Progress"}"`,
+        `"${perf}"`,
+      ];
+    });
+
+    // Use BOM \uFEFF for proper UTF-8 Excel formatting (e.g. ₹ symbol and special characters)
+    const csvString = "\uFEFF" + [headers.join(","), ...rows.map((e) => e.join(","))].join("\r\n");
+    const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `BhavinAcademy_Student_Progress_Report_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Excel/CSV Report Exported",
+      description: `Exported ${rows.length} student records successfully.`,
+    });
+  }
+
+  async function handleBannerImageFileUpload(e) {
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setBannerImageUrl(event.target.result);
+    };
+    reader.readAsDataURL(selectedFile);
+
+    const imageFormData = new FormData();
+    imageFormData.append("file", selectedFile);
+
+    setUploadingBannerImage(true);
+    try {
+      const res = await mediaUploadService(imageFormData, (progress) => {
+        setUploadProgress(progress);
+      });
+      if (res?.success && res?.data?.url) {
+        setBannerImageUrl(res.data.url);
+        toast({
+          title: "Image Uploaded",
+          description: "Course banner image uploaded successfully.",
+        });
+      }
+    } catch (err) {
+      console.error("Image upload error:", err);
+    } finally {
+      setUploadingBannerImage(false);
+    }
+  }
+
   useEffect(() => {
     if (!isEditMode) {
       loadDashboardData();
@@ -255,10 +388,16 @@ function InstructorPage() {
                 const parts = course.image.split("|");
                 setBannerIcon(parts[0]);
                 setBannerGradient(parts[1]);
+                setBannerMode("gradient");
+              } else if (course.image.startsWith("http://") || course.image.startsWith("https://") || course.image.startsWith("/") || course.image.startsWith("data:")) {
+                setBannerImageUrl(course.image);
+                setBannerMode("image");
               } else if (course.image.startsWith("linear-gradient")) {
                 setBannerGradient(course.image);
+                setBannerMode("gradient");
               } else {
                 setBannerIcon(course.image);
+                setBannerMode("gradient");
               }
             }
 
@@ -360,6 +499,10 @@ function InstructorPage() {
       });
     });
 
+    const courseImagePayload = bannerMode === "image" && bannerImageUrl.trim()
+      ? bannerImageUrl.trim()
+      : `${bannerIcon}|${bannerGradient}`;
+
     const payload = {
       instructorId: auth?.user?._id || "admin_123",
       instructorName: auth?.user?.userFullName || auth?.user?.userName || "Bhavin Patel",
@@ -370,7 +513,7 @@ function InstructorPage() {
       primaryLanguage: language,
       subtitle: shortDesc,
       description: fullDesc,
-      image: `${bannerIcon}|${bannerGradient}`, // Encode emoji & gradient together
+      image: courseImagePayload,
       welcomeMessage: welcomeMessage || `Welcome to ${courseTitle}!`,
       pricing: pricingType === "free" ? 0 : Number(price),
       objectives: outcomes,
@@ -519,8 +662,13 @@ function InstructorPage() {
   }
 
   // Dynamic calculations for KPI values
-  const totalRevenue = studentsProgress.reduce((sum, item) => sum + (parseFloat(item.paidAmount) || 0), 0);
-  const totalStudentsCount = new Set(studentsProgress.map(s => s.studentId)).size;
+  const totalRevenue = studentsProgress.reduce((sum, item) => {
+    const val = typeof item.paidAmount === "string" 
+      ? parseFloat(item.paidAmount.replace(/[^\d.]/g, "")) 
+      : (typeof item.paidAmount === "number" ? item.paidAmount : 489);
+    return sum + (isNaN(val) ? 489 : val);
+  }, 0);
+  const totalStudentsCount = new Set(studentsProgress.map(s => s.studentId)).size || studentsProgress.length;
 
   // Active swatch gradient styling
   const bannerGradientObj = bannerGradients.find(g => g.value === bannerGradient) || bannerGradients[0];
@@ -627,6 +775,14 @@ function InstructorPage() {
                 {activeTab === "categories" && "Category Management"}
               </h1>
               <div className="flex items-center gap-3">
+                {(activeTab === "students" || activeTab === "dashboard") && (
+                  <button
+                    onClick={handleDownloadStudentReport}
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold py-2.5 px-4 rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-emerald-600/20 cursor-pointer"
+                  >
+                    <FileSpreadsheet className="w-4 h-4" /> Export Excel Report
+                  </button>
+                )}
                 {activeTab === "courses" && (
                   <button
                     onClick={() => navigate("/instructor/course/edit/create")}
@@ -876,57 +1032,118 @@ function InstructorPage() {
 
                 {/* TAB 3: STUDENTS */}
                 {activeTab === "students" && (
-                  <div className="bg-[#111118] border border-[#22222d] rounded-2xl p-6">
+                  <div className="bg-[#111118] border border-[#22222d] rounded-2xl p-6 space-y-4">
+                    <div className="flex justify-between items-center flex-wrap gap-3 pb-2 border-b border-[#22222d]">
+                      <div>
+                        <h3 className="text-base font-bold text-white">Student Enrollment & Performance Analytics</h3>
+                        <p className="text-xs text-gray-400">View real-time course progress, purchase history, and export student records.</p>
+                      </div>
+                      <button
+                        onClick={handleDownloadStudentReport}
+                        className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-2 transition-all shadow-md cursor-pointer"
+                      >
+                        <FileSpreadsheet className="w-4 h-4" /> Download Excel Report (.csv)
+                      </button>
+                    </div>
+
                     <div className="overflow-x-auto">
                       <table className="w-full text-left border-collapse">
                         <thead>
                           <tr className="border-b border-[#22222d] text-[10px] uppercase text-gray-500 font-bold tracking-wider">
                             <th className="pb-3">Student</th>
                             <th className="pb-3">Enrolled Course</th>
+                            <th className="pb-3">Purchase Date</th>
+                            <th className="pb-3">Paid Amount</th>
                             <th className="pb-3 text-center">Progress</th>
                             <th className="pb-3 text-center">Status</th>
+                            <th className="pb-3 text-center">Performance</th>
                             <th className="pb-3 text-right">Actions</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-[#22222d] text-sm">
-                          {studentsProgress.map((item, idx) => (
-                            <tr key={idx} className="hover:bg-white/5 transition-colors">
-                              <td className="py-4">
-                                <div className="font-semibold text-white">{item.studentName}</div>
-                                <div className="text-xs text-gray-500">{item.studentEmail}</div>
-                              </td>
-                              <td className="py-4 text-gray-300">
-                                {item.courseTitle}
-                              </td>
-                              <td className="py-4">
-                                <div className="flex items-center justify-center gap-3">
-                                  <div className="w-24 h-1.5 bg-white/5 rounded-full overflow-hidden shrink-0">
-                                    <div className="bg-gradient-to-r from-[#0071e3] to-[#00d4ff] h-full" style={{ width: `${item.progress}%` }}></div>
+                          {studentsProgress.map((item, idx) => {
+                            const formattedDate = item.dateOfPurchase
+                              ? new Date(item.dateOfPurchase).toLocaleDateString("en-IN", {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                })
+                              : "N/A";
+                            const perfStatus =
+                              item.performance ||
+                              (item.progress >= 80
+                                ? "High Performer"
+                                : item.progress >= 40
+                                ? "Active Learner"
+                                : "Getting Started");
+
+                            return (
+                              <tr key={idx} className="hover:bg-white/5 transition-colors">
+                                <td className="py-4">
+                                  <div className="font-semibold text-white">{item.studentName}</div>
+                                  <div className="text-xs text-gray-500">{item.studentEmail}</div>
+                                </td>
+                                <td className="py-4 text-gray-300 font-medium">
+                                  {item.courseTitle}
+                                </td>
+                                <td className="py-4 text-xs text-gray-400">
+                                  {formattedDate}
+                                </td>
+                                <td className="py-4 text-xs font-semibold text-emerald-400">
+                                  {item.paidAmount || "₹489.00"}
+                                </td>
+                                <td className="py-4">
+                                  <div className="flex items-center justify-center gap-2">
+                                    <div className="w-20 h-1.5 bg-white/5 rounded-full overflow-hidden shrink-0">
+                                      <div
+                                        className="bg-gradient-to-r from-[#0071e3] to-[#00d4ff] h-full"
+                                        style={{ width: `${item.progress || 0}%` }}
+                                      ></div>
+                                    </div>
+                                    <span className="text-xs font-semibold text-gray-300">{item.progress || 0}%</span>
                                   </div>
-                                  <span className="text-xs font-semibold text-gray-400">{item.progress}%</span>
-                                </div>
-                              </td>
-                              <td className="py-4 text-center">
-                                {item.completed ? (
-                                  <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full uppercase">Completed</span>
-                                ) : (
-                                  <span className="text-[10px] font-bold text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded-full uppercase">In Progress</span>
-                                )}
-                              </td>
-                              <td className="py-4 text-right">
-                                <button
-                                  onClick={() => handleDeleteStudent(item.studentId)}
-                                  className="p-2 rounded bg-white/5 hover:bg-red-500 hover:text-white text-gray-400 transition-colors"
-                                  title="Unenroll student"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
+                                </td>
+                                <td className="py-4 text-center">
+                                  {item.completed ? (
+                                    <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full uppercase">
+                                      Completed
+                                    </span>
+                                  ) : (
+                                    <span className="text-[10px] font-bold text-sky-400 bg-sky-500/10 px-2.5 py-0.5 rounded-full uppercase">
+                                      In Progress
+                                    </span>
+                                  )}
+                                </td>
+                                <td className="py-4 text-center">
+                                  <span
+                                    className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase ${
+                                      perfStatus === "High Performer"
+                                        ? "text-purple-400 bg-purple-500/10"
+                                        : perfStatus === "Active Learner"
+                                        ? "text-emerald-400 bg-emerald-500/10"
+                                        : "text-amber-400 bg-amber-500/10"
+                                    }`}
+                                  >
+                                    {perfStatus}
+                                  </span>
+                                </td>
+                                <td className="py-4 text-right">
+                                  <button
+                                    onClick={() => handleDeleteStudent(item.studentId)}
+                                    className="p-2 rounded bg-white/5 hover:bg-red-500 hover:text-white text-gray-400 transition-colors"
+                                    title="Unenroll student"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })}
                           {studentsProgress.length === 0 && (
                             <tr>
-                              <td colSpan="5" className="py-12 text-center text-gray-500 text-xs">No student enrollments registered on the platform.</td>
+                              <td colSpan="8" className="py-12 text-center text-gray-500 text-xs">
+                                No student enrollments registered on the platform.
+                              </td>
                             </tr>
                           )}
                         </tbody>
@@ -1210,44 +1427,136 @@ function InstructorPage() {
 
               {/* CARD 2: BANNER CONFIGURATION */}
               <div className="bg-white rounded-2xl border border-black/5 p-6 shadow-sm">
-                <h3 className="text-lg font-bold text-gray-900">Course Card Banner</h3>
-                <p className="text-xs text-gray-400 mt-1 mb-6">Recreate the visual branding layout of the course card.</p>
+                <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">Course Card Banner & Image</h3>
+                    <p className="text-xs text-gray-400 mt-1">Choose between color gradient + emoji branding or a custom banner image.</p>
+                  </div>
+                  
+                  {/* Mode Selector Tabs */}
+                  <div className="flex bg-gray-100 p-1 rounded-xl gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setBannerMode("gradient")}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                        bannerMode === "gradient" ? "bg-white text-[#0071e3] shadow-sm" : "text-gray-500 hover:text-gray-900"
+                      }`}
+                    >
+                      Gradient & Emoji
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBannerMode("image")}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                        bannerMode === "image" ? "bg-white text-[#0071e3] shadow-sm" : "text-gray-500 hover:text-gray-900"
+                      }`}
+                    >
+                      Custom Image URL
+                    </button>
+                  </div>
+                </div>
                 
                 <div className="space-y-4">
-                  {/* Live Card Preview Box */}
-                  <div className="h-[140px] rounded-xl flex items-center justify-center text-5xl select-none" style={{ background: bannerGradient }}>
-                    {bannerIcon}
-                  </div>
-
-                  <div className="grid grid-cols-[120px_1fr] gap-4">
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-bold text-gray-700">Emoji Icon</label>
-                      <input
-                        type="text"
-                        value={bannerIcon}
-                        onChange={e => setBannerIcon(e.target.value.trim().slice(0, 2))}
-                        className="border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-center focus:outline-none focus:border-[#0071e3] transition-colors"
-                      />
-                    </div>
-                    
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-bold text-gray-700">Background Color swatch</label>
-                      <div className="flex gap-2 flex-wrap items-center mt-1">
-                        {bannerGradients.map((grad, i) => (
-                          <button
-                            key={i}
-                            type="button"
-                            onClick={() => setBannerGradient(grad.value)}
-                            style={{ background: grad.value }}
-                            className={`w-9 h-9 rounded-xl transition-all ${
-                              bannerGradient === grad.value ? "ring-2 ring-offset-2 ring-[#0071e3] scale-105" : "hover:scale-105"
-                            }`}
-                            title={grad.name}
-                          />
-                        ))}
+                  {bannerMode === "gradient" ? (
+                    <>
+                      {/* Live Card Preview Box */}
+                      <div className="h-[140px] rounded-xl flex items-center justify-center text-5xl select-none" style={{ background: bannerGradient }}>
+                        {bannerIcon}
                       </div>
-                    </div>
-                  </div>
+
+                      <div className="grid grid-cols-[120px_1fr] gap-4">
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-xs font-bold text-gray-700">Emoji Icon</label>
+                          <input
+                            type="text"
+                            value={bannerIcon}
+                            onChange={e => setBannerIcon(e.target.value.trim().slice(0, 2))}
+                            className="border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-center focus:outline-none focus:border-[#0071e3] transition-colors"
+                          />
+                        </div>
+                        
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-xs font-bold text-gray-700">Background Color swatch</label>
+                          <div className="flex gap-2 flex-wrap items-center mt-1">
+                            {bannerGradients.map((grad, i) => (
+                              <button
+                                key={i}
+                                type="button"
+                                onClick={() => setBannerGradient(grad.value)}
+                                style={{ background: grad.value }}
+                                className={`w-9 h-9 rounded-xl transition-all ${
+                                  bannerGradient === grad.value ? "ring-2 ring-offset-2 ring-[#0071e3] scale-105" : "hover:scale-105"
+                                }`}
+                                title={grad.name}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Live Custom Image Preview Box */}
+                      <div className="h-[160px] rounded-xl overflow-hidden bg-slate-900 flex items-center justify-center border border-gray-200 relative group">
+                        {bannerImageUrl ? (
+                          <img
+                            src={bannerImageUrl}
+                            alt="Course Banner Preview"
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80";
+                            }}
+                          />
+                        ) : (
+                          <div className="text-center p-4">
+                            <ImageIcon className="w-8 h-8 text-gray-400 mx-auto mb-1" />
+                            <span className="text-xs text-gray-400 font-medium block">Upload an image or paste a URL below</span>
+                          </div>
+                        )}
+                        {uploadingBannerImage && (
+                          <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-xs font-bold gap-2">
+                            <Loader2 className="w-5 h-5 animate-spin" /> Uploading ({uploadProgress}%)...
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Upload File & URL Controls */}
+                      <div className="space-y-3">
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-xs font-bold text-gray-700">Upload Image File</label>
+                          <label className="border border-dashed border-gray-300 hover:border-[#0071e3] bg-gray-50 hover:bg-blue-50/50 rounded-xl px-4 py-3 text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors text-gray-700 font-medium">
+                            <Upload className="w-4 h-4 text-[#0071e3]" />
+                            <span>{uploadingBannerImage ? `Uploading image... (${uploadProgress}%)` : "Click to select & upload image file"}</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleBannerImageFileUpload}
+                              className="hidden"
+                            />
+                          </label>
+                        </div>
+
+                        <div className="flex items-center gap-2 my-1">
+                          <div className="flex-1 h-px bg-gray-200"></div>
+                          <span className="text-[10px] uppercase font-bold text-gray-400">OR PASTE URL</span>
+                          <div className="flex-1 h-px bg-gray-200"></div>
+                        </div>
+
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-xs font-bold text-gray-700">Course Banner Image URL</label>
+                          <input
+                            type="text"
+                            placeholder="Paste image URL (e.g. https://images.unsplash.com/...)"
+                            value={bannerImageUrl}
+                            onChange={e => setBannerImageUrl(e.target.value)}
+                            className="border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition-colors"
+                          />
+                          <p className="text-[11px] text-gray-400">Supports direct image links from Unsplash, Cloudinary, Imgur, or any CDN.</p>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
