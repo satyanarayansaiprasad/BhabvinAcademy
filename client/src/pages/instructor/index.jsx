@@ -932,6 +932,9 @@ function InstructorPage() {
                         </tbody>
                       </table>
                     </div>
+                  </div>
+                )}
+
                 {/* TAB 4: CATEGORIES */}
                 {activeTab === "categories" && (
                   <div className="space-y-6">
