@@ -146,23 +146,7 @@ function StudentExamPage() {
     return (
         <div className="min-h-screen bg-[#0a0a0f] text-[#f5f5f7] font-sans selection:bg-[#0071e3]/30 flex flex-col justify-between">
             
-            {/* NAV */}
-            <nav className="sticky top-0 z-[100] bg-black/85 backdrop-blur-[20px] border-b border-white/8 h-[52px] flex items-center justify-center">
-                <div className="max-w-[1080px] w-full flex items-center justify-between px-6">
-                    <div className="text-[18px] font-bold tracking-tight text-[#f5f5f7]">
-                        Bhavin<span className="text-[#0071e3]">Academy</span>
-                    </div>
-                    <ul className="hidden md:flex gap-5 list-none text-left">
-                        <li><Link to="/courses" className="text-[13px] text-[#f5f5f7]/60 no-underline hover:text-[#f5f5f7] transition-all">Courses</Link></li>
-                        <li><Link to="/blog" className="text-[13px] text-[#f5f5f7]/60 no-underline hover:text-[#f5f5f7] transition-all">Blog</Link></li>
-                        <li><Link to="/about" className="text-[13px] text-[#f5f5f7]/60 no-underline hover:text-[#f5f5f7] transition-all">About</Link></li>
-                        <li><Link to="/contact" className="text-[13px] text-[#f5f5f7]/60 no-underline hover:text-[#f5f5f7] transition-all">Contact</Link></li>
-                    </ul>
-                    <button className="bg-[#0071e3] text-white border-none py-[7px] px-[16px] rounded-[980px] text-[13px] font-medium hover:bg-[#0077ed] transition-colors cursor-pointer">
-                        Sign in
-                    </button>
-                </div>
-            </nav>
+
 
             {/* EXAM WRAPPER */}
             <div className="max-w-[860px] w-full mx-auto p-[48px_24px_80px] flex-1 text-left">
