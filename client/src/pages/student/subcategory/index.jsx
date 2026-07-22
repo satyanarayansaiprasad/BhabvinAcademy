@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { fetchStudentViewCourseListService } from "@/services";
 import { Button } from "@/components/ui/button";
+import CourseCard from "@/components/student-view/course-card";
 
 function SubCategoryPage() {
     const { id } = useParams();
@@ -24,8 +25,6 @@ function SubCategoryPage() {
         async function fetchCourses() {
             setLoading(true);
             try {
-                // We pass the subcategory ID as the query to find related courses.
-                // It's likely returning empty on new categories until authors map courses.
                 const response = await fetchStudentViewCourseListService(`?category=${id}`);
                 if (response?.success) {
                     setCourses(response.data);
@@ -57,15 +56,11 @@ function SubCategoryPage() {
                 ) : courses.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {courses.map((course) => (
-                            <div key={course._id} className="bg-white rounded-2xl p-6 border border-zinc-200 shadow-sm flex flex-col cursor-pointer hover:shadow-lg transition-transform hover:-translate-y-1" onClick={() => navigate(`/course/details/${course._id}`)}>
-                                <img src={course.image} alt={course.title} className="w-full h-48 object-cover rounded-xl mb-4" />
-                                <h3 className="font-bold text-lg mb-2 text-zinc-900">{course.title}</h3>
-                                <p className="text-zinc-500 text-sm mb-4 line-clamp-2">{course.description}</p>
-                                <div className="mt-auto flex items-center justify-between">
-                                    <span className="font-black text-lg">₹{course.pricing}</span>
-                                    <span className="text-blue-600 font-bold text-sm">View Details →</span>
-                                </div>
-                            </div>
+                            <CourseCard
+                                key={course._id}
+                                course={course}
+                                onClick={(courseId) => navigate(`/course/details/${courseId}`)}
+                            />
                         ))}
                     </div>
                 ) : (

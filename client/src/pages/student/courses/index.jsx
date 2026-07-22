@@ -334,19 +334,6 @@ function StudentViewCoursesPage() {
         </div>
       </div>
 
-      {/* PROMO BAND */}
-      <div className="px-6 pb-[48px]">
-        <div className="promo-band max-w-[1080px] mx-auto bg-gradient-to-r from-[#1d1d1f] to-[#1a1a2e] rounded-[20px] p-[36px_40px] flex flex-col sm:flex-row items-center justify-between gap-[24px] relative overflow-hidden">
-          <div className="absolute right-[-60px] top-[-60px] w-[240px] h-[240px] rounded-full bg-[radial-gradient(circle,rgba(0,113,227,0.3)_0%,transparent_70%)] pointer-events-none" />
-          <div className="promo-text z-10">
-            <h3 className="text-[22px] font-bold text-[#f5f5f7] tracking-[-0.5px] mb-[6px]">🎓 Not sure where to start?</h3>
-            <p className="text-[14px] text-[#86868b] leading-[1.5]">Take our 2-minute quiz and we'll recommend the perfect learning path for your goals and experience level.</p>
-          </div>
-          <button onClick={() => navigate('/courses')} className="bg-[#0071e3] text-white font-medium py-[12px] px-[24px] rounded-[980px] hover:bg-[#0077ed] transition-colors whitespace-nowrap z-10">
-            Find My Path →
-          </button>
-        </div>
-      </div>
 
       {/* CTA BAND */}
       <section className="bg-[#0071e3] py-[80px] px-6 text-center flex flex-col items-center">

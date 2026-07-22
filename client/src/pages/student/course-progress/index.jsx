@@ -3,7 +3,26 @@ import { useNavigate, useParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
     Award,
-    RotateCcw
+    RotateCcw,
+    Star,
+    Share2,
+    X,
+    Search,
+    ChevronDown,
+    ChevronUp,
+    CheckSquare,
+    Square,
+    Sparkles,
+    Clock,
+    Globe,
+    Smartphone,
+    PlayCircle,
+    FileText,
+    CheckCircle2,
+    MoreVertical,
+    Download,
+    ExternalLink,
+    HelpCircle
 } from "lucide-react";
 import { AuthContext } from "@/context/auth-context";
 import { StudentContext } from "@/context/student-context";
@@ -25,45 +44,37 @@ function StudentViewCourseProgressPage() {
     const [currentLecture, setCurrentLecture] = useState(null);
     const [activeTab, setActiveTab] = useState("overview");
     const [isSideBarOpen, setIsSideBarOpen] = useState(true);
+    const [sidebarTab, setSidebarTab] = useState("content"); // 'content' or 'ai'
     const [showConfetti, setShowConfetti] = useState(false);
     const [showCertificate, setShowCertificate] = useState(false);
-    const [openModules, setOpenModules] = useState([0]); // First module open by default
+    const [openSections, setOpenSections] = useState({});
+    const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+    const [openResourcesDropdown, setOpenResourcesDropdown] = useState(null);
 
     // Interactive state for Notes & Q&A
     const [notes, setNotes] = useState([
-        { time: "08:15", text: "Remember: /24 = 255.255.255.0 = 256 addresses, 254 usable. The -2 accounts for network address and broadcast." },
-        { time: "11:40", text: "VLSM trick: always allocate the largest subnet first, then work downward. Prevents address space waste." }
+        { time: "08:15", text: "Key concept: Allocate largest subnets first when implementing VLSM address schemes." },
+        { time: "14:30", text: "RFC 3021 allows /31 subnets on point-to-point serial and WAN links." }
     ]);
     const [newNoteText, setNewNoteText] = useState("");
+    
     const [qaList, setQaList] = useState([
         {
             user: "Vijay Sharma",
             userInitials: "VS",
-            userBg: "#9b27af",
+            userBg: "#5850ec",
             time: "2 days ago · at 18:44",
-            text: "When using VLSM, if we allocate a /26 first and then a /28, does the /28 have to come right after the /26 block or can it be anywhere in the remaining address space?",
+            text: "When using VLSM, if we allocate a /26 first and then a /28, does the /28 have to come right after the /26 block?",
             likes: 8,
             reply: {
-                name: "Ankit Kumar",
-                initials: "AK",
-                text: "Great question, Vijay! The /28 can go anywhere in the remaining space — no strict ordering is required protocol-wise. In practice we start from the beginning of remaining space to avoid fragmentation and keep the address plan readable. The CCNA exam tests whether you can find valid subnets, not placement order."
-            }
-        },
-        {
-            user: "Pooja Raghavan",
-            userInitials: "PR",
-            userBg: "#c0392b",
-            time: "5 days ago · at 31:20",
-            text: "Is /31 actually usable for point-to-point links? I thought you always need a network and broadcast address?",
-            likes: 14,
-            reply: {
-                name: "Ankit Kumar",
-                initials: "AK",
-                text: "Excellent catch — yes! RFC 3021 allows /31 on point-to-point links. Both addresses are usable as host addresses. Cisco IOS supports this and it saves address space on WAN links. I cover this in Part 2 as well!"
+                name: "Bhavin Patel",
+                initials: "BP",
+                text: "Great question! The /28 can go anywhere in the remaining space — no strict ordering is required protocol-wise."
             }
         }
     ]);
     const [newQuestionText, setNewQuestionText] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
         fetchCurrentCourseProgress();
@@ -72,30 +83,51 @@ function StudentViewCourseProgressPage() {
     async function fetchCurrentCourseProgress() {
         const response = await getCurrentCourseProgressService(auth?.user?._id, id);
         if (response?.success) {
+            const courseDetails = response?.data?.courseDetails;
+            const progress = response?.data?.progress;
+
             setStudentCurrentCourseProgress({
-                courseDetails: response?.data?.courseDetails,
-                progress: response?.data?.progress,
+                courseDetails: courseDetails,
+                progress: progress,
             });
             
+            // Set up initial curriculum sections state (all expanded by default)
+            if (courseDetails?.curriculum) {
+                const initialSections = {};
+                courseDetails.curriculum.forEach((item, idx) => {
+                    const secTitle = item.section || "Section 1: Course Curriculum";
+                    initialSections[secTitle] = true;
+                });
+                setOpenSections(initialSections);
+            }
+
             if (response?.data?.completed) {
-                setCurrentLecture(response?.data?.courseDetails?.curriculum[0]);
+                setCurrentLecture(courseDetails?.curriculum[0]);
                 setShowConfetti(true);
-            } else if (response?.data?.progress?.length === 0) {
-                setCurrentLecture(response?.data?.courseDetails?.curriculum[0]);
+            } else if (progress?.length === 0) {
+                setCurrentLecture(courseDetails?.curriculum[0]);
             } else {
-                const lastIdx = response?.data?.progress.reduceRight((acc, obj, index) => acc === -1 && obj.viewed ? index : acc, -1);
-                setCurrentLecture(response?.data?.courseDetails?.curriculum[lastIdx + 1] || response?.data?.courseDetails?.curriculum[0]);
+                const lastIdx = progress.reduceRight((acc, obj, index) => acc === -1 && obj.viewed ? index : acc, -1);
+                setCurrentLecture(courseDetails?.curriculum[lastIdx + 1] || courseDetails?.curriculum[0]);
             }
         }
     }
 
-    const toggleModule = (idx) => {
-        setOpenModules(prev => prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]);
+    const toggleSection = (secTitle) => {
+        setOpenSections(prev => ({
+            ...prev,
+            [secTitle]: !prev[secTitle]
+        }));
     };
 
-    const handleMarkAsDone = async () => {
-        if (currentLecture) {
-            const response = await markLectureAsViewedService(auth?.user?._id, studentCurrentCourseProgress?.courseDetails?._id, currentLecture._id);
+    const handleMarkAsDone = async (lectureId) => {
+        const targetId = lectureId || currentLecture?._id;
+        if (targetId) {
+            const response = await markLectureAsViewedService(
+                auth?.user?._id, 
+                studentCurrentCourseProgress?.courseDetails?._id, 
+                targetId
+            );
             if (response?.success) fetchCurrentCourseProgress();
         }
     };
@@ -103,7 +135,7 @@ function StudentViewCourseProgressPage() {
     const handleSaveNote = () => {
         if (!newNoteText.trim()) return;
         const note = {
-            time: "14:32",
+            time: "05:20",
             text: newNoteText.trim()
         };
         setNotes([note, ...notes]);
@@ -112,7 +144,7 @@ function StudentViewCourseProgressPage() {
 
     const handlePostQuestion = () => {
         if (!newQuestionText.trim()) return;
-        const initials = auth?.user?.userFullName ? auth.user.userFullName.split(" ").map(n => n[0]).join("").toUpperCase() : "AM";
+        const initials = auth?.user?.userFullName ? auth.user.userFullName.split(" ").map(n => n[0]).join("").toUpperCase() : "ST";
         const question = {
             user: auth?.user?.userFullName || auth?.user?.userName || "Student",
             userInitials: initials,
@@ -125,70 +157,89 @@ function StudentViewCourseProgressPage() {
         setNewQuestionText("");
     };
 
-    const progressValue = Math.round((studentCurrentCourseProgress?.progress?.filter(p => p.viewed).length / studentCurrentCourseProgress?.courseDetails?.curriculum.length) * 100) || 0;
+    const curriculum = studentCurrentCourseProgress?.courseDetails?.curriculum || [];
+    const viewedCount = studentCurrentCourseProgress?.progress?.filter(p => p.viewed).length || 0;
+    const totalLectures = curriculum.length || 1;
+    const progressValue = Math.round((viewedCount / totalLectures) * 100) || 0;
+
+    // Group curriculum by section
+    const groupedCurriculum = curriculum.reduce((acc, item, index) => {
+        const secTitle = item.section || "Section 1: Course Curriculum";
+        if (!acc[secTitle]) acc[secTitle] = [];
+        acc[secTitle].push({ ...item, originalIndex: index });
+        return acc;
+    }, {});
 
     const userInitials = auth?.user?.userFullName 
         ? auth.user.userFullName.split(" ").map(n => n[0]).join("").toUpperCase() 
-        : "RV";
+        : "BP";
 
     return (
-        <div className="flex flex-col h-screen bg-[#f5f7fa] font-sans overflow-hidden text-[#1a1a2e]">
+        <div className="flex flex-col h-screen bg-[#1c1d1f] font-sans overflow-hidden text-white select-none">
             {showConfetti && <Confetti recycle={false} numberOfPieces={500} gravity={0.1} />}
 
-            {/* TOP NAVBAR */}
-            <nav className="h-[52px] bg-white/95 backdrop-blur-[20px] border-b border-[#e2e8f0] flex items-center justify-between px-5 sticky top-0 z-[100] shadow-[0_1px_4px_rgba(0,0,0,0.06)] shrink-0">
-                <div className="flex items-center gap-4 min-w-0">
-                    <Link to="/" className="text-[17px] font-bold text-[#1a1a2e] no-underline tracking-tight">
+            {/* TOP UDEMY DARK NAVBAR */}
+            <nav className="h-[56px] bg-[#1c1d1f] border-b border-[#2d2f31] flex items-center justify-between px-4 sticky top-0 z-[100] shrink-0">
+                {/* Left logo & course title */}
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <Link to="/" className="text-[18px] font-bold text-white no-underline tracking-tight shrink-0 hover:opacity-90">
                         Bhavin<span className="text-[#0071e3]">Academy</span>
                     </Link>
-                    <div className="w-[1px] h-5 bg-[#d1d9e0]" />
-                    <div className="text-[13px] text-[#64748b] truncate max-w-[300px]" title={studentCurrentCourseProgress?.courseDetails?.title}>
-                        {studentCurrentCourseProgress?.courseDetails?.title}
-                    </div>
+                    <div className="w-[1px] h-5 bg-[#3e4143] shrink-0 hidden sm:block" />
+                    <h1 className="text-[14px] font-semibold text-[#f7f9fa] truncate max-w-[550px]" title={studentCurrentCourseProgress?.courseDetails?.title}>
+                        {studentCurrentCourseProgress?.courseDetails?.title || "Digital Marketing, Social Media & AI Mastery"}
+                    </h1>
                 </div>
 
-                <div className="flex items-center gap-6">
-                    <div className="hidden md:flex items-center gap-2.5">
-                        <div className="w-[160px] h-[4px] bg-[#e2e8f0] rounded-[2px] overflow-hidden">
-                            <motion.div initial={{ width: 0 }} animate={{ width: `${progressValue}%` }} className="h-full bg-[#0071e3] rounded-[2px]" />
+                {/* Right controls */}
+                <div className="flex items-center gap-3 shrink-0">
+                    {/* Star Rating Button */}
+                    <button 
+                        onClick={() => alert("Thank you for your 5-star rating!")}
+                        className="hidden md:flex items-center gap-1.5 text-[13px] font-medium text-white hover:text-amber-400 bg-transparent border-none cursor-pointer px-2 py-1 transition-colors"
+                    >
+                        <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                        <span>Your rating</span>
+                    </button>
+
+                    {/* Progress / Get Certificate pill */}
+                    <button 
+                        onClick={() => progressValue === 100 ? setShowCertificate(true) : alert(`Course ${progressValue}% complete. Complete all lectures to claim your certificate.`)}
+                        className="flex items-center gap-2 bg-transparent border border-[#6a6f73] hover:border-white text-white rounded-[4px] px-3 py-1.5 text-[12px] font-bold cursor-pointer transition-colors"
+                    >
+                        <div className="w-5 h-5 rounded-full border-2 border-white/40 flex items-center justify-center text-[9px]">
+                            {progressValue}%
                         </div>
-                        <span className="text-[12px] text-[#64748b]">{progressValue}% complete</span>
-                    </div>
-                </div>
+                        <span className="hidden sm:inline">{progressValue === 100 ? "Get Certificate 🏆" : "Get Certificate"}</span>
+                    </button>
 
-                <div className="flex items-center gap-3">
+                    {/* Share Button */}
                     <button 
                         onClick={() => {
-                            alert('Keyboard Shortcuts:\nSpace — Play/Pause\nN — Next lesson\nP — Previous lesson');
+                            navigator.clipboard?.writeText(window.location.href);
+                            alert("Course link copied to clipboard!");
                         }}
-                        className="bg-transparent border-none cursor-pointer text-[#64748b] text-[16px] w-[34px] h-[34px] rounded-[8px] flex items-center justify-center hover:bg-[#f1f5f9] hover:text-[#1a1a2e] transition-all"
-                        title="Keyboard Shortcuts"
+                        className="hidden sm:flex items-center gap-1.5 bg-transparent border border-[#6a6f73] hover:border-white text-white rounded-[4px] px-3 py-1.5 text-[12px] font-bold cursor-pointer transition-colors"
                     >
-                        ⌨
+                        <Share2 className="w-3.5 h-3.5" />
+                        <span>Share</span>
                     </button>
-                    <button 
-                        onClick={() => {
-                            setActiveTab("notes");
-                        }}
-                        className="bg-transparent border-none cursor-pointer text-[#64748b] text-[16px] w-[34px] h-[34px] rounded-[8px] flex items-center justify-center hover:bg-[#f1f5f9] hover:text-[#1a1a2e] transition-all"
-                        title="My Notes"
-                    >
-                        📝
+
+                    {/* Menu dots */}
+                    <button className="text-white hover:bg-white/10 p-2 rounded-full cursor-pointer bg-transparent border-none">
+                        <MoreVertical className="w-4 h-4" />
                     </button>
-                    <div className="w-[30px] h-[30px] rounded-full bg-[#0071e3] flex items-center justify-center text-[11px] font-bold text-white cursor-pointer" title="Your profile">
-                        {userInitials}
-                    </div>
                 </div>
             </nav>
 
-            {/* MAIN PLAYER GRID */}
-            <div className="flex flex-1 overflow-hidden min-h-0">
+            {/* MAIN LEARNING CONTENT SPLIT GRID */}
+            <div className="flex flex-1 overflow-hidden min-h-0 relative">
                 
-                {/* LEFT COL: VIDEO + CONTENT */}
-                <main className="flex-1 flex flex-col overflow-y-auto no-scrollbar min-h-0 bg-[#f5f7fa]">
+                {/* MAIN COLUMN (PLAYER + TABS + OVERVIEW) */}
+                <main className="flex-1 flex flex-col overflow-y-auto min-h-0 bg-white text-[#1c1d1f]">
                     
-                    {/* VIDEO WRAPPER */}
-                    <div className="bg-black aspect-video w-full shrink-0 relative overflow-hidden">
+                    {/* VIDEO CONTAINER */}
+                    <div className="bg-black aspect-video w-full shrink-0 relative overflow-hidden flex items-center justify-center">
                         <VideoPlayer
                             width="100%"
                             height="100%"
@@ -198,184 +249,218 @@ function StudentViewCourseProgressPage() {
                         />
                     </div>
 
-                    {/* LESSON NAV BAR */}
-                    <div className="flex items-center justify-between p-[14px_24px] border-b border-[#e2e8f0] bg-white shrink-0 gap-[10px] flex-wrap text-left">
-                        <div className="flex items-center gap-2 text-[13px] text-[#94a3b8] font-light">
-                            Module 01 · Networking Fundamentals
-                            <span className="text-[#1a1a2e] mx-1">›</span>
-                            <span className="text-[#1a1a2e] font-medium">{currentLecture?.title}</span>
-                        </div>
-                        <div className="flex items-center gap-[14px] flex-wrap">
-                            <div className="flex items-center gap-2 cursor-pointer select-none" onClick={handleMarkAsDone}>
-                                <div className={`w-[18px] h-[18px] rounded-[5px] border-2 flex items-center justify-center transition-all ${studentCurrentCourseProgress?.progress?.find(p => p.lectureId === currentLecture?._id)?.viewed ? 'bg-[#16a34a] border-[#16a34a]' : 'border-[#cbd5e1]'}`}>
-                                    {studentCurrentCourseProgress?.progress?.find(p => p.lectureId === currentLecture?._id)?.viewed && (
-                                        <div className="w-[4px] h-[8px] border-r-2 border-b-2 border-white rotate-45 -translate-y-[1px]" />
-                                    )}
+                    {/* SEPARATE DOWNLOADABLE FILE / RESOURCE BANNER */}
+                    {currentLecture?.fileUrl && (
+                        <div className="bg-[#f0f7ff] border-b border-[#bfdbfe] p-4 px-6 flex items-center justify-between flex-wrap gap-3 shrink-0">
+                            <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-lg bg-[#0071e3] text-white flex items-center justify-center shrink-0">
+                                    <FileText className="w-5 h-5" />
                                 </div>
-                                <span className="text-[13px] text-[#64748b]">
-                                    {studentCurrentCourseProgress?.progress?.find(p => p.lectureId === currentLecture?._id)?.viewed ? 'Completed ✓' : 'Mark as complete'}
-                                </span>
+                                <div>
+                                    <div className="text-sm font-bold text-[#1c1d1f]">
+                                        {currentLecture?.fileName || "Downloadable Resource Document"}
+                                    </div>
+                                    <div className="text-xs text-[#6a6f73]">
+                                        Section resource file (PDF / Document)
+                                    </div>
+                                </div>
                             </div>
-                            <div className="flex gap-2">
-                                <button 
-                                    className="flex items-center gap-1.5 bg-[#f1f5f9] text-[#475569] border border-[#e2e8f0] p-[7px_14px] rounded-[8px] text-[13px] font-medium cursor-pointer hover:bg-[#e2e8f0] hover:border-[#cbd5e1] transition-all" 
-                                    onClick={() => {
-                                        const idx = studentCurrentCourseProgress?.courseDetails?.curriculum.indexOf(currentLecture);
-                                        if (idx > 0) setCurrentLecture(studentCurrentCourseProgress.courseDetails.curriculum[idx - 1]);
-                                    }}
-                                >
-                                    ‹ Previous
-                                </button>
-                                <button 
-                                    className="flex items-center gap-1.5 bg-[#0071e3] text-white border border-[#0071e3] p-[7px_14px] rounded-[8px] text-[13px] font-medium cursor-pointer hover:bg-[#0077ed] transition-all" 
-                                    onClick={() => {
-                                        const idx = studentCurrentCourseProgress?.courseDetails?.curriculum.indexOf(currentLecture);
-                                        if (idx < studentCurrentCourseProgress?.courseDetails?.curriculum.length - 1) {
-                                            setCurrentLecture(studentCurrentCourseProgress.courseDetails.curriculum[idx + 1]);
-                                        }
-                                    }}
-                                >
-                                    Next ›
-                                </button>
-                            </div>
+                            <a
+                                href={currentLecture.fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                download
+                                className="bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-2 no-underline transition-colors shadow-sm"
+                            >
+                                <Download className="w-4 h-4" /> Download File Resource
+                            </a>
                         </div>
-                    </div>
+                    )}
 
-                    {/* TABS */}
-                    <div className="flex border-b border-[#e2e8f0] px-6 bg-white shrink-0">
+                    {/* SUB-VIDEO TABS NAVBAR */}
+                    <div className="flex items-center border-b border-[#d1d7dc] px-6 bg-white shrink-0 overflow-x-auto no-scrollbar">
+                        <button className="p-3 text-gray-600 hover:text-black bg-transparent border-none cursor-pointer">
+                            <Search className="w-4 h-4" />
+                        </button>
+
                         {[
                             { id: "overview", label: "Overview" },
+                            { id: "qa", label: "Q&A" },
                             { id: "notes", label: "Notes" },
-                            { id: "resources", label: "Resources" },
-                            { id: "qa", label: `Q&A` },
+                            { id: "announcements", label: "Announcements" },
+                            { id: "reviews", label: "Reviews" },
+                            { id: "learning-tools", label: "Learning Tools" },
                         ].map(tab => (
                             <button 
                                 key={tab.id} 
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`p-[14px_16px] text-[14px] font-medium cursor-pointer relative transition-all border-none bg-transparent ${activeTab === tab.id ? 'text-[#1a1a2e] after:content-[""] after:absolute after:bottom-[-1px] after:left-0 after:right-0 after:h-[2px] after:bg-[#0071e3] after:rounded-[1px]' : 'text-[#94a3b8] hover:text-[#475569]'}`}
+                                className={`py-4 px-4 text-[14px] font-bold cursor-pointer relative transition-colors border-none bg-transparent whitespace-nowrap ${
+                                    activeTab === tab.id 
+                                        ? 'text-[#1c1d1f] border-b-2 border-[#1c1d1f]' 
+                                        : 'text-[#6a6f73] hover:text-[#1c1d1f]'
+                                }`}
                             >
                                 {tab.label}
-                                {tab.id === "qa" && (
-                                    <span className="bg-[#eff6ff] text-[#0071e3] text-[10px] font-bold p-[1px_6px] rounded-[10px] ml-1">
-                                        {qaList.length}
-                                    </span>
-                                )}
                             </button>
                         ))}
                     </div>
 
-                    {/* TAB CONTENT */}
-                    <div className="p-[28px_24px] flex-1 bg-[#f5f7fa] text-left">
+                    {/* TAB CONTENT AREA */}
+                    <div className="p-6 md:p-8 flex-1 bg-white text-left max-w-[1000px]">
+                        
+                        {/* TAB 1: OVERVIEW */}
                         {activeTab === "overview" && (
-                            <div className="space-y-8 max-w-[800px]">
-                                <div className="overview-section">
-                                    <h3 className="text-[17px] font-bold mb-3.5 text-[#1a1a2e]">About this lesson</h3>
-                                    <p className="text-[15px] text-[#475569] leading-[1.75]">
-                                        {studentCurrentCourseProgress?.courseDetails?.description || 
-                                         "In this lesson, you'll build a rock-solid understanding of IP subnetting — the skill that defines every network engineer. We'll break down binary addressing, CIDR notation, and subnet masks step by step, with Packet Tracer exercises following each concept. By the end you'll be able to design and calculate subnets mentally, a skill that appears on every CCNA exam."}
+                            <div className="space-y-8">
+                                {/* Title & Stats */}
+                                <div>
+                                    <h2 className="text-[24px] font-bold text-[#1c1d1f] leading-snug mb-3">
+                                        {studentCurrentCourseProgress?.courseDetails?.title || "Digital Marketing, Social Media, ChatGPT, Prompt Engineering, Google Ads, Facebook, SEO, WordPress, Instagram, YouTube."}
+                                    </h2>
+
+                                    {/* Ratings & Enrolled Bar */}
+                                    <div className="flex items-center gap-4 text-[13px] text-[#2d2f31] flex-wrap mb-2">
+                                        <div className="flex items-center gap-1">
+                                            <span className="font-bold text-amber-600">4.5</span>
+                                            <div className="flex text-amber-500">
+                                                {"★".repeat(5)}
+                                            </div>
+                                            <span className="text-[#6a6f73] ml-1">(95,020 ratings)</span>
+                                        </div>
+                                        <span className="text-gray-300">•</span>
+                                        <span className="font-semibold">290,864 Students</span>
+                                        <span className="text-gray-300">•</span>
+                                        <span className="font-semibold">96.5 hours Total</span>
+                                    </div>
+
+                                    {/* Meta Tags */}
+                                    <div className="flex items-center gap-4 text-[13px] text-[#6a6f73] flex-wrap">
+                                        <span className="flex items-center gap-1.5">
+                                            <Clock className="w-3.5 h-3.5" /> Last updated June 2024
+                                        </span>
+                                        <span className="flex items-center gap-1.5">
+                                            <Globe className="w-3.5 h-3.5" /> English [Auto], French, Arabic, <button className="text-[#0071e3] underline bg-transparent border-none cursor-pointer">20 more</button>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <hr className="border-t border-[#d1d7dc]" />
+
+                                {/* Schedule Learning Time Card */}
+                                <div className="bg-[#f7f9fa] border border-[#d1d7dc] rounded-[8px] p-5 flex items-start gap-4">
+                                    <div className="p-3 bg-white rounded-full border border-[#d1d7dc] text-[#1c1d1f] shrink-0">
+                                        <Clock className="w-6 h-6" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h4 className="text-[16px] font-bold text-[#1c1d1f] mb-1">Schedule learning time</h4>
+                                        <p className="text-[14px] text-[#6a6f73] leading-relaxed mb-4">
+                                            Learning a little each day adds up. Research shows that students who make learning a habit are more likely to reach their goals. Get time slots to learn and get reminders using your learning schedule.
+                                        </p>
+                                        <div className="flex items-center gap-3">
+                                            <button className="bg-[#a435f0] hover:bg-[#8710d8] text-white text-[13px] font-bold px-4 py-2 rounded-[4px] border-none cursor-pointer transition-colors">
+                                                Get started
+                                            </button>
+                                            <button className="bg-transparent text-[#1c1d1f] hover:bg-gray-200 text-[13px] font-bold px-4 py-2 rounded-[4px] border-none cursor-pointer transition-colors">
+                                                Dismiss
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* By the Numbers Section */}
+                                <div>
+                                    <h3 className="text-[18px] font-bold text-[#1c1d1f] mb-4">By the numbers</h3>
+                                    <div className="grid grid-cols-2 md:grid-cols-2 gap-x-12 gap-y-3 text-[14px] text-[#2d2f31]">
+                                        <div className="flex justify-between py-1 border-b border-gray-100">
+                                            <span className="text-[#6a6f73]">Skill level:</span>
+                                            <span className="font-semibold">{studentCurrentCourseProgress?.courseDetails?.level || "All Levels"}</span>
+                                        </div>
+                                        <div className="flex justify-between py-1 border-b border-gray-100">
+                                            <span className="text-[#6a6f73]">Lectures:</span>
+                                            <span className="font-semibold">{totalLectures}</span>
+                                        </div>
+                                        <div className="flex justify-between py-1 border-b border-gray-100">
+                                            <span className="text-[#6a6f73]">Students:</span>
+                                            <span className="font-semibold">290,861</span>
+                                        </div>
+                                        <div className="flex justify-between py-1 border-b border-gray-100">
+                                            <span className="text-[#6a6f73]">Video:</span>
+                                            <span className="font-semibold">96.5 total hours</span>
+                                        </div>
+                                        <div className="flex justify-between py-1 border-b border-gray-100">
+                                            <span className="text-[#6a6f73]">Languages:</span>
+                                            <span className="font-semibold">English</span>
+                                        </div>
+                                        <div className="flex justify-between py-1 border-b border-gray-100">
+                                            <span className="text-[#6a6f73]">Captions:</span>
+                                            <span className="font-semibold">Yes</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr className="border-t border-[#d1d7dc]" />
+
+                                {/* Certificates Section */}
+                                <div>
+                                    <h3 className="text-[18px] font-bold text-[#1c1d1f] mb-2">Certificates</h3>
+                                    <p className="text-[14px] text-[#6a6f73] mb-4">Get BhavinAcademy certificate by completing entire course</p>
+                                    <button 
+                                        onClick={() => progressValue === 100 ? setShowCertificate(true) : alert("Complete 100% of the course to unlock certificate!")}
+                                        className="border border-[#1c1d1f] bg-white text-[#1c1d1f] font-bold text-[13px] px-5 py-2.5 rounded-[4px] hover:bg-[#f7f9fa] transition-colors cursor-pointer"
+                                    >
+                                        BhavinAcademy certificate
+                                    </button>
+                                </div>
+
+                                <hr className="border-t border-[#d1d7dc]" />
+
+                                {/* Features Section */}
+                                <div>
+                                    <h3 className="text-[18px] font-bold text-[#1c1d1f] mb-2">Features</h3>
+                                    <p className="text-[14px] text-[#2d2f31] flex items-center gap-2">
+                                        Available on <span className="font-bold text-[#a435f0]">iOS</span> and <span className="font-bold text-[#a435f0]">Android</span>
                                     </p>
                                 </div>
-                                <div className="overview-section">
-                                    <h3 className="text-[17px] font-bold mb-3.5 text-[#1a1a2e]">What you'll learn</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-[10px_24px]">
-                                        {[
-                                            "Binary-to-decimal conversion at speed",
-                                            "CIDR notation and prefix lengths",
-                                            "Calculating network & broadcast addresses",
-                                            "Determining usable host ranges per subnet",
-                                            "Subnet design for real enterprise topologies",
-                                            "Variable Length Subnet Masking (VLSM)"
-                                        ].map((item, idx) => (
-                                            <div key={idx} className="flex items-start gap-2.5 text-[14px] text-[#334155] leading-normal">
-                                                <div className="w-[18px] h-[18px] rounded-full bg-[#dcfce7] border border-[#16a34a] flex items-center justify-center shrink-0 mt-[1px] text-[9px] text-[#16a34a] font-bold">✓</div>
-                                                <span>{item}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
 
-                        {activeTab === "notes" && (
-                            <div className="max-w-[800px]">
-                                <div className="flex gap-2 mb-4 items-center flex-wrap">
-                                    <span className="text-[13px] text-[#64748b]">Timestamp:</span>
+                                <hr className="border-t border-[#d1d7dc]" />
+
+                                {/* Description Section */}
+                                <div>
+                                    <h3 className="text-[18px] font-bold text-[#1c1d1f] mb-3">Description</h3>
+                                    <div className={`text-[14px] text-[#2d2f31] leading-relaxed relative ${!isDescriptionExpanded ? 'line-clamp-4' : ''}`}>
+                                        <p className="font-semibold mb-2">Congratulations, You Found It!</p>
+                                        <p className="mb-2">
+                                            {studentCurrentCourseProgress?.courseDetails?.description || 
+                                             "The Most Complete Course on Digital Marketing, Social Media, ChatGPT, Prompt Engineering, Google Ads, Facebook, SEO, WordPress, Instagram, YouTube."}
+                                        </p>
+                                        <p>Instead of buying 27 different courses, this masterclass combines all essential topics into a single structured curriculum designed for career growth and hands-on skill mastery.</p>
+                                    </div>
                                     <button 
-                                        className="text-[12px] font-semibold text-[#0071e3] bg-[#eff6ff] border border-[#bfdbfe] p-[5px_12px] rounded-[6px] cursor-pointer hover:bg-[#dbeafe] transition-all"
-                                        onClick={() => setNewNoteText(prev => prev + "[@ 14:32] ")}
+                                        onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                                        className="mt-3 text-[#a435f0] hover:text-[#8710d8] font-bold text-[14px] flex items-center gap-1 bg-transparent border-none cursor-pointer"
                                     >
-                                        + 14:32
-                                    </button>
-                                    <span className="text-[12px] text-[#94a3b8]">Insert current video timestamp into note</span>
-                                </div>
-                                <textarea 
-                                    className="w-full min-h-[160px] bg-white border border-[#e2e8f0] rounded-[12px] p-4 text-[14px] text-[#1a1a2e] leading-[1.7] resize-y outline-none focus:border-[#93c5fd] focus:shadow-[0_0_0_3px_rgba(0,113,227,0.08)] transition-all placeholder:text-[#cbd5e1]"
-                                    placeholder="Type your notes here... Use timestamps to link notes to specific moments in the video."
-                                    value={newNoteText}
-                                    onChange={(e) => setNewNoteText(e.target.value)}
-                                />
-                                <div className="flex justify-end mt-3">
-                                    <button 
-                                        className="bg-[#0071e3] text-white border-none p-[8px_20px] rounded-[8px] text-[13px] font-semibold cursor-pointer hover:bg-[#0077ed] transition-all"
-                                        onClick={handleSaveNote}
-                                    >
-                                        Save Note
+                                        {isDescriptionExpanded ? "Show less ▲" : "Show more ▼"}
                                     </button>
                                 </div>
 
-                                <div className="mt-8">
-                                    <h4 className="text-[13px] font-semibold text-[#94a3b8] uppercase tracking-[0.06em] mb-3.5">Saved Notes</h4>
-                                    <div className="space-y-3">
-                                        {notes.map((note, idx) => (
-                                            <div key={idx} className="p-4 rounded-[10px] bg-white border border-[#e2e8f0] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-                                                <div className="text-[11px] font-semibold text-[#0071e3] mb-1.5">@ {note.time}</div>
-                                                <div className="text-[14px] text-[#334155] leading-[1.6]">{note.text}</div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
                             </div>
                         )}
 
-                        {activeTab === "resources" && (
-                            <div className="space-y-2.5 max-w-[800px]">
-                                {[
-                                    { name: "Subnetting Quick Reference Sheet", meta: "PDF · 2 pages · Printable cheat sheet", icon: "📄", bg: "bg-[#fee2e2]" },
-                                    { name: "Packet Tracer Lab: Subnet Design Exercise", meta: ".pkt file · Cisco Packet Tracer 8.2+", icon: "🔬", bg: "bg-[#dbeafe]" },
-                                    { name: "Subnet Mask Cheat Table (/1–/32)", meta: "PDF · Full CIDR table with host counts", icon: "📊", bg: "bg-[#fee2e2]" },
-                                    { name: "RFC 1878 — Variable Length Subnet Table", meta: "External link · IETF official document", icon: "🔗", bg: "bg-[#fef9c3]" }
-                                ].map((res, idx) => (
-                                    <div key={idx} className="flex items-center gap-3.5 p-[14px_16px] rounded-[12px] bg-white border border-[#e2e8f0] shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] hover:bg-[#f8fafc] cursor-pointer transition-all">
-                                        <div className={`w-[38px] h-[38px] rounded-[10px] ${res.bg} flex items-center justify-center text-[18px] shrink-0`}>
-                                            {res.icon}
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="text-[14px] font-medium text-[#1a1a2e] mb-[2px]">{res.name}</div>
-                                            <div className="text-[12px] text-[#94a3b8]">{res.meta}</div>
-                                        </div>
-                                        <button className="text-[11px] font-semibold text-[#0071e3] p-[5px_12px] rounded-[6px] bg-[#eff6ff] border border-[#bfdbfe] cursor-pointer hover:bg-[#dbeafe] transition-all whitespace-nowrap">
-                                            {res.icon === "🔗" ? "Open ↗" : "Download"}
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
+                        {/* TAB 2: Q&A */}
                         {activeTab === "qa" && (
-                            <div className="max-w-[800px] space-y-7">
+                            <div className="space-y-6 max-w-[800px]">
                                 <div className="flex gap-3 items-start">
-                                    <div className="w-[36px] h-[36px] rounded-full bg-[#0071e3] shrink-0 flex items-center justify-center text-[12px] font-bold text-white">
+                                    <div className="w-[36px] h-[36px] rounded-full bg-[#a435f0] shrink-0 flex items-center justify-center text-[13px] font-bold text-white">
                                         {userInitials}
                                     </div>
                                     <div className="flex-1">
                                         <textarea 
-                                            className="w-full bg-white border border-[#e2e8f0] rounded-[12px] p-[14px_16px] text-[14px] text-[#1a1a2e] outline-none min-h-[90px] focus:border-[#93c5fd] focus:shadow-[0_0_0_3px_rgba(0,113,227,0.08)] transition-all placeholder:text-[#cbd5e1]" 
-                                            placeholder="Ask a question about this lesson..."
+                                            className="w-full bg-white border border-[#d1d7dc] rounded-[4px] p-3 text-[14px] text-[#1c1d1f] outline-none min-h-[90px] focus:border-[#a435f0] transition-colors placeholder:text-[#6a6f73]" 
+                                            placeholder="Ask a question about this lecture..."
                                             value={newQuestionText}
                                             onChange={(e) => setNewQuestionText(e.target.value)}
                                         />
                                         <button 
-                                            className="mt-2.5 bg-[#0071e3] text-white border-none p-[8px_20px] rounded-[8px] text-[13px] font-semibold cursor-pointer hover:bg-[#0077ed] transition-all"
+                                            className="mt-2 bg-[#a435f0] text-white border-none px-4 py-2 rounded-[4px] text-[13px] font-bold cursor-pointer hover:bg-[#8710d8] transition-colors"
                                             onClick={handlePostQuestion}
                                         >
                                             Post Question
@@ -383,43 +468,29 @@ function StudentViewCourseProgressPage() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-6 pt-4 border-t border-[#f1f5f9]">
+                                <div className="space-y-6 pt-4 border-t border-[#d1d7dc]">
                                     {qaList.map((qa, idx) => (
-                                        <div key={idx} className="pt-4 first:pt-0 border-t first:border-none border-[#f1f5f9]">
-                                            <div className="flex gap-3 items-start mb-2.5">
+                                        <div key={idx} className="space-y-3">
+                                            <div className="flex gap-3 items-start">
                                                 <div 
-                                                    className="w-[34px] h-[34px] rounded-full flex items-center justify-center text-[12px] font-bold text-white shrink-0"
+                                                    className="w-[36px] h-[36px] rounded-full flex items-center justify-center text-[12px] font-bold text-white shrink-0"
                                                     style={{ backgroundColor: qa.userBg }}
                                                 >
                                                     {qa.userInitials}
                                                 </div>
                                                 <div>
-                                                    <div className="text-[13px] font-semibold text-[#1a1a2e]">{qa.user}</div>
-                                                    <div className="text-[11px] text-[#94a3b8]">{qa.time}</div>
+                                                    <div className="text-[14px] font-bold text-[#1c1d1f]">{qa.user}</div>
+                                                    <div className="text-[12px] text-[#6a6f73]">{qa.time}</div>
                                                 </div>
                                             </div>
-                                            <p className="text-[14px] text-[#334155] leading-[1.65] pl-[46px]">{qa.text}</p>
-                                            <div className="flex gap-4 pl-[46px] mt-2.5">
-                                                <button className="text-[12px] text-[#94a3b8] hover:text-[#0071e3] bg-none border-none cursor-pointer flex items-center gap-1">
-                                                    👍 {qa.likes}
-                                                </button>
-                                                <button className="text-[12px] text-[#94a3b8] hover:text-[#0071e3] bg-none border-none cursor-pointer">
-                                                    Reply
-                                                </button>
-                                            </div>
-
+                                            <p className="text-[14px] text-[#2d2f31] leading-relaxed pl-12">{qa.text}</p>
                                             {qa.reply && (
-                                                <div className="ml-[46px] mt-3.5 p-[14px_16px] bg-[#f0f7ff] rounded-[10px] border-l-2 border-[#0071e3]">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <div className="w-[26px] h-[26px] rounded-full bg-[#dcfce7] flex items-center justify-center text-[10px] font-bold text-[#16a34a] shrink-0">
-                                                            {qa.reply.initials}
-                                                        </div>
-                                                        <span className="text-[12px] font-semibold text-[#16a34a]">{qa.reply.name}</span>
-                                                        <span className="text-[10px] font-semibold bg-[#dcfce7] text-[#16a34a] p-[1px_7px] rounded-[4px] border border-[#bbf7d0]">
-                                                            Instructor
-                                                        </span>
+                                                <div className="ml-12 p-4 bg-[#f7f9fa] rounded-[8px] border-l-4 border-[#a435f0]">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className="text-[13px] font-bold text-[#1c1d1f]">{qa.reply.name}</span>
+                                                        <span className="text-[10px] font-bold bg-[#a435f0] text-white px-1.5 py-0.5 rounded">Instructor</span>
                                                     </div>
-                                                    <p className="text-[13px] text-[#475569] leading-[1.65]">{qa.reply.text}</p>
+                                                    <p className="text-[13px] text-[#2d2f31]">{qa.reply.text}</p>
                                                 </div>
                                             )}
                                         </div>
@@ -427,98 +498,385 @@ function StudentViewCourseProgressPage() {
                                 </div>
                             </div>
                         )}
-                    </div>
-                </main>
 
-                {/* RIGHT SIDEBAR */}
-                <aside className="w-[360px] border-l border-[#e2e8f0] bg-white flex flex-col shrink-0 overflow-hidden relative shadow-[-1px_0_0_#f1f5f9] text-left">
-                    <div className="p-[16px_18px] border-b border-[#f1f5f9] shrink-0 bg-[#fafbfc]">
-                        <h3 className="text-[13px] font-semibold text-[#1a1a2e] mb-2">Course Content</h3>
-                        <div className="flex gap-3 text-[12px] text-[#94a3b8] mb-3">
-                            <span className="smeta"><strong>{studentCurrentCourseProgress?.courseDetails?.curriculum?.length || 0}</strong> lessons</span>
-                            <span className="smeta"><strong>6h 20m</strong> total</span>
-                            <span className="smeta"><strong>4</strong> labs</span>
-                        </div>
-                        <div className="flex items-center gap-2 mt-3">
-                            <div className="flex-1 h-[3px] bg-[#e2e8f0] rounded-[2px] overflow-hidden">
-                                <div className="h-full bg-[#0071e3] rounded-[2px] transition-all duration-500" style={{ width: `${progressValue}%` }} />
+                        {/* TAB 3: NOTES */}
+                        {activeTab === "notes" && (
+                            <div className="max-w-[800px] space-y-6">
+                                <div>
+                                    <textarea 
+                                        className="w-full min-h-[140px] bg-white border border-[#d1d7dc] rounded-[4px] p-4 text-[14px] text-[#1c1d1f] outline-none focus:border-[#a435f0] transition-colors placeholder:text-[#6a6f73]"
+                                        placeholder="Create a new note at 05:20..."
+                                        value={newNoteText}
+                                        onChange={(e) => setNewNoteText(e.target.value)}
+                                    />
+                                    <div className="flex justify-end mt-2">
+                                        <button 
+                                            className="bg-[#a435f0] text-white border-none px-5 py-2 rounded-[4px] text-[13px] font-bold cursor-pointer hover:bg-[#8710d8] transition-colors"
+                                            onClick={handleSaveNote}
+                                        >
+                                            Save Note
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <h4 className="text-[14px] font-bold text-[#1c1d1f]">Your Saved Notes</h4>
+                                    {notes.map((note, idx) => (
+                                        <div key={idx} className="p-4 rounded-[6px] bg-[#f7f9fa] border border-[#d1d7dc]">
+                                            <span className="text-[12px] font-bold bg-[#1c1d1f] text-white px-2 py-0.5 rounded mr-2">
+                                                {note.time}
+                                            </span>
+                                            <span className="text-[14px] text-[#2d2f31]">{note.text}</span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                            <span className="text-[11px] text-[#94a3b8] whitespace-nowrap">{progressValue}% done</span>
-                        </div>
-                    </div>
+                        )}
 
-                    <div className="flex-1 overflow-y-auto no-scrollbar">
-                        {[0].map(modIdx => (
-                            <div key={modIdx} className="border-b border-[#f1f5f9]">
-                                <div 
-                                    className="p-[14px_18px] flex items-center justify-between cursor-pointer hover:bg-[#f8fafc] transition-all"
-                                    onClick={() => toggleModule(modIdx)}
-                                >
-                                    <div className="min-w-0">
-                                        <div className="text-[11px] font-semibold text-[#94a3b8] uppercase tracking-[0.06em] mb-[3px]">Module 01</div>
-                                        <div className="text-[13px] font-semibold text-[#334155] leading-[1.35] truncate">
-                                            Networking Fundamentals
+                        {/* TAB 4: ANNOUNCEMENTS */}
+                        {activeTab === "announcements" && (
+                            <div className="max-w-[800px] space-y-4">
+                                <div className="p-6 bg-[#f7f9fa] border border-[#d1d7dc] rounded-[8px]">
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <div className="w-10 h-10 rounded-full bg-[#0071e3] text-white font-bold flex items-center justify-center text-sm">BP</div>
+                                        <div>
+                                            <div className="font-bold text-[15px] text-[#1c1d1f]">Bhavin Patel</div>
+                                            <div className="text-[12px] text-[#6a6f73]">Posted 3 days ago</div>
                                         </div>
                                     </div>
-                                    <span className={`text-[14px] text-[#94a3b8] transition-transform duration-300 ${openModules.includes(modIdx) ? 'rotate-180' : ''}`}>▾</span>
+                                    <h4 className="font-bold text-[16px] mb-2 text-[#1c1d1f]">New AI & ChatGPT Prompting Modules Added!</h4>
+                                    <p className="text-[14px] text-[#6a6f73] leading-relaxed">
+                                        We have updated the curriculum with 12 new hands-on AI workflow lectures. Make sure to check out Section 14 for the updated resources!
+                                    </p>
                                 </div>
-                                
-                                {openModules.includes(modIdx) && (
-                                    <div className="overflow-hidden bg-[#fafbfc]">
-                                        {studentCurrentCourseProgress?.courseDetails?.curriculum.map((item, i) => {
-                                            const isDone = studentCurrentCourseProgress?.progress?.find(p => p.lectureId === item._id)?.viewed;
-                                            const isCurrent = currentLecture?._id === item._id;
-                                            return (
-                                                <div 
-                                                    key={item._id} 
-                                                    onClick={() => setCurrentLecture(item)}
-                                                    className={`flex items-center gap-2.5 p-[10px_18px] cursor-pointer relative transition-all border-none ${isCurrent ? 'bg-[#eff6ff] before:content-[""] before:absolute before:left-0 before:top-0 before:bottom-0 before:width-[3px] before:bg-[#0071e3] before:rounded-[0_2px_2px_0]' : 'hover:bg-[#f8fafc]'}`}
-                                                >
-                                                    <div className={`w-[20px] h-[20px] rounded-full shrink-0 flex items-center justify-center text-[9px] ${isDone ? 'bg-[#dcfce7] border border-[#16a34a] text-[#16a34a] font-bold' : isCurrent ? 'bg-[#eff6ff] border border-[#0071e3] text-[#0071e3]' : 'bg-[#f1f5f9] border border-[#e2e8f0] text-gray-300'}`}>
-                                                        {isDone ? "✓" : isCurrent ? "▶" : "🔒"}
-                                                    </div>
-                                                    <div className="min-w-0 flex-1">
-                                                        <div className={`text-[13px] leading-[1.35] truncate ${isCurrent ? 'font-semibold text-[#1a1a2e]' : 'text-[#475569]'}`}>
-                                                            {item.title}
-                                                        </div>
-                                                        <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-[#94a3b8]">
-                                                            {i === 0 && <span className="text-[9px] font-bold text-[#0071e3] bg-[#eff6ff] border border-[#bfdbfe] p-[1px_6px] rounded-[3px]">FREE</span>}
-                                                            {i === 7 && <span className="text-[9px] font-bold text-[#b45309] bg-[#fef3c7] border border-[#fde68a] p-[1px_6px] rounded-[3px]">LAB</span>}
-                                                        </div>
-                                                    </div>
-                                                    <span className="text-[11px] text-[#94a3b8] shrink-0">22 min</span>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                )}
                             </div>
-                        ))}
+                        )}
+
+                        {/* TAB 5: REVIEWS */}
+                        {activeTab === "reviews" && (
+                            <div className="max-w-[800px] space-y-6">
+                                <div className="flex items-center gap-6 p-6 bg-[#f7f9fa] border border-[#d1d7dc] rounded-[8px]">
+                                    <div className="text-center">
+                                        <div className="text-[48px] font-black text-[#1c1d1f] leading-none">4.5</div>
+                                        <div className="text-amber-500 text-[18px] my-1">★★★★★</div>
+                                        <div className="text-[12px] text-[#6a6f73]">Course Rating</div>
+                                    </div>
+                                    <div className="flex-1 space-y-1 text-[12px]">
+                                        {[5, 4, 3, 2, 1].map((stars) => (
+                                            <div key={stars} className="flex items-center gap-2">
+                                                <span className="w-12 text-[#6a6f73]">{stars} stars</span>
+                                                <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                    <div className="h-full bg-amber-500" style={{ width: `${stars === 5 ? 70 : stars === 4 ? 20 : 5}%` }} />
+                                                </div>
+                                                <span className="w-8 text-[#6a6f73]">{stars === 5 ? '70%' : '20%'}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* TAB 6: LEARNING TOOLS */}
+                        {activeTab === "learning-tools" && (
+                            <div className="max-w-[800px] space-y-4">
+                                <div className="p-6 border border-[#d1d7dc] rounded-[8px] bg-[#f7f9fa]">
+                                    <h4 className="font-bold text-[16px] text-[#1c1d1f] mb-2">Learning Reminders</h4>
+                                    <p className="text-[14px] text-[#6a6f73] mb-4">Set up push notifications or calendar invites to keep your study schedule on track.</p>
+                                    <button className="bg-[#1c1d1f] text-white text-[13px] font-bold px-4 py-2 rounded-[4px] border-none cursor-pointer">
+                                        Sync Calendar (.ics)
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
                     </div>
-                </aside>
+
+                    {/* UDEMY BOTTOM FOOTER */}
+                    <footer className="bg-[#1c1d1f] text-white mt-auto pt-10 pb-8 px-6 md:px-12 border-t border-[#2d2f31]">
+                        {/* Top banner */}
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-8 border-b border-[#2d2f31]">
+                            <div>
+                                <h4 className="text-[16px] font-bold text-white mb-1">Teach the world online</h4>
+                                <p className="text-[13px] text-[#aeaeb2]">Create an online video course, reach students across the globe, and earn money</p>
+                            </div>
+                            <button className="border border-white hover:bg-white/10 text-white font-bold text-[13px] px-5 py-2.5 rounded-[4px] bg-transparent cursor-pointer whitespace-nowrap">
+                                Teach on BhavinAcademy
+                            </button>
+                        </div>
+
+                        {/* Companies banner */}
+                        <div className="py-6 border-b border-[#2d2f31] flex flex-col md:flex-row items-center justify-between gap-4">
+                            <span className="text-[13px] font-bold text-[#aeaeb2]">Top companies choose BhavinAcademy Business to build in-demand career skills.</span>
+                            <div className="flex items-center gap-6 text-[#aeaeb2] font-black text-sm tracking-wider opacity-75">
+                                <span>NASDAQ</span>
+                                <span>VOLKSWAGEN</span>
+                                <span>NETAPP</span>
+                                <span>EVENTBRITE</span>
+                            </div>
+                        </div>
+
+                        {/* Links Grid */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-8 text-[12px] text-[#aeaeb2]">
+                            <div className="space-y-2">
+                                <div className="font-bold text-white mb-2">In-demand Careers</div>
+                                <div>Data Scientist</div>
+                                <div>Full Stack Web Developer</div>
+                                <div>Cloud Engineer</div>
+                                <div>Project Manager</div>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="font-bold text-white mb-2">Web Development</div>
+                                <div>JavaScript</div>
+                                <div>React JS</div>
+                                <div>Angular</div>
+                                <div>Node.js</div>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="font-bold text-white mb-2">IT Certifications</div>
+                                <div>Amazon AWS</div>
+                                <div>Microsoft Azure</div>
+                                <div>Cisco CCNA</div>
+                                <div>CompTIA Security+</div>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="font-bold text-white mb-2">Leadership & AI</div>
+                                <div>Management Skills</div>
+                                <div>Artificial Intelligence</div>
+                                <div>ChatGPT Prompting</div>
+                                <div>Data Analytics</div>
+                            </div>
+                        </div>
+
+                        {/* Copyright */}
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-[#2d2f31] text-[12px] text-[#aeaeb2]">
+                            <div className="flex items-center gap-3">
+                                <span className="text-[16px] font-bold text-white">Bhavin<span className="text-[#0071e3]">Academy</span></span>
+                                <span>© 2026 BhavinAcademy, Inc.</span>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <button className="hover:text-white bg-transparent border-none cursor-pointer text-[#aeaeb2]">Cookie settings</button>
+                                <button className="flex items-center gap-1 hover:text-white bg-transparent border-none cursor-pointer text-[#aeaeb2]">
+                                    <Globe className="w-3.5 h-3.5" /> English
+                                </button>
+                            </div>
+                        </div>
+                    </footer>
+                </main>
+
+                {/* RIGHT SIDEBAR (COURSE CONTENT ACCORDION) */}
+                {isSideBarOpen ? (
+                    <aside className="w-[360px] md:w-[400px] bg-white border-l border-[#d1d7dc] flex flex-col shrink-0 overflow-hidden text-left z-20">
+                        {/* Sidebar Header with Tabs & Close button */}
+                        <div className="flex items-center justify-between border-b border-[#d1d7dc] px-4 py-3 bg-white shrink-0">
+                            <div className="flex items-center gap-4 text-[14px]">
+                                <button 
+                                    onClick={() => setSidebarTab("content")}
+                                    className={`font-bold pb-1 bg-transparent border-none cursor-pointer ${sidebarTab === "content" ? 'text-[#1c1d1f] border-b-2 border-[#1c1d1f]' : 'text-[#6a6f73]'}`}
+                                >
+                                    Course content
+                                </button>
+                                <button 
+                                    onClick={() => setSidebarTab("ai")}
+                                    className={`font-bold pb-1 flex items-center gap-1 bg-transparent border-none cursor-pointer ${sidebarTab === "ai" ? 'text-[#1c1d1f] border-b-2 border-[#1c1d1f]' : 'text-[#6a6f73]'}`}
+                                >
+                                    <Sparkles className="w-3.5 h-3.5 text-[#a435f0]" /> AI Assistant
+                                </button>
+                            </div>
+                            <button 
+                                onClick={() => setIsSideBarOpen(false)}
+                                className="text-[#1c1d1f] hover:bg-gray-100 p-1.5 rounded-full cursor-pointer bg-transparent border-none"
+                                title="Close sidebar"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        {/* Sidebar Content (Sections Accordion) */}
+                        {sidebarTab === "content" ? (
+                            <div className="flex-1 overflow-y-auto no-scrollbar">
+                                {Object.keys(groupedCurriculum).map((secTitle, secIdx) => {
+                                    const sectionLectures = groupedCurriculum[secTitle];
+                                    const completedSecCount = sectionLectures.filter(l => studentCurrentCourseProgress?.progress?.find(p => p.lectureId === l._id)?.viewed).length;
+                                    const isExpanded = openSections[secTitle] !== false;
+
+                                    return (
+                                        <div key={secIdx} className="border-b border-[#d1d7dc]">
+                                            {/* Section Accordion Header */}
+                                            <div 
+                                                onClick={() => toggleSection(secTitle)}
+                                                className="p-4 bg-[#f7f9fa] hover:bg-[#e9ecef] cursor-pointer flex items-start justify-between gap-2 transition-colors select-none"
+                                            >
+                                                <div>
+                                                    <h3 className="text-[14px] font-bold text-[#1c1d1f] leading-snug">
+                                                        {secTitle}
+                                                    </h3>
+                                                    <div className="text-[12px] text-[#6a6f73] mt-1">
+                                                        {completedSecCount} / {sectionLectures.length} | {sectionLectures.length * 8}m
+                                                    </div>
+                                                </div>
+                                                <button className="bg-transparent border-none cursor-pointer text-[#1c1d1f] mt-0.5">
+                                                    {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                                </button>
+                                            </div>
+
+                                            {/* Lectures List inside section */}
+                                            {isExpanded && (
+                                                <div className="divide-y divide-gray-100 bg-white">
+                                                    {sectionLectures.map((lecture) => {
+                                                        const isDone = studentCurrentCourseProgress?.progress?.find(p => p.lectureId === lecture._id)?.viewed;
+                                                        const isCurrent = currentLecture?._id === lecture._id;
+
+                                                        return (
+                                                            <div 
+                                                                key={lecture._id}
+                                                                className={`p-3.5 px-4 flex items-start gap-3 transition-colors relative group ${
+                                                                    isCurrent ? 'bg-[#f7f9fa]' : 'hover:bg-gray-50'
+                                                                }`}
+                                                            >
+                                                                {/* Checkbox */}
+                                                                <button 
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleMarkAsDone(lecture._id);
+                                                                    }}
+                                                                    className="mt-0.5 text-[#1c1d1f] hover:text-[#a435f0] bg-transparent border-none cursor-pointer shrink-0"
+                                                                >
+                                                                    {isDone ? (
+                                                                        <CheckSquare className="w-4 h-4 text-[#1c1d1f] fill-[#1c1d1f] text-white" />
+                                                                    ) : (
+                                                                        <Square className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                                                                    )}
+                                                                </button>
+
+                                                                {/* Title & info */}
+                                                                <div 
+                                                                    className="flex-1 min-w-0 cursor-pointer"
+                                                                    onClick={() => setCurrentLecture(lecture)}
+                                                                >
+                                                                    <div className={`text-[13px] leading-snug line-clamp-2 ${isCurrent ? 'font-bold text-[#1c1d1f]' : 'text-[#2d2f31]'}`}>
+                                                                        {lecture.title}
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2 mt-1 text-[11px] text-[#6a6f73]">
+                                                                        <span className="flex items-center gap-1">
+                                                                            <PlayCircle className="w-3 h-3 text-gray-400" /> 8 min
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Resources dropdown / download button */}
+                                                                {lecture.fileUrl ? (
+                                                                    <a 
+                                                                        href={lecture.fileUrl}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        download
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                        className="flex items-center gap-1 border border-emerald-200 text-emerald-700 hover:bg-emerald-50 rounded-[4px] px-2 py-1 text-[11px] font-semibold bg-white cursor-pointer no-underline shrink-0"
+                                                                        title="Download attached file resource"
+                                                                    >
+                                                                        <Download className="w-3 h-3 text-emerald-600" />
+                                                                        <span>File</span>
+                                                                    </a>
+                                                                ) : (
+                                                                    <div className="relative shrink-0">
+                                                                        <button 
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                setOpenResourcesDropdown(openResourcesDropdown === lecture._id ? null : lecture._id);
+                                                                            }}
+                                                                            className="flex items-center gap-1 border border-[#d1d7dc] text-[#1c1d1f] hover:bg-gray-100 rounded-[4px] px-2 py-1 text-[11px] font-semibold bg-white cursor-pointer"
+                                                                        >
+                                                                            <FileText className="w-3 h-3 text-[#0071e3]" />
+                                                                            <span>Resources</span>
+                                                                            <ChevronDown className="w-3 h-3" />
+                                                                        </button>
+
+                                                                        {/* Dropdown Menu */}
+                                                                        {openResourcesDropdown === lecture._id && (
+                                                                            <div className="absolute right-0 top-7 w-48 bg-white border border-[#d1d7dc] rounded-[4px] shadow-lg z-50 p-2 space-y-1">
+                                                                                <a 
+                                                                                    href="#" 
+                                                                                    onClick={(e) => { e.preventDefault(); alert("Downloading lecture notes..."); }}
+                                                                                    className="flex items-center gap-2 p-1.5 text-[12px] text-[#1c1d1f] hover:bg-gray-100 rounded no-underline"
+                                                                                >
+                                                                                    <Download className="w-3.5 h-3.5 text-[#0071e3]" /> Lecture PDF Notes
+                                                                                </a>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            /* AI Assistant Tab */
+                            <div className="p-5 flex-1 flex flex-col space-y-4">
+                                <div className="p-4 bg-[#f0f7ff] border border-[#bfdbfe] rounded-[8px] text-[13px] text-[#1c1d1f]">
+                                    <div className="font-bold mb-1 flex items-center gap-1.5 text-[#0071e3]">
+                                        <Sparkles className="w-4 h-4" /> AI Study Assistant
+                                    </div>
+                                    Ask any question about this lecture or request a quick summary!
+                                </div>
+                                <div className="flex-1 border border-[#d1d7dc] rounded-[8px] p-3 text-[13px] text-gray-500 overflow-y-auto">
+                                    AI Assistant is ready. Type your prompt below.
+                                </div>
+                                <div className="flex gap-2">
+                                    <input 
+                                        type="text"
+                                        placeholder="Ask AI about this video..."
+                                        className="flex-1 border border-[#d1d7dc] rounded-[4px] px-3 py-2 text-[13px] outline-none focus:border-[#a435f0]"
+                                    />
+                                    <button className="bg-[#a435f0] text-white px-3 py-2 rounded-[4px] font-bold text-[12px] border-none cursor-pointer">
+                                        Ask
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </aside>
+                ) : (
+                    /* Toggle button to reopen sidebar */
+                    <button 
+                        onClick={() => setIsSideBarOpen(true)}
+                        className="fixed right-0 top-24 bg-[#1c1d1f] text-white p-2.5 rounded-l-md shadow-lg border border-r-0 border-[#2d2f31] z-30 cursor-pointer flex items-center gap-1 text-[12px] font-bold"
+                    >
+                        <span>Course Content</span> ◀
+                    </button>
+                )}
             </div>
 
-            {/* COMPLETION MODAL */}
+            {/* COMPLETION CELEBRATION MODAL */}
             <AnimatePresence>
                 {showConfetti && (
                     <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm">
-                        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-[32px] p-12 max-w-lg w-full text-center shadow-2xl relative overflow-hidden">
-                            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#0071e3] to-[#00d4ff]" />
-                            <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-8 relative">
-                                <Award className="w-12 h-12 text-green-600" />
+                        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white text-[#1c1d1f] rounded-[24px] p-10 max-w-lg w-full text-center shadow-2xl relative overflow-hidden">
+                            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#0071e3] to-[#a435f0]" />
+                            <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <Award className="w-10 h-10 text-green-600" />
                             </div>
-                            <h2 className="text-[32px] font-black tracking-tight text-[#1d1d1f] mb-4 leading-tight">Mastery Achieved!</h2>
-                            <p className="text-[15px] text-[#86868b] leading-relaxed mb-10 max-w-sm mx-auto">
-                                Congratulations on completing <span className="text-[#1d1d1f] font-bold">"{studentCurrentCourseProgress?.courseDetails?.title}"</span>. You've earned a verified skill badge and completed all labs.
+                            <h2 className="text-[28px] font-bold tracking-tight mb-3">Congratulations!</h2>
+                            <p className="text-[14px] text-[#6a6f73] leading-relaxed mb-8">
+                                You have successfully completed <span className="text-[#1c1d1f] font-bold">"{studentCurrentCourseProgress?.courseDetails?.title}"</span>.
                             </p>
                             <div className="flex flex-col gap-3">
-                                <button className="w-full bg-[#0071e3] text-white text-[14px] font-black py-4 rounded-2xl hover:bg-[#0077ed] transition-all flex items-center justify-center gap-2 border-none cursor-pointer" onClick={() => setShowCertificate(true)}>Claim Your Certificate</button>
+                                <button className="w-full bg-[#a435f0] text-white text-[14px] font-bold py-3.5 rounded-[4px] hover:bg-[#8710d8] transition-colors border-none cursor-pointer" onClick={() => setShowCertificate(true)}>
+                                    Claim Your Certificate 🏆
+                                </button>
                                 <div className="grid grid-cols-2 gap-3">
-                                    <button className="bg-white border border-[#e2e8f0] text-[#1d1d1f] text-[13px] font-bold py-3.5 rounded-2xl hover:bg-[#f5f7fa] flex items-center justify-center gap-2 cursor-pointer" onClick={() => navigate("/student-courses")}>My Courses</button>
-                                    <button className="bg-white border border-[#e2e8f0] text-[#1d1d1f] text-[13px] font-bold py-3.5 rounded-2xl hover:bg-[#f5f7fa] flex items-center justify-center gap-2 cursor-pointer" onClick={async () => {
+                                    <button className="bg-white border border-[#d1d7dc] text-[#1c1d1f] text-[13px] font-bold py-3 rounded-[4px] hover:bg-gray-50 cursor-pointer" onClick={() => navigate("/student-courses")}>
+                                        My Courses
+                                    </button>
+                                    <button className="bg-white border border-[#d1d7dc] text-[#1c1d1f] text-[13px] font-bold py-3 rounded-[4px] hover:bg-gray-50 flex items-center justify-center gap-2 cursor-pointer" onClick={async () => {
                                         const response = await resetCourseProgressService(auth?.user?._id, studentCurrentCourseProgress?.courseDetails?._id);
                                         if (response?.success) { setShowConfetti(false); fetchCurrentCourseProgress(); }
-                                    }}><RotateCcw size={16}/> Rewatch</button>
+                                    }}>
+                                        <RotateCcw size={15}/> Rewatch
+                                    </button>
                                 </div>
                             </div>
                         </motion.div>
@@ -526,14 +884,14 @@ function StudentViewCourseProgressPage() {
                 )}
             </AnimatePresence>
 
-            {/* CERTIFICATE DOWNLOADING */}
+            {/* CERTIFICATE DOWNLOADING COMPONENT */}
             {showCertificate && (
                 <Certificate
                     key={studentCurrentCourseProgress?.courseDetails?._id}
                     userName={auth?.user?.userFullName || auth?.user?.userName}
                     courseTitle={studentCurrentCourseProgress?.courseDetails?.title}
                     completionDate={new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}
-                    instructorName={studentCurrentCourseProgress?.courseDetails?.instructorName}
+                    instructorName={studentCurrentCourseProgress?.courseDetails?.instructorName || "Bhavin Patel"}
                     silentDownload={true}
                     onDownloadComplete={() => setShowCertificate(false)}
                 />

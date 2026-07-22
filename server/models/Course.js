@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const LectureSchema = new mongoose.Schema({
   title: String,
   videoUrl: String,
+  fileUrl: String,
+  fileName: String,
   public_id: String,
   freePreview: Boolean,
   videoSource: String,

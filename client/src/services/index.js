@@ -290,3 +290,24 @@ export async function submitContactService(formData) {
   const { data } = await axiosInstance.post("/contact/submit", formData);
   return data;
 }
+
+export async function fetchCategoriesService() {
+  const { data } = await axiosInstance.get("/instructor/category/get");
+  return data;
+}
+
+export async function addNewCategoryService(formData) {
+  const { data } = await axiosInstance.post("/instructor/category/add", formData);
+  return data;
+}
+
+export async function updateCategoryService(id, formData) {
+  const { data } = await axiosInstance.put(`/instructor/category/update/${id}`, formData);
+  return data;
+}
+
+export async function deleteCategoryService(id) {
+  const { data } = await axiosInstance.delete(`/instructor/category/delete/${id}`);
+  return data;
+}
+

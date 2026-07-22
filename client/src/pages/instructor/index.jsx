@@ -10,6 +10,10 @@ import {
   deleteCourseService,
   fetchAdminStudentProgressService,
   deleteAdminStudentService,
+  fetchCategoriesService,
+  addNewCategoryService,
+  updateCategoryService,
+  deleteCategoryService,
 } from "@/services";
 import {
   TvMinimalPlay,
@@ -33,7 +37,8 @@ import {
   FileText,
   HelpCircle,
   Eye,
-  AlertTriangle
+  AlertTriangle,
+  FolderKanban
 } from "lucide-react";
 
 // Banner gradients definitions matching the mockups
@@ -61,53 +66,26 @@ function InstructorPage() {
   // Main Dashboard Data
   const [courses, setCourses] = useState([]);
   const [studentsProgress, setStudentsProgress] = useState([]);
+  const [categoriesList, setCategoriesList] = useState([]);
   const [loadingDashboard, setLoadingDashboard] = useState(true);
 
-  // Course Editor Form States
-  const [courseTitle, setCourseTitle] = useState("");
-  const [shortDesc, setShortDesc] = useState("");
-  const [fullDesc, setFullDesc] = useState("");
-  const [category, setCategory] = useState("Microsoft");
-  const [difficulty, setDifficulty] = useState("Intermediate");
-  const [language, setLanguage] = useState("English");
-  const [estimatedHours, setEstimatedHours] = useState(10);
-  const [welcomeMessage, setWelcomeMessage] = useState("");
-  
-  // Banner Emoji & Gradient
-  const [bannerIcon, setBannerIcon] = useState("🪟");
-  const [bannerGradient, setBannerGradient] = useState("linear-gradient(135deg,#0078d4,#005a9e)");
+  // Category Management Form State
+  const [newCatName, setNewCatName] = useState("");
+  const [editingCatId, setEditingCatId] = useState(null);
+  const [editingCatName, setEditingCatName] = useState("");
+  const [savingCategory, setSavingCategory] = useState(false);
 
-  // Curriculum Builder (Section -> Lessons)
-  const [sections, setSections] = useState([
-    {
-      id: "sec_1",
-      title: "Section 1 — Getting Started",
-      lessons: [
-        { id: "les_1", title: "Introduction to the course", type: "video", videoUrl: "", freePreview: true, notes: "" }
-      ]
-    }
-  ]);
-
-  // Pricing & Access
-  const [pricingType, setPricingType] = useState("free"); // 'free' (included in subscription) or 'standalone'
-  const [price, setPrice] = useState(0);
-
-  // Requirements & Outcomes
-  const [prerequisites, setPrerequisites] = useState("");
-  const [outcomes, setOutcomes] = useState("");
-  const [targetAudience, setTargetAudience] = useState("");
-
-  const [savingCourse, setSavingCourse] = useState(false);
-
-  // Fetch Dashboard data
+  // Fetch Dashboard & Category data
   async function loadDashboardData() {
     setLoadingDashboard(true);
     try {
       const coursesRes = await fetchInstructorCourseListService();
       const progressRes = await fetchAdminStudentProgressService();
+      const catRes = await fetchCategoriesService();
 
       if (coursesRes?.success) setCourses(coursesRes.data);
       if (progressRes?.success) setStudentsProgress(progressRes.data);
+      if (catRes?.success) setCategoriesList(catRes.data);
     } catch (err) {
       console.error(err);
       toast({
@@ -117,6 +95,132 @@ function InstructorPage() {
       });
     } finally {
       setLoadingDashboard(false);
+    }
+  }
+
+  async function loadCategoriesData() {
+    try {
+      const catRes = await fetchCategoriesService();
+      if (catRes?.success) setCategoriesList(catRes.data);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  // Category CRUD Handlers
+  async function handleAddCategory() {
+    if (!newCatName || !newCatName.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Category name cannot be empty.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const trimmed = newCatName.trim();
+    const isDuplicate = categoriesList.some(
+      (cat) => cat.name.toLowerCase() === trimmed.toLowerCase()
+    );
+
+    if (isDuplicate) {
+      toast({
+        title: "Duplicate Category",
+        description: "A category with this name already exists.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSavingCategory(true);
+    try {
+      const res = await addNewCategoryService({ name: trimmed });
+      if (res?.success) {
+        toast({
+          title: "Category Created",
+          description: `Category "${trimmed}" has been created successfully.`,
+        });
+        setNewCatName("");
+        loadCategoriesData();
+      } else {
+        toast({
+          title: "Error",
+          description: res?.message || "Failed to create category.",
+          variant: "destructive",
+        });
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: err.response?.data?.message || "Error creating category.",
+        variant: "destructive",
+      });
+    } finally {
+      setSavingCategory(false);
+    }
+  }
+
+  async function handleUpdateCategory(id) {
+    if (!editingCatName || !editingCatName.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Category name cannot be empty.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const trimmed = editingCatName.trim();
+    const isDuplicate = categoriesList.some(
+      (cat) => cat._id !== id && cat.name.toLowerCase() === trimmed.toLowerCase()
+    );
+
+    if (isDuplicate) {
+      toast({
+        title: "Duplicate Category",
+        description: "Another category with this name already exists.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const res = await updateCategoryService(id, { name: trimmed });
+      if (res?.success) {
+        toast({
+          title: "Category Updated",
+          description: "Category updated successfully.",
+        });
+        setEditingCatId(null);
+        setEditingCatName("");
+        loadCategoriesData();
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: err.response?.data?.message || "Error updating category.",
+        variant: "destructive",
+      });
+    }
+  }
+
+  async function handleDeleteCategory(id) {
+    if (!window.confirm("Are you sure you want to delete this category?")) return;
+    try {
+      const res = await deleteCategoryService(id);
+      if (res?.success) {
+        toast({
+          title: "Category Deleted",
+          description: "Category has been removed.",
+        });
+        loadCategoriesData();
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to delete category.",
+        variant: "destructive",
+      });
     }
   }
 
@@ -171,6 +275,8 @@ function InstructorPage() {
                   title: item.title,
                   type: item.videoSource === "doc" ? "doc" : item.videoSource === "quiz" ? "quiz" : "video",
                   videoUrl: item.videoUrl || "",
+                  fileUrl: item.fileUrl || "",
+                  fileName: item.fileName || "",
                   freePreview: item.freePreview || false,
                   notes: item.notes || ""
                 });
@@ -217,7 +323,7 @@ function InstructorPage() {
           id: "sec_1",
           title: "Section 1 — Getting Started",
           lessons: [
-            { id: "les_1", title: "Introduction to the course", type: "video", videoUrl: "", freePreview: true, notes: "" }
+            { id: "les_1", title: "Introduction to the course", type: "video", videoUrl: "", fileUrl: "", fileName: "", freePreview: true, notes: "" }
           ]
         }
       ]);
@@ -244,6 +350,8 @@ function InstructorPage() {
         flatCurriculum.push({
           title: les.title,
           videoUrl: les.videoUrl,
+          fileUrl: les.fileUrl,
+          fileName: les.fileName || les.title,
           freePreview: les.freePreview,
           videoSource: les.type, // 'video', 'doc', 'quiz'
           notes: les.notes,
@@ -473,6 +581,16 @@ function InstructorPage() {
                 Students
                 {studentsProgress.length > 0 && <span className="ml-auto text-[10px] bg-white/10 px-2 py-0.5 rounded-full text-gray-400">{studentsProgress.length}</span>}
               </button>
+              <button
+                onClick={() => setActiveTab("categories")}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all text-left ${
+                  activeTab === "categories" ? "bg-[#0071e3]/15 text-[#0071e3]" : "text-gray-400 hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                <FolderKanban className="w-[16px] h-[16px]" />
+                Categories
+                {categoriesList.length > 0 && <span className="ml-auto text-[10px] bg-white/10 px-2 py-0.5 rounded-full text-gray-400">{categoriesList.length}</span>}
+              </button>
 
               <div className="mt-auto border-t border-[#22222d] pt-4 flex flex-col gap-2">
                 <button
@@ -500,16 +618,14 @@ function InstructorPage() {
 
           {/* MAIN PANELS CONTAINER */}
           <main className="flex-1 ml-[240px] p-8 min-h-screen">
-            {/* TOP BAR */}
+            {/* MAIN CONTENT TOP BAR */}
             <div className="flex justify-between items-center mb-8">
-              <div>
-                <span className="text-xs text-[#0071e3] font-semibold tracking-wider uppercase">Admin Panel</span>
-                <h1 className="text-2xl font-bold tracking-tight text-[#f5f5f7] mt-1">
-                  {activeTab === "dashboard" && "Platform Overview"}
-                  {activeTab === "courses" && "Course Management"}
-                  {activeTab === "students" && "Enrolled Students"}
-                </h1>
-              </div>
+              <h1 className="text-2xl font-bold tracking-tight text-[#f5f5f7]">
+                {activeTab === "dashboard" && "Platform Overview"}
+                {activeTab === "courses" && "Course Management"}
+                {activeTab === "students" && "Enrolled Students"}
+                {activeTab === "categories" && "Category Management"}
+              </h1>
               <div className="flex items-center gap-3">
                 {activeTab === "courses" && (
                   <button
@@ -816,6 +932,123 @@ function InstructorPage() {
                         </tbody>
                       </table>
                     </div>
+                {/* TAB 4: CATEGORIES */}
+                {activeTab === "categories" && (
+                  <div className="space-y-6">
+                    {/* Add Category Form Card */}
+                    <div className="bg-[#111118] border border-[#22222d] rounded-2xl p-6">
+                      <h3 className="text-base font-bold text-white mb-1">Create New Category</h3>
+                      <p className="text-xs text-gray-400 mb-4">
+                        Add a new course category dynamically. Duplicate names (case-insensitive) are automatically prevented.
+                      </p>
+
+                      <div className="flex gap-3 max-w-md">
+                        <input
+                          type="text"
+                          placeholder="e.g. Artificial Intelligence"
+                          value={newCatName}
+                          onChange={(e) => setNewCatName(e.target.value)}
+                          className="flex-1 bg-[#1a1a24] border border-[#22222d] text-white rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-[#0071e3] transition-colors"
+                        />
+                        <button
+                          onClick={handleAddCategory}
+                          disabled={savingCategory}
+                          className="bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-bold px-5 py-2 rounded-xl transition-all disabled:opacity-50 flex items-center gap-1.5 whitespace-nowrap"
+                        >
+                          <Plus className="w-4 h-4" /> Add Category
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Category List Table */}
+                    <div className="bg-[#111118] border border-[#22222d] rounded-2xl p-6">
+                      <h3 className="text-base font-bold text-white mb-4">Existing Categories</h3>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                          <thead>
+                            <tr className="border-b border-[#22222d] text-[10px] uppercase text-gray-500 font-bold tracking-wider">
+                              <th className="pb-3">Category Name</th>
+                              <th className="pb-3">Slug</th>
+                              <th className="pb-3 text-center">Status</th>
+                              <th className="pb-3 text-right">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-[#22222d] text-sm">
+                            {categoriesList.map((cat) => (
+                              <tr key={cat._id} className="hover:bg-white/5 transition-colors">
+                                <td className="py-3 font-semibold text-white">
+                                  {editingCatId === cat._id ? (
+                                    <input
+                                      type="text"
+                                      value={editingCatName}
+                                      onChange={(e) => setEditingCatName(e.target.value)}
+                                      className="bg-[#1a1a24] border border-[#0071e3] text-white text-xs rounded px-2 py-1 outline-none"
+                                    />
+                                  ) : (
+                                    cat.name
+                                  )}
+                                </td>
+                                <td className="py-3 text-xs text-gray-400 font-mono">
+                                  {cat.slug || cat.name.toLowerCase().replace(/\s+/g, '-')}
+                                </td>
+                                <td className="py-3 text-center">
+                                  <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full uppercase">
+                                    {cat.status || "Active"}
+                                  </span>
+                                </td>
+                                <td className="py-3 text-right">
+                                  <div className="flex items-center justify-end gap-2">
+                                    {editingCatId === cat._id ? (
+                                      <>
+                                        <button
+                                          onClick={() => handleUpdateCategory(cat._id)}
+                                          className="text-xs font-bold text-emerald-400 hover:underline px-2 py-1"
+                                        >
+                                          Save
+                                        </button>
+                                        <button
+                                          onClick={() => setEditingCatId(null)}
+                                          className="text-xs font-bold text-gray-400 hover:underline px-2 py-1"
+                                        >
+                                          Cancel
+                                        </button>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <button
+                                          onClick={() => {
+                                            setEditingCatId(cat._id);
+                                            setEditingCatName(cat.name);
+                                          }}
+                                          className="p-1.5 rounded bg-white/5 hover:bg-blue-500/20 hover:text-[#0071e3] text-gray-400 transition-colors"
+                                          title="Edit Category"
+                                        >
+                                          <Edit className="w-3.5 h-3.5" />
+                                        </button>
+                                        <button
+                                          onClick={() => handleDeleteCategory(cat._id)}
+                                          className="p-1.5 rounded bg-white/5 hover:bg-red-500 hover:text-white text-gray-400 transition-colors"
+                                          title="Delete Category"
+                                        >
+                                          <Trash2 className="w-3.5 h-3.5" />
+                                        </button>
+                                      </>
+                                    )}
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                            {categoriesList.length === 0 && (
+                              <tr>
+                                <td colSpan="4" className="py-12 text-center text-gray-500 text-xs">
+                                  No categories available. Add your first category above.
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
                   </div>
                 )}
               </>
@@ -911,11 +1144,21 @@ function InstructorPage() {
                         onChange={e => setCategory(e.target.value)}
                         className="border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#0071e3] transition-colors bg-white cursor-pointer"
                       >
-                        <option>Microsoft</option>
-                        <option>Linux</option>
-                        <option>Networking</option>
-                        <option>Cloud</option>
-                        <option>Security</option>
+                        {categoriesList.length > 0 ? (
+                          categoriesList.map((cat) => (
+                            <option key={cat._id || cat.slug} value={cat.name}>
+                              {cat.name}
+                            </option>
+                          ))
+                        ) : (
+                          <>
+                            <option>Microsoft</option>
+                            <option>Linux</option>
+                            <option>Networking</option>
+                            <option>Cloud</option>
+                            <option>Security</option>
+                          </>
+                        )}
                       </select>
                     </div>
 
@@ -1075,18 +1318,33 @@ function InstructorPage() {
                               </div>
                             </div>
 
-                            {les.type === "video" && (
-                              <div className="flex flex-col gap-1 text-xs">
-                                <label className="text-[10px] font-bold text-gray-500">Video Link URL</label>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                              <div className="flex flex-col gap-1">
+                                <label className="text-[10px] font-bold text-gray-500 flex items-center gap-1">
+                                  <Play className="w-3 h-3 text-[#0071e3]" /> Video Link URL
+                                </label>
                                 <input
                                   type="text"
-                                  placeholder="Paste video file link URL here..."
-                                  value={les.videoUrl}
+                                  placeholder="https://... video URL"
+                                  value={les.videoUrl || ""}
                                   onChange={e => updateLessonField(sec.id, les.id, "videoUrl", e.target.value)}
                                   className="border border-gray-200 rounded-lg px-3 py-1.5 text-xs bg-gray-50 focus:outline-none focus:border-[#0071e3] transition-colors"
                                 />
                               </div>
-                            )}
+
+                              <div className="flex flex-col gap-1">
+                                <label className="text-[10px] font-bold text-gray-500 flex items-center gap-1">
+                                  <FileText className="w-3 h-3 text-emerald-600" /> Downloadable File / Resource URL (PDF, Doc)
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="https://... PDF or document URL"
+                                  value={les.fileUrl || ""}
+                                  onChange={e => updateLessonField(sec.id, les.id, "fileUrl", e.target.value)}
+                                  className="border border-gray-200 rounded-lg px-3 py-1.5 text-xs bg-gray-50 focus:outline-none focus:border-[#0071e3] transition-colors"
+                                />
+                              </div>
+                            </div>
 
                             <div className="flex flex-col gap-1 text-xs">
                               <label className="text-[10px] font-bold text-gray-500">Lesson Notes</label>
