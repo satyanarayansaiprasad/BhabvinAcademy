@@ -44,7 +44,8 @@ import {
   FileSpreadsheet,
   Upload,
   Image as ImageIcon,
-  Loader2
+  Loader2,
+  ChevronRight
 } from "lucide-react";
 
 // Banner gradients definitions matching the mockups
@@ -120,6 +121,65 @@ function InstructorPage() {
   const [editingCatId, setEditingCatId] = useState(null);
   const [editingCatName, setEditingCatName] = useState("");
   const [savingCategory, setSavingCategory] = useState(false);
+
+  // Expanded Student Accordion State
+  const [expandedStudentEmails, setExpandedStudentEmails] = useState({});
+
+  function toggleStudentExpand(email) {
+    setExpandedStudentEmails(prev => ({
+      ...prev,
+      [email]: !prev[email]
+    }));
+  }
+
+  // Group student progress records by unique student (studentEmail || studentId)
+  const groupedStudents = React.useMemo(() => {
+    const map = new Map();
+
+    (studentsProgress || []).forEach((item) => {
+      const key = (item.studentEmail || item.studentId || "unknown").toLowerCase().trim();
+
+      if (!map.has(key)) {
+        map.set(key, {
+          studentId: item.studentId,
+          studentName: item.studentName || "Student",
+          studentEmail: item.studentEmail || "student@example.com",
+          totalSpent: 0,
+          courses: [],
+        });
+      }
+
+      const group = map.get(key);
+      const paidNum = typeof item.paidAmount === "string" 
+        ? (parseFloat(item.paidAmount.replace(/[^\d.]/g, "")) || 0)
+        : (Number(item.paidAmount) || 0);
+
+      group.totalSpent += paidNum;
+      group.courses.push({
+        ...item,
+        numericPaidAmount: paidNum,
+      });
+    });
+
+    return Array.from(map.values()).map(group => {
+      const avgProgress = group.courses.length > 0
+        ? Math.round(group.courses.reduce((s, c) => s + (c.progress || 0), 0) / group.courses.length)
+        : 0;
+      
+      const totalCompleted = group.courses.filter(c => c.completed || c.progress === 100).length;
+      
+      let overallPerf = "Getting Started";
+      if (avgProgress >= 80 || (totalCompleted === group.courses.length && group.courses.length > 0)) overallPerf = "High Performer";
+      else if (avgProgress >= 40 || totalCompleted > 0) overallPerf = "Active Learner";
+
+      return {
+        ...group,
+        avgProgress,
+        totalCompleted,
+        overallPerf,
+      };
+    });
+  }, [studentsProgress]);
 
   // Fetch Dashboard & Category data
   async function loadDashboardData() {
@@ -271,7 +331,7 @@ function InstructorPage() {
   }
 
   function handleDownloadStudentReport() {
-    if (!studentsProgress || studentsProgress.length === 0) {
+    if (!groupedStudents || groupedStudents.length === 0) {
       toast({
         title: "No Student Data",
         description: "There are no student progress records available to export.",
@@ -283,31 +343,40 @@ function InstructorPage() {
     const headers = [
       "Student Name",
       "Student Email",
-      "Enrolled Course",
+      "Total Courses Purchased",
+      "Total Student Spend",
+      "Enrolled Course Title",
       "Purchase Date",
-      "Paid Amount",
-      "Progress (%)",
-      "Completion Status",
-      "Performance Indicator",
+      "Course Paid Amount",
+      "Course Progress (%)",
+      "Course Status",
+      "Performance Status",
     ];
 
-    const rows = studentsProgress.map((item) => {
-      const pDate = item.dateOfPurchase ? new Date(item.dateOfPurchase).toLocaleDateString("en-IN") : "N/A";
-      const pAmt = item.paidAmount || "₹489.00";
-      const perf = item.performance || (item.progress >= 80 ? "High Performer" : item.progress >= 40 ? "Active Learner" : "Getting Started");
-      return [
-        `"${(item.studentName || "Student").replace(/"/g, '""')}"`,
-        `"${(item.studentEmail || "").replace(/"/g, '""')}"`,
-        `"${(item.courseTitle || "").replace(/"/g, '""')}"`,
-        `"${pDate}"`,
-        `"${pAmt}"`,
-        `"${item.progress || 0}%"`,
-        `"${item.completed ? "Completed" : "In Progress"}"`,
-        `"${perf}"`,
-      ];
+    const rows = [];
+
+    groupedStudents.forEach((student) => {
+      student.courses.forEach((item) => {
+        const pDate = item.dateOfPurchase ? new Date(item.dateOfPurchase).toLocaleDateString("en-IN") : "N/A";
+        const pAmt = item.paidAmount || `₹${item.numericPaidAmount || 489}`;
+        const perf = item.performance || (item.progress >= 80 ? "High Performer" : item.progress >= 40 ? "Active Learner" : "Getting Started");
+
+        rows.push([
+          `"${(student.studentName || "Student").replace(/"/g, '""')}"`,
+          `"${(student.studentEmail || "").replace(/"/g, '""')}"`,
+          `"${student.courses.length} Courses"`,
+          `"₹${student.totalSpent.toFixed(2)}"`,
+          `"${(item.courseTitle || "").replace(/"/g, '""')}"`,
+          `"${pDate}"`,
+          `"${pAmt}"`,
+          `"${item.progress || 0}%"`,
+          `"${item.completed ? "Completed" : "In Progress"}"`,
+          `"${perf}"`,
+        ]);
+      });
     });
 
-    // Use BOM \uFEFF for proper UTF-8 Excel formatting (e.g. ₹ symbol and special characters)
+    // Use BOM \uFEFF for proper UTF-8 Excel formatting
     const csvString = "\uFEFF" + [headers.join(","), ...rows.map((e) => e.join(","))].join("\r\n");
     const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -321,7 +390,7 @@ function InstructorPage() {
 
     toast({
       title: "Excel/CSV Report Exported",
-      description: `Exported ${rows.length} student records successfully.`,
+      description: `Exported ${rows.length} enrollment records across ${groupedStudents.length} students successfully.`,
     });
   }
 
@@ -1036,7 +1105,7 @@ function InstructorPage() {
                     <div className="flex justify-between items-center flex-wrap gap-3 pb-2 border-b border-[#22222d]">
                       <div>
                         <h3 className="text-base font-bold text-white">Student Enrollment & Performance Analytics</h3>
-                        <p className="text-xs text-gray-400">View real-time course progress, purchase history, and export student records.</p>
+                        <p className="text-xs text-gray-400">Grouped by student with course breakdown, progress metrics, and Excel reporting.</p>
                       </div>
                       <button
                         onClick={handleDownloadStudentReport}
@@ -1050,98 +1119,216 @@ function InstructorPage() {
                       <table className="w-full text-left border-collapse">
                         <thead>
                           <tr className="border-b border-[#22222d] text-[10px] uppercase text-gray-500 font-bold tracking-wider">
-                            <th className="pb-3">Student</th>
-                            <th className="pb-3">Enrolled Course</th>
-                            <th className="pb-3">Purchase Date</th>
-                            <th className="pb-3">Paid Amount</th>
-                            <th className="pb-3 text-center">Progress</th>
-                            <th className="pb-3 text-center">Status</th>
+                            <th className="pb-3 pl-2">Student</th>
+                            <th className="pb-3 text-center">Courses Enrolled</th>
+                            <th className="pb-3 text-center">Total Spent</th>
+                            <th className="pb-3 text-center">Avg Progress</th>
+                            <th className="pb-3 text-center">Completion</th>
                             <th className="pb-3 text-center">Performance</th>
-                            <th className="pb-3 text-right">Actions</th>
+                            <th className="pb-3 text-right pr-2">Course Breakdown</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-[#22222d] text-sm">
-                          {studentsProgress.map((item, idx) => {
-                            const formattedDate = item.dateOfPurchase
-                              ? new Date(item.dateOfPurchase).toLocaleDateString("en-IN", {
-                                  day: "2-digit",
-                                  month: "short",
-                                  year: "numeric",
-                                })
-                              : "N/A";
-                            const perfStatus =
-                              item.performance ||
-                              (item.progress >= 80
-                                ? "High Performer"
-                                : item.progress >= 40
-                                ? "Active Learner"
-                                : "Getting Started");
+                          {groupedStudents.map((student, idx) => {
+                            const isExpanded = !!expandedStudentEmails[student.studentEmail];
 
                             return (
-                              <tr key={idx} className="hover:bg-white/5 transition-colors">
-                                <td className="py-4">
-                                  <div className="font-semibold text-white">{item.studentName}</div>
-                                  <div className="text-xs text-gray-500">{item.studentEmail}</div>
-                                </td>
-                                <td className="py-4 text-gray-300 font-medium">
-                                  {item.courseTitle}
-                                </td>
-                                <td className="py-4 text-xs text-gray-400">
-                                  {formattedDate}
-                                </td>
-                                <td className="py-4 text-xs font-semibold text-emerald-400">
-                                  {item.paidAmount || "₹489.00"}
-                                </td>
-                                <td className="py-4">
-                                  <div className="flex items-center justify-center gap-2">
-                                    <div className="w-20 h-1.5 bg-white/5 rounded-full overflow-hidden shrink-0">
-                                      <div
-                                        className="bg-gradient-to-r from-[#0071e3] to-[#00d4ff] h-full"
-                                        style={{ width: `${item.progress || 0}%` }}
-                                      ></div>
+                              <React.Fragment key={idx}>
+                                {/* MAIN PARENT ROW */}
+                                <tr
+                                  onClick={() => toggleStudentExpand(student.studentEmail)}
+                                  className={`hover:bg-white/5 transition-colors cursor-pointer ${
+                                    isExpanded ? "bg-white/[0.03]" : ""
+                                  }`}
+                                >
+                                  <td className="py-4 pl-2">
+                                    <div className="flex items-center gap-3">
+                                      <button
+                                        type="button"
+                                        className="p-1 rounded-md bg-white/5 hover:bg-[#0071e3] text-gray-400 hover:text-white transition-colors"
+                                      >
+                                        {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                                      </button>
+                                      <div>
+                                        <div className="font-semibold text-white flex items-center gap-2">
+                                          {student.studentName}
+                                        </div>
+                                        <div className="text-xs text-gray-500">{student.studentEmail}</div>
+                                      </div>
                                     </div>
-                                    <span className="text-xs font-semibold text-gray-300">{item.progress || 0}%</span>
-                                  </div>
-                                </td>
-                                <td className="py-4 text-center">
-                                  {item.completed ? (
-                                    <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full uppercase">
-                                      Completed
+                                  </td>
+
+                                  <td className="py-4 text-center">
+                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-[#0071e3]/10 text-[#0071e3] border border-[#0071e3]/20">
+                                      {student.courses.length} {student.courses.length === 1 ? "Course" : "Courses"}
                                     </span>
-                                  ) : (
-                                    <span className="text-[10px] font-bold text-sky-400 bg-sky-500/10 px-2.5 py-0.5 rounded-full uppercase">
-                                      In Progress
+                                  </td>
+
+                                  <td className="py-4 text-center font-bold text-emerald-400 text-xs">
+                                    ₹{student.totalSpent.toFixed(2)}
+                                  </td>
+
+                                  <td className="py-4">
+                                    <div className="flex items-center justify-center gap-2">
+                                      <div className="w-20 h-1.5 bg-white/5 rounded-full overflow-hidden shrink-0">
+                                        <div
+                                          className="bg-gradient-to-r from-[#0071e3] to-[#00d4ff] h-full"
+                                          style={{ width: `${student.avgProgress}%` }}
+                                        ></div>
+                                      </div>
+                                      <span className="text-xs font-semibold text-gray-300">{student.avgProgress}%</span>
+                                    </div>
+                                  </td>
+
+                                  <td className="py-4 text-center">
+                                    <span className="text-[11px] font-semibold text-gray-300">
+                                      {student.totalCompleted} / {student.courses.length} Done
                                     </span>
-                                  )}
-                                </td>
-                                <td className="py-4 text-center">
-                                  <span
-                                    className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase ${
-                                      perfStatus === "High Performer"
-                                        ? "text-purple-400 bg-purple-500/10"
-                                        : perfStatus === "Active Learner"
-                                        ? "text-emerald-400 bg-emerald-500/10"
-                                        : "text-amber-400 bg-amber-500/10"
-                                    }`}
-                                  >
-                                    {perfStatus}
-                                  </span>
-                                </td>
-                                <td className="py-4 text-right">
-                                  <button
-                                    onClick={() => handleDeleteStudent(item.studentId)}
-                                    className="p-2 rounded bg-white/5 hover:bg-red-500 hover:text-white text-gray-400 transition-colors"
-                                    title="Unenroll student"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </button>
-                                </td>
-                              </tr>
+                                  </td>
+
+                                  <td className="py-4 text-center">
+                                    <span
+                                      className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase ${
+                                        student.overallPerf === "High Performer"
+                                          ? "text-purple-400 bg-purple-500/10"
+                                          : student.overallPerf === "Active Learner"
+                                          ? "text-emerald-400 bg-emerald-500/10"
+                                          : "text-amber-400 bg-amber-500/10"
+                                      }`}
+                                    >
+                                      {student.overallPerf}
+                                    </span>
+                                  </td>
+
+                                  <td className="py-4 text-right pr-2">
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleStudentExpand(student.studentEmail);
+                                      }}
+                                      className="text-xs font-semibold text-[#0071e3] hover:underline flex items-center gap-1 ml-auto"
+                                    >
+                                      {isExpanded ? "Hide Details" : `View Courses (${student.courses.length})`}
+                                      {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                                    </button>
+                                  </td>
+                                </tr>
+
+                                {/* EXPANDED SUB-TABLE ROW */}
+                                {isExpanded && (
+                                  <tr>
+                                    <td colSpan="7" className="p-0 border-b border-[#22222d]">
+                                      <div className="bg-[#0a0a0f] p-4 m-2 rounded-xl border border-[#22222d] space-y-3">
+                                        <div className="text-xs font-bold text-gray-400 uppercase tracking-wider flex justify-between items-center">
+                                          <span>Enrolled Courses for {student.studentName}</span>
+                                          <span className="text-gray-500 normal-case font-normal text-[11px]">
+                                            Click trash icon to unenroll course
+                                          </span>
+                                        </div>
+
+                                        <table className="w-full text-left text-xs border-collapse">
+                                          <thead>
+                                            <tr className="border-b border-[#22222d] text-[10px] uppercase text-gray-500 font-bold">
+                                              <th className="pb-2">Course Title</th>
+                                              <th className="pb-2">Purchase Date</th>
+                                              <th className="pb-2">Paid Amount</th>
+                                              <th className="pb-2 text-center">Progress</th>
+                                              <th className="pb-2 text-center">Status</th>
+                                              <th className="pb-2 text-center">Performance</th>
+                                              <th className="pb-2 text-right">Actions</th>
+                                            </tr>
+                                          </thead>
+                                          <tbody className="divide-y divide-[#22222d]/60">
+                                            {student.courses.map((cItem, cIdx) => {
+                                              const pDate = cItem.dateOfPurchase
+                                                ? new Date(cItem.dateOfPurchase).toLocaleDateString("en-IN", {
+                                                    day: "2-digit",
+                                                    month: "short",
+                                                    year: "numeric",
+                                                  })
+                                                : "N/A";
+                                              const cPerf =
+                                                cItem.performance ||
+                                                (cItem.progress >= 80
+                                                  ? "High Performer"
+                                                  : cItem.progress >= 40
+                                                  ? "Active Learner"
+                                                  : "Getting Started");
+
+                                              return (
+                                                <tr key={cIdx} className="hover:bg-white/5 transition-colors">
+                                                  <td className="py-3 font-medium text-white">
+                                                    {cItem.courseTitle}
+                                                  </td>
+                                                  <td className="py-3 text-gray-400">
+                                                    {pDate}
+                                                  </td>
+                                                  <td className="py-3 font-semibold text-emerald-400">
+                                                    {cItem.paidAmount || `₹${cItem.numericPaidAmount}`}
+                                                  </td>
+                                                  <td className="py-3">
+                                                    <div className="flex items-center justify-center gap-2">
+                                                      <div className="w-16 h-1.5 bg-white/5 rounded-full overflow-hidden shrink-0">
+                                                        <div
+                                                          className="bg-gradient-to-r from-[#0071e3] to-[#00d4ff] h-full"
+                                                          style={{ width: `${cItem.progress || 0}%` }}
+                                                        ></div>
+                                                      </div>
+                                                      <span className="font-semibold text-gray-300">{cItem.progress || 0}%</span>
+                                                    </div>
+                                                  </td>
+                                                  <td className="py-3 text-center">
+                                                    {cItem.completed ? (
+                                                      <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full uppercase">
+                                                        Completed
+                                                      </span>
+                                                    ) : (
+                                                      <span className="text-[10px] font-bold text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded-full uppercase">
+                                                        In Progress
+                                                      </span>
+                                                    )}
+                                                  </td>
+                                                  <td className="py-3 text-center">
+                                                    <span
+                                                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
+                                                        cPerf === "High Performer"
+                                                          ? "text-purple-400 bg-purple-500/10"
+                                                          : cPerf === "Active Learner"
+                                                          ? "text-emerald-400 bg-emerald-500/10"
+                                                          : "text-amber-400 bg-amber-500/10"
+                                                      }`}
+                                                    >
+                                                      {cPerf}
+                                                    </span>
+                                                  </td>
+                                                  <td className="py-3 text-right">
+                                                    <button
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleDeleteStudent(cItem.studentId);
+                                                      }}
+                                                      className="p-1.5 rounded bg-white/5 hover:bg-red-500 hover:text-white text-gray-400 transition-colors"
+                                                      title="Unenroll student"
+                                                    >
+                                                      <Trash2 className="w-3.5 h-3.5" />
+                                                    </button>
+                                                  </td>
+                                                </tr>
+                                              );
+                                            })}
+                                          </tbody>
+                                        </table>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                )}
+                              </React.Fragment>
                             );
                           })}
-                          {studentsProgress.length === 0 && (
+                          {groupedStudents.length === 0 && (
                             <tr>
-                              <td colSpan="8" className="py-12 text-center text-gray-500 text-xs">
+                              <td colSpan="7" className="py-12 text-center text-gray-500 text-xs">
                                 No student enrollments registered on the platform.
                               </td>
                             </tr>
