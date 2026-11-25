@@ -1,12 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { AuthContext } from "@/context/auth-context";
 import { StudentContext } from "@/context/student-context";
 import { createPaymentService, captureAndFinalizePaymentService, createFreeOrderService } from "@/services";
 import { useContext, useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ShieldCheck, CreditCard, ShoppingBag, Loader2 } from "lucide-react";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import { ShieldCheck, CreditCard, ShoppingBag, Loader2, Lock, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 function CheckoutPage() {
@@ -94,7 +92,7 @@ function CheckoutPage() {
                         email: auth?.user?.userEmail,
                     },
                     theme: {
-                        color: "#0067b8",
+                        color: "#0071e3",
                     },
                 };
 
@@ -111,86 +109,179 @@ function CheckoutPage() {
 
     if (itemsToBuy.length === 0) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center p-4">
-                <ShoppingBag className="w-12 h-12 xs:w-16 xs:h-16 text-zinc-300 mb-4" />
-                <h2 className="text-xl xs:text-2xl font-bold text-zinc-900 mb-2">Your checkout is empty</h2>
-                <Button onClick={() => navigate("/courses")} className="rounded-full px-8 min-h-[44px]">Browse Courses</Button>
+            <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center">
+                <div className="w-20 h-20 rounded-full bg-gray-50 flex items-center justify-center mb-6">
+                    <ShoppingBag className="w-10 h-10 text-gray-300" />
+                </div>
+                <h2 className="text-2xl font-bold text-[#1d1d1f] tracking-tight mb-2">Your checkout is empty</h2>
+                <p className="text-sm text-[#86868b] max-w-sm mb-6">Select a course to enrich your knowledge and boost your professional career.</p>
+                <Button onClick={() => navigate("/courses")} className="bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full px-8 py-3 text-sm font-semibold transition-colors">
+                    Explore Courses
+                </Button>
             </div>
         );
     }
 
     return (
-    <div className="bg-[#f2f2f2] min-h-screen pt-20 xs:pt-24 md:pt-32 pb-16">
+    <div className="bg-[#fafbfc] min-h-screen font-sans text-[#1d1d1f] pt-24 pb-20">
       {isProcessing && (
-        <div className="fixed inset-0 bg-white/80 backdrop-blur-sm z-[100] flex flex-col items-center justify-center p-6 text-center">
-          <div className="flex flex-col items-center">
-            <Loader2 className="w-12 h-12 text-[#0067b8] animate-spin mb-4" />
-            <h2 className="text-2xl font-semibold tracking-tight text-black mb-2">Verifying your payment...</h2>
-            <p className="text-[#616161] font-normal">Please do not close or refresh this page.</p>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex flex-col items-center justify-center p-6 text-center text-white">
+          <div className="bg-[#1d1d1f] p-8 rounded-2xl border border-white/10 shadow-2xl flex flex-col items-center max-w-sm w-full">
+            <Loader2 className="w-10 h-10 text-[#0071e3] animate-spin mb-4" />
+            <h2 className="text-xl font-bold tracking-tight mb-2">Verifying your payment...</h2>
+            <p className="text-xs text-gray-400">Please do not close or refresh this page.</p>
           </div>
         </div>
       )}
-      <div className="container mx-auto px-4 xs:px-6 max-w-6xl">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Course List */}
-          <div className="lg:col-span-2 space-y-8">
-            <h1 className="text-3xl xs:text-4xl font-semibold tracking-tight text-black">Checkout</h1>
+
+      <div className="max-w-[1140px] mx-auto px-6">
+        
+        {/* Navigation Breadcrumb */}
+        <div className="mb-6 flex items-center gap-2 text-xs text-[#86868b]">
+          <button 
+            onClick={() => navigate(-1)} 
+            className="flex items-center gap-1 text-[#0071e3] hover:underline bg-transparent border-none p-0 cursor-pointer font-medium"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" /> Back
+          </button>
+          <span>/</span>
+          <span>Checkout & Secure Payment</span>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-10 items-start">
+          
+          {/* Left Column: Course Items */}
+          <div className="space-y-6">
+            <div>
+              <span className="text-[11px] font-bold text-[#0071e3] uppercase tracking-wider">Step 2 of 2</span>
+              <h1 className="text-3xl font-extrabold tracking-tight text-[#1d1d1f] mt-1">Review Your Enrollment</h1>
+              <p className="text-sm text-[#86868b] mt-1">Confirm the course items and proceed to instant secure access.</p>
+            </div>
+
             <div className="space-y-4">
-              {itemsToBuy.map((item, index) => (
-                <div key={index} className="bg-white rounded-sm border border-[#e6e6e6] p-4 flex flex-col xs:flex-row gap-6 shadow-sm overflow-hidden">
-                  <img
-                    src={item.courseImage || item.image}
-                    className="w-full xs:w-32 h-20 rounded-sm object-cover shrink-0"
-                    alt={item.title}
-                  />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-black text-lg mb-1">{item.title}</h3>
-                    <p className="text-xs text-[#616161] font-normal mb-2">By <span className="text-black font-semibold">{item.instructorName}</span></p>
-                    <p className="text-xl font-bold text-black">₹{item.coursePricing || item.pricing}</p>
+              {itemsToBuy.map((item, index) => {
+                const itemImg = item.courseImage || item.image;
+                const isGradient = itemImg && (itemImg.includes("gradient") || itemImg.includes("|"));
+                let iconChar = "📚";
+                let bgGrad = "linear-gradient(135deg, #0071e3, #42a5f5)";
+                if (isGradient && itemImg.includes("|")) {
+                  const parts = itemImg.split("|");
+                  iconChar = parts[0] || "📚";
+                  bgGrad = parts[1] || bgGrad;
+                }
+
+                return (
+                  <div key={index} className="bg-white rounded-2xl border border-[#e5e5e5] p-5 flex flex-col sm:flex-row gap-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] transition-all">
+                    {isGradient ? (
+                      <div 
+                        className="w-full sm:w-36 h-24 rounded-xl flex items-center justify-center text-3xl shrink-0 shadow-sm"
+                        style={{ background: bgGrad }}
+                      >
+                        {iconChar}
+                      </div>
+                    ) : (
+                      <img
+                        src={itemImg || "/banner-img.png"}
+                        className="w-full sm:w-36 h-24 rounded-xl object-cover shrink-0 bg-gray-100"
+                        alt={item.title}
+                      />
+                    )}
+                    <div className="flex-1 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="bg-blue-50 text-[#0071e3] text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                            Course
+                          </span>
+                          <span className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" /> Full Lifetime Access
+                          </span>
+                        </div>
+                        <h3 className="font-bold text-[#1d1d1f] text-base leading-snug line-clamp-2">{item.title}</h3>
+                        <p className="text-xs text-[#86868b] mt-1">
+                          Instructor: <strong className="text-[#1d1d1f] font-medium">{item.instructorName || "Bhavin Patel"}</strong>
+                        </p>
+                      </div>
+                      <div className="pt-3 border-t border-gray-100 flex items-center justify-between mt-2">
+                        <span className="text-xs text-[#86868b]">Course Fee</span>
+                        <p className="text-xl font-extrabold text-[#1d1d1f]">
+                          ₹{item.coursePricing || item.pricing}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
+            </div>
+
+            {/* Guarantee badge */}
+            <div className="p-4 bg-white rounded-2xl border border-[#e5e5e5] flex items-center gap-3.5 text-xs text-[#6e6e73]">
+              <div className="w-9 h-9 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <strong className="text-[#1d1d1f] block font-semibold">100% Risk-Free Learning</strong>
+                <span>7-day money back guarantee with verifiable certification upon course completion.</span>
+              </div>
             </div>
           </div>
 
-          {/* Summary */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-sm border border-[#e6e6e6] p-8 shadow-sm lg:sticky lg:top-32 overflow-hidden">
-              <h2 className="text-lg font-semibold text-black mb-6">Order Summary</h2>
-              <div className="space-y-4 mb-8">
-                <div className="flex justify-between text-[#616161] font-normal text-sm">
-                  <span>Subtotal</span><span>₹{totalAmount}</span>
+          {/* Right Column: Order Summary Card (Themed with Course Details) */}
+          <div className="lg:sticky lg:top-28 space-y-4">
+            <div className="bg-white rounded-2xl border border-[#e5e5e5] p-7 shadow-[0_4px_24px_rgba(0,0,0,0.06)] relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#0071e3] via-[#00c7be] to-[#0071e3]" />
+              
+              <h2 className="text-lg font-bold text-[#1d1d1f] tracking-tight mb-5 flex items-center justify-between">
+                <span>Order Summary</span>
+                <Lock className="w-4 h-4 text-[#86868b]" />
+              </h2>
+
+              <div className="space-y-3.5 mb-6 text-sm">
+                <div className="flex justify-between text-[#6e6e73]">
+                  <span>Subtotal ({itemsToBuy.length} item{itemsToBuy.length > 1 ? "s" : ""})</span>
+                  <span className="text-[#1d1d1f] font-medium">₹{totalAmount}</span>
                 </div>
-                <div className="flex justify-between text-[#616161] font-normal text-sm">
-                  <span>Tax</span><span>₹0.00</span>
+                <div className="flex justify-between text-[#6e6e73]">
+                  <span>Platform Fee & Tax</span>
+                  <span className="text-emerald-600 font-medium">FREE (₹0)</span>
                 </div>
-                <div className="pt-4 border-t border-[#f2f2f2] flex justify-between items-end">
-                  <span className="font-semibold text-black">Total</span>
-                  <span className="text-3xl font-bold text-black tracking-tight">₹{totalAmount}</span>
+                <div className="pt-4 border-t border-[#f0f0f0] flex justify-between items-baseline">
+                  <div>
+                    <span className="font-bold text-base text-[#1d1d1f] block">Total Amount</span>
+                    <span className="text-[11px] text-[#86868b]">Includes all curriculum updates</span>
+                  </div>
+                  <span className="text-3xl font-black text-[#1d1d1f] tracking-tight">₹{totalAmount}</span>
                 </div>
               </div>
-              <Button
+
+              <button
                 onClick={handlePayment}
-                className="w-full bg-[#0067b8] hover:bg-[#005a9e] text-white rounded-sm h-14 text-lg font-semibold transition-none flex items-center justify-center gap-2"
+                className="w-full bg-[#0071e3] hover:bg-[#0077ed] active:scale-[0.98] text-white rounded-xl py-3.5 text-base font-semibold transition-all shadow-[0_4px_14px_rgba(0,113,227,0.35)] flex items-center justify-center gap-2 cursor-pointer border-none"
               >
                 {totalAmount === 0 ? (
                   <>
                     <ShieldCheck className="w-5 h-5" />
-                    <span>Free Enroll</span>
+                    <span>Complete Free Enrollment</span>
                   </>
                 ) : (
                   <>
                     <CreditCard className="w-5 h-5" />
-                    <span>Pay Now</span>
+                    <span>Pay Securely — ₹{totalAmount}</span>
                   </>
                 )}
-              </Button>
-              <div className="mt-6 flex items-center justify-center gap-2 text-[#616161] font-normal text-xs">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                Secure Payment Shielded by SSL
+              </button>
+
+              <div className="mt-5 pt-4 border-t border-gray-100 flex items-center justify-center gap-2 text-[11px] text-[#86868b]">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>256-Bit SSL Encrypted Checkout via Razorpay</span>
               </div>
             </div>
+
+            {/* Quick Support Link */}
+            <div className="text-center text-xs text-[#86868b]">
+              Need help? <Link to="/contact" className="text-[#0071e3] hover:underline font-medium">Contact our team</Link>
+            </div>
           </div>
+
         </div>
       </div>
     </div>

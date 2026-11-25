@@ -100,7 +100,7 @@ function InstructorPage() {
       id: "sec_1",
       title: "Section 1 — Getting Started",
       lessons: [
-        { id: "les_1", title: "Introduction to the course", type: "video", videoUrl: "", fileUrl: "", fileName: "", freePreview: true, notes: "" }
+        { id: "les_1", title: "Introduction to the course", type: "video", videoUrl: "", fileUrl: "", fileName: "", duration: "15 min", freePreview: true, notes: "" }
       ]
     }
   ]);
@@ -485,6 +485,7 @@ function InstructorPage() {
                   videoUrl: item.videoUrl || "",
                   fileUrl: item.fileUrl || "",
                   fileName: item.fileName || "",
+                  duration: item.duration || "15 min",
                   freePreview: item.freePreview || false,
                   notes: item.notes || ""
                 });
@@ -531,7 +532,7 @@ function InstructorPage() {
           id: "sec_1",
           title: "Section 1 — Getting Started",
           lessons: [
-            { id: "les_1", title: "Introduction to the course", type: "video", videoUrl: "", fileUrl: "", fileName: "", freePreview: true, notes: "" }
+            { id: "les_1", title: "Introduction to the course", type: "video", videoUrl: "", fileUrl: "", fileName: "", duration: "15 min", freePreview: true, notes: "" }
           ]
         }
       ]);
@@ -560,6 +561,7 @@ function InstructorPage() {
           videoUrl: les.videoUrl,
           fileUrl: les.fileUrl,
           fileName: les.fileName || les.title,
+          duration: les.duration || "15 min",
           freePreview: les.freePreview,
           videoSource: les.type, // 'video', 'doc', 'quiz'
           notes: les.notes,
@@ -685,6 +687,7 @@ function InstructorPage() {
 
   function addLesson(secId, type) {
     const defaultTitle = type === "video" ? "New Video Lesson" : type === "quiz" ? "New Quiz" : "New Document";
+    const defaultDuration = type === "quiz" ? "10 min" : type === "doc" ? "5 min" : "15 min";
     setSections(sections.map(sec => {
       if (sec.id === secId) {
         return {
@@ -696,6 +699,9 @@ function InstructorPage() {
               title: defaultTitle,
               type: type,
               videoUrl: "",
+              fileUrl: "",
+              fileName: "",
+              duration: defaultDuration,
               freePreview: false,
               notes: ""
             }
@@ -1817,7 +1823,7 @@ function InstructorPage() {
                               </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                               <div className="flex flex-col gap-1">
                                 <label className="text-[10px] font-bold text-gray-500 flex items-center gap-1">
                                   <Play className="w-3 h-3 text-[#0071e3]" /> Video Link URL
@@ -1840,6 +1846,19 @@ function InstructorPage() {
                                   placeholder="https://... PDF or document URL"
                                   value={les.fileUrl || ""}
                                   onChange={e => updateLessonField(sec.id, les.id, "fileUrl", e.target.value)}
+                                  className="border border-gray-200 rounded-lg px-3 py-1.5 text-xs bg-gray-50 focus:outline-none focus:border-[#0071e3] transition-colors"
+                                />
+                              </div>
+
+                              <div className="flex flex-col gap-1">
+                                <label className="text-[10px] font-bold text-gray-500 flex items-center gap-1">
+                                  <Clock className="w-3 h-3 text-amber-600" /> Lesson Duration
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="e.g. 15 min, 30 min, 1 hr"
+                                  value={les.duration || ""}
+                                  onChange={e => updateLessonField(sec.id, les.id, "duration", e.target.value)}
                                   className="border border-gray-200 rounded-lg px-3 py-1.5 text-xs bg-gray-50 focus:outline-none focus:border-[#0071e3] transition-colors"
                                 />
                               </div>

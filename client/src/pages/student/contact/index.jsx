@@ -257,15 +257,18 @@ function ContactPage() {
               <div className="flex flex-col items-center justify-center text-center py-[24px]">
                 <div className="text-[44px] mb-[16px]">✅</div>
                 <h3 className="text-[22px] font-bold text-[#1d1d1f] tracking-[-0.5px] mb-[6px]">Message received!</h3>
-                <p className="text-[14px] text-[#6e6e73] max-w-[340px] mb-[24px]">
-                  Thanks for reaching out. We'll reply to your email within one business day.
+                <p className="text-[14px] text-[#6e6e73] max-w-[360px] mb-[16px]">
+                  Thanks for reaching out! A notification has been sent to our support team at <strong className="text-[#1d1d1f]">support@bhavinacademy.com</strong> and we'll reply to your email within one business day.
                 </p>
+                <div className="bg-[#f0f7ff] border border-[#bfdbfe] text-[#0071e3] text-xs font-semibold px-4 py-2 rounded-full mb-[24px]">
+                  Dispatched to support@bhavinacademy.com
+                </div>
                 <button 
                   onClick={() => {
                     setIsSubmitted(false);
                     setFormData({ fname: "", lname: "", email: "", topic: "", message: "" });
                   }}
-                  className="text-[13px] text-[#0071e3] font-semibold hover:underline bg-none border-none p-0"
+                  className="text-[13px] text-[#0071e3] font-semibold hover:underline bg-none border-none p-0 cursor-pointer"
                 >
                   Send another message
                 </button>

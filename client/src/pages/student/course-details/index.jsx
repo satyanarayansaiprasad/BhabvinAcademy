@@ -3,7 +3,7 @@ import { StudentContext } from "@/context/student-context";
 import { AuthContext } from "@/context/auth-context";
 import { fetchStudentViewCourseDetailsService } from "@/services";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { Check, Clock, Globe, Lock, Play, Share2 } from "lucide-react";
+import { Check, Clock, Globe, Lock, Play, Share2, FileText, BookOpen, ExternalLink, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import VideoPlayer from "@/components/video-player";
@@ -29,6 +29,8 @@ function StudentViewCourseDetailsPage() {
 
   const [displayCurrentVideoFreePreview, setDisplayCurrentVideoFreePreview] = useState(null);
   const [showFreePreviewDialog, setShowFreePreviewDialog] = useState(false);
+  const [displayCurrentNotesPreview, setDisplayCurrentNotesPreview] = useState(null);
+  const [showNotesDialog, setShowNotesDialog] = useState(false);
   const [isCurriculumOpen, setIsCurriculumOpen] = useState(true);
 
   const isCourseInCart = cartItems.some(item => item.courseId === studentViewCourseDetails?._id);
@@ -50,6 +52,10 @@ function StudentViewCourseDetailsPage() {
   }, [displayCurrentVideoFreePreview]);
 
   useEffect(() => {
+    if (displayCurrentNotesPreview !== null) setShowNotesDialog(true);
+  }, [displayCurrentNotesPreview]);
+
+  useEffect(() => {
     if (currentCourseDetailsId !== null) fetchCourseDetails();
   }, [currentCourseDetailsId]);
 
@@ -64,8 +70,42 @@ function StudentViewCourseDetailsPage() {
     }
   }, [location.pathname]);
 
-  function handleSetFreePreview(getCurrentVideoInfo) {
-    setDisplayCurrentVideoFreePreview(getCurrentVideoInfo?.videoUrl);
+  function handleCurriculumItemClick(item) {
+    if (!item.freePreview) return;
+
+    // Check if this is a document / resource link (REQ-04)
+    if (item.videoSource === "doc" || (item.fileUrl && !item.videoUrl)) {
+      if (item.fileUrl) {
+        window.open(item.fileUrl, "_blank", "noopener,noreferrer");
+        return;
+      }
+    }
+
+    // Check if this is an Additional Notes item (REQ-02)
+    const isNotesItem = (item.title && item.title.toLowerCase().includes("note")) ||
+      (!item.videoUrl && (item.notes || item.fileUrl));
+
+    if (isNotesItem && !item.videoUrl) {
+      setDisplayCurrentNotesPreview({
+        title: item.title,
+        notes: item.notes || "No detailed notes provided for this lesson.",
+        fileUrl: item.fileUrl || null,
+        fileName: item.fileName || null,
+      });
+      return;
+    }
+
+    // Otherwise, if it has a videoUrl, open in video player
+    if (item.videoUrl) {
+      setDisplayCurrentVideoFreePreview(item.videoUrl);
+    } else if (item.notes) {
+      setDisplayCurrentNotesPreview({
+        title: item.title,
+        notes: item.notes,
+        fileUrl: item.fileUrl || null,
+        fileName: item.fileName || null,
+      });
+    }
   }
 
   async function handleBuyNow() {
@@ -272,26 +312,45 @@ function StudentViewCourseDetailsPage() {
 
             {isCurriculumOpen && (
               <div className="px-[22px] py-[12px] pb-[18px] bg-white divide-y divide-[#f5f5f5]">
-                {studentViewCourseDetails?.curriculum?.map((item, idx) => (
-                  <div 
-                    key={idx} 
-                    onClick={() => item.freePreview && handleSetFreePreview(item)}
-                    className={`flex items-center gap-[12px] py-[10px] text-[14px] text-[#3d3d3f] ${
-                      item.freePreview ? "cursor-pointer hover:text-[#0071e3]" : ""
-                    }`}
-                  >
-                    <div className="w-[28px] h-[28px] rounded-[8px] bg-[#e8f1fb] flex items-center justify-center text-[14px] text-[#0071e3] shrink-0">
-                      ▶
-                    </div>
-                    <span>{item.title}</span>
-                    {item.freePreview && (
-                      <span className="text-[11px] font-bold text-[#0071e3] bg-[#e8f1fb] px-[8px] py-[2px] rounded-[980px] ml-2">
-                        Free
+                {studentViewCourseDetails?.curriculum?.map((item, idx) => {
+                  const isDoc = item.videoSource === "doc" || (item.fileUrl && !item.videoUrl);
+                  const isNotes = !item.videoUrl && (item.notes || (item.title && item.title.toLowerCase().includes("note")));
+
+                  return (
+                    <div 
+                      key={idx} 
+                      onClick={() => item.freePreview && handleCurriculumItemClick(item)}
+                      className={`flex items-center gap-[12px] py-[10px] text-[14px] text-[#3d3d3f] ${
+                        item.freePreview ? "cursor-pointer hover:text-[#0071e3]" : ""
+                      }`}
+                    >
+                      <div className={`w-[28px] h-[28px] rounded-[8px] flex items-center justify-center text-[13px] shrink-0 ${
+                        isDoc ? "bg-emerald-50 text-emerald-600" : isNotes ? "bg-amber-50 text-amber-600" : "bg-[#e8f1fb] text-[#0071e3]"
+                      }`}>
+                        {isDoc ? <FileText className="w-4 h-4" /> : isNotes ? <BookOpen className="w-4 h-4" /> : "▶"}
+                      </div>
+                      <span className="font-medium">{item.title}</span>
+                      {isDoc && (
+                        <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-[6px] py-[1px] rounded-full flex items-center gap-1">
+                          Document <ExternalLink className="w-2.5 h-2.5" />
+                        </span>
+                      )}
+                      {isNotes && !isDoc && (
+                        <span className="text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-[6px] py-[1px] rounded-full">
+                          Notes
+                        </span>
+                      )}
+                      {item.freePreview && (
+                        <span className="text-[11px] font-bold text-[#0071e3] bg-[#e8f1fb] px-[8px] py-[2px] rounded-[980px] ml-1">
+                          Free
+                        </span>
+                      )}
+                      <span className="ml-auto text-[12px] text-[#86868b] font-normal">
+                        {item.duration || "15 min"}
                       </span>
-                    )}
-                    <span className="ml-auto text-[12px] text-[#86868b]">15 min</span>
-                  </div>
-                ))}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -463,13 +522,67 @@ function StudentViewCourseDetailsPage() {
         </button>
       </div>
 
-      {/* Preview Dialog */}
+      {/* Video Preview Dialog */}
       <Dialog open={showFreePreviewDialog} onOpenChange={(val) => {
         setShowFreePreviewDialog(val);
         if(!val) setDisplayCurrentVideoFreePreview(null);
       }}>
         <DialogContent className="max-w-[1000px] w-full p-0 border-none bg-black overflow-hidden aspect-video">
           <VideoPlayer url={displayCurrentVideoFreePreview} width="100%" height="100%" />
+        </DialogContent>
+      </Dialog>
+
+      {/* Additional Notes / Document Modal (REQ-02) */}
+      <Dialog open={showNotesDialog} onOpenChange={(val) => {
+        setShowNotesDialog(val);
+        if(!val) setDisplayCurrentNotesPreview(null);
+      }}>
+        <DialogContent className="max-w-[650px] w-full p-0 overflow-hidden bg-white border border-[#e5e5e5] rounded-[18px] shadow-2xl">
+          <div className="p-6 border-b border-[#f0f0f0] bg-[#fafbfc] flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#0071e3] flex items-center justify-center">
+                <BookOpen className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-[11px] font-bold text-[#0071e3] uppercase tracking-wider">Lesson Notes & Reference</span>
+                <h3 className="text-[18px] font-bold text-[#1d1d1f] tracking-tight">
+                  {displayCurrentNotesPreview?.title || "Additional Notes"}
+                </h3>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-6 max-h-[60vh] overflow-y-auto space-y-4 text-left">
+            <div className="prose max-w-none text-[#334155] text-[15px] leading-relaxed whitespace-pre-wrap bg-[#f8fafc] p-5 rounded-xl border border-[#e2e8f0]">
+              {displayCurrentNotesPreview?.notes}
+            </div>
+
+            {displayCurrentNotesPreview?.fileUrl && (
+              <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-emerald-900 text-[13px] font-semibold">
+                  <FileText className="w-4 h-4 text-emerald-600" />
+                  <span>{displayCurrentNotesPreview?.fileName || "Attached Study Material"}</span>
+                </div>
+                <a
+                  href={displayCurrentNotesPreview.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white text-[12px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 no-underline transition-colors"
+                >
+                  <Download className="w-3.5 h-3.5" /> Download
+                </a>
+              </div>
+            )}
+          </div>
+
+          <div className="p-4 px-6 border-t border-[#f0f0f0] bg-[#fafbfc] flex justify-end">
+            <button
+              onClick={() => setShowNotesDialog(false)}
+              className="bg-[#0071e3] hover:bg-[#0077ed] text-white text-[13px] font-semibold px-5 py-2 rounded-full cursor-pointer transition-colors"
+            >
+              Done Reading
+            </button>
+          </div>
         </DialogContent>
       </Dialog>
 

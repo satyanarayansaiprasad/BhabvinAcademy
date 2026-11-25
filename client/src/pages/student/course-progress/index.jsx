@@ -238,19 +238,55 @@ function StudentViewCourseProgressPage() {
                 {/* MAIN COLUMN (PLAYER + TABS + OVERVIEW) */}
                 <main className="flex-1 flex flex-col overflow-y-auto min-h-0 bg-white text-[#1c1d1f]">
                     
-                    {/* VIDEO CONTAINER */}
-                    <div className="bg-black aspect-video w-full shrink-0 relative overflow-hidden flex items-center justify-center">
-                        <VideoPlayer
-                            width="100%"
-                            height="100%"
-                            url={currentLecture?.videoUrl}
-                            onProgressUpdate={setCurrentLecture}
-                            progressData={currentLecture}
-                        />
-                    </div>
+                    {/* LECTURE MEDIA / DOCUMENT / NOTES CONTAINER */}
+                    {currentLecture?.videoUrl ? (
+                        <div className="bg-black aspect-video w-full shrink-0 relative overflow-hidden flex items-center justify-center">
+                            <VideoPlayer
+                                width="100%"
+                                height="100%"
+                                url={currentLecture?.videoUrl}
+                                onProgressUpdate={setCurrentLecture}
+                                progressData={currentLecture}
+                            />
+                        </div>
+                    ) : (
+                        /* Document or Rich Text Notes view instead of blank/broken video player (REQ-01 & REQ-02) */
+                        <div className="bg-gradient-to-br from-[#0a1628] via-[#111827] to-[#000] p-8 md:p-12 text-white shrink-0 min-h-[340px] flex flex-col justify-center">
+                            <div className="max-w-[760px] mx-auto w-full space-y-5">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-[#60a5fa] border border-blue-500/30 text-xs font-semibold">
+                                    {currentLecture?.videoSource === "doc" || currentLecture?.fileUrl ? <FileText className="w-3.5 h-3.5" /> : <BookOpen className="w-3.5 h-3.5" />}
+                                    <span>{currentLecture?.videoSource === "doc" || currentLecture?.fileUrl ? "Document Lesson" : "Reading & Study Notes"}</span>
+                                </div>
+                                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white leading-tight">
+                                    {currentLecture?.title}
+                                </h2>
+                                <p className="text-gray-300 text-sm md:text-base leading-relaxed bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 whitespace-pre-wrap">
+                                    {currentLecture?.notes || "No additional text notes provided for this lesson. Refer to the attached study materials or navigate to the next chapter."}
+                                </p>
+                                <div className="flex flex-wrap items-center gap-3 pt-2">
+                                    {currentLecture?.fileUrl && (
+                                        <a
+                                            href={currentLecture.fileUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="bg-[#0071e3] hover:bg-[#0077ed] text-white px-5 py-2.5 rounded-full text-xs font-bold inline-flex items-center gap-2 no-underline transition-all shadow-lg"
+                                        >
+                                            <ExternalLink className="w-4 h-4" /> Open Document in Browser
+                                        </a>
+                                    )}
+                                    <button
+                                        onClick={() => handleMarkAsDone(currentLecture?._id)}
+                                        className="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-5 py-2.5 rounded-full text-xs font-semibold inline-flex items-center gap-2 cursor-pointer transition-all"
+                                    >
+                                        <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Mark as Read
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* SEPARATE DOWNLOADABLE FILE / RESOURCE BANNER */}
-                    {currentLecture?.fileUrl && (
+                    {currentLecture?.fileUrl && currentLecture?.videoUrl && (
                         <div className="bg-[#f0f7ff] border-b border-[#bfdbfe] p-4 px-6 flex items-center justify-between flex-wrap gap-3 shrink-0">
                             <div className="flex items-center gap-3">
                                 <div className="w-9 h-9 rounded-lg bg-[#0071e3] text-white flex items-center justify-center shrink-0">
@@ -269,10 +305,9 @@ function StudentViewCourseProgressPage() {
                                 href={currentLecture.fileUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                download
                                 className="bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-2 no-underline transition-colors shadow-sm"
                             >
-                                <Download className="w-4 h-4" /> Download File Resource
+                                <ExternalLink className="w-4 h-4" /> Open in Browser
                             </a>
                         </div>
                     )}
@@ -711,7 +746,7 @@ function StudentViewCourseProgressPage() {
                                                         {secTitle}
                                                     </h3>
                                                     <div className="text-[12px] text-[#6a6f73] mt-1">
-                                                        {completedSecCount} / {sectionLectures.length} | {sectionLectures.length * 8}m
+                                                        {completedSecCount} / {sectionLectures.length} lessons
                                                     </div>
                                                 </div>
                                                 <button className="bg-transparent border-none cursor-pointer text-[#1c1d1f] mt-0.5">
@@ -725,6 +760,7 @@ function StudentViewCourseProgressPage() {
                                                     {sectionLectures.map((lecture) => {
                                                         const isDone = studentCurrentCourseProgress?.progress?.find(p => p.lectureId === lecture._id)?.viewed;
                                                         const isCurrent = currentLecture?._id === lecture._id;
+                                                        const isDoc = lecture.videoSource === "doc" || (lecture.fileUrl && !lecture.videoUrl);
 
                                                         return (
                                                             <div 
@@ -758,24 +794,24 @@ function StudentViewCourseProgressPage() {
                                                                     </div>
                                                                     <div className="flex items-center gap-2 mt-1 text-[11px] text-[#6a6f73]">
                                                                         <span className="flex items-center gap-1">
-                                                                            <PlayCircle className="w-3 h-3 text-gray-400" /> 8 min
+                                                                            {isDoc ? <FileText className="w-3 h-3 text-emerald-600" /> : <PlayCircle className="w-3 h-3 text-gray-400" />}
+                                                                            {lecture.duration || "15 min"}
                                                                         </span>
                                                                     </div>
                                                                 </div>
 
-                                                                {/* Resources dropdown / download button */}
+                                                                {/* Resources dropdown / browser open button */}
                                                                 {lecture.fileUrl ? (
                                                                     <a 
                                                                         href={lecture.fileUrl}
                                                                         target="_blank"
                                                                         rel="noopener noreferrer"
-                                                                        download
                                                                         onClick={(e) => e.stopPropagation()}
                                                                         className="flex items-center gap-1 border border-emerald-200 text-emerald-700 hover:bg-emerald-50 rounded-[4px] px-2 py-1 text-[11px] font-semibold bg-white cursor-pointer no-underline shrink-0"
-                                                                        title="Download attached file resource"
+                                                                        title="Open document in browser"
                                                                     >
-                                                                        <Download className="w-3 h-3 text-emerald-600" />
-                                                                        <span>File</span>
+                                                                        <ExternalLink className="w-3 h-3 text-emerald-600" />
+                                                                        <span>Doc</span>
                                                                     </a>
                                                                 ) : (
                                                                     <div className="relative shrink-0">
