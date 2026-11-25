@@ -103,6 +103,18 @@ function App() {
               <RouteGuard element={<InstructorPage />} authenticated={auth?.authenticate} user={auth?.user} isLoading={isLoading} />
             }
           />
+          <Route path="/admin" element={
+              <RouteGuard element={<InstructorPage />} authenticated={auth?.authenticate} user={auth?.user} isLoading={isLoading} />
+            }
+          />
+          <Route path="/admin/course/create" element={
+              <RouteGuard element={<InstructorPage />} authenticated={auth?.authenticate} user={auth?.user} isLoading={isLoading} />
+            }
+          />
+          <Route path="/admin/course/edit/:id" element={
+              <RouteGuard element={<InstructorPage />} authenticated={auth?.authenticate} user={auth?.user} isLoading={isLoading} />
+            }
+          />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>

@@ -51,12 +51,20 @@ function StudentViewCommonHeader() {
                 {link.label}
               </Link>
             ))}
-            {(auth?.user?.role === "instructor" || auth?.user?.role === "sub-admin") && (
+            {(auth?.user?.role === "instructor" || auth?.user?.role === "admin" || auth?.user?.role === "sub-admin") && (
               <Link
-                to="/instructor"
-                className="text-[13px] text-[#0071e3] font-semibold hover:opacity-100 transition-opacity no-underline"
+                to="/admin"
+                className="text-[13px] text-[#0071e3] font-semibold hover:opacity-100 transition-opacity no-underline bg-[#0071e3]/10 px-2.5 py-1 rounded-md"
               >
-                Instructor Panel
+                Admin Dashboard
+              </Link>
+            )}
+            {auth?.authenticate && (auth?.user?.role === "user" || auth?.user?.role === "student" || !auth?.user?.role) && (
+              <Link
+                to="/dashboard"
+                className="text-[13px] text-[#1d1d1f] opacity-70 hover:opacity-100 transition-opacity font-normal no-underline"
+              >
+                My Dashboard
               </Link>
             )}
           </nav>
@@ -129,13 +137,21 @@ function StudentViewCommonHeader() {
               ))}
               {auth?.authenticate && (
                 <>
-                  {(auth?.user?.role === "instructor" || auth?.user?.role === "sub-admin") && (
+                  {(auth?.user?.role === "instructor" || auth?.user?.role === "admin" || auth?.user?.role === "sub-admin") ? (
                     <Link
-                      to="/instructor"
+                      to="/admin"
                       onClick={() => setIsMobileMenuOpen(false)}
                       className="text-[20px] font-semibold text-[#0071e3] border-b border-black/5 pb-2"
                     >
-                      Instructor Panel
+                      Admin Dashboard
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="text-[20px] font-semibold text-[#1d1d1f] border-b border-black/5 pb-2"
+                    >
+                      Student Dashboard
                     </Link>
                   )}
                   <Link

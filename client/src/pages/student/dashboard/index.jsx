@@ -11,10 +11,16 @@ function StudentDashboardPage() {
     const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
+        // If an admin or instructor visits /dashboard, redirect them directly to the admin dashboard
+        if (auth?.user?.role === "instructor" || auth?.user?.role === "admin" || auth?.user?.role === "sub-admin") {
+            navigate("/admin", { replace: true });
+            return;
+        }
+
         if (auth?.user?._id) {
             fetchBoughtCourses(auth?.user?._id);
         }
-    }, [auth]);
+    }, [auth, navigate]);
 
     const userFullName = auth?.user?.userFullName || auth?.user?.userName || "Arjun Mehta";
     const userInitials = userFullName

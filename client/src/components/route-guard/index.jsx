@@ -22,13 +22,18 @@ function RouteGuard({ authenticated, user, element, isLoading }) {
   }
 
   if (authenticated && location.pathname.includes("/auth")) {
+    const isStaff = user?.role === "instructor" || user?.role === "admin" || user?.role === "sub-admin";
+    const defaultRedirect = isStaff ? "/admin" : "/home";
     const redirectPath = location.state?.from
       ? (location.state.from.pathname + (location.state.from.search || ""))
-      : "/home";
+      : defaultRedirect;
     return <Navigate to={redirectPath} replace />;
   }
 
-  if (authenticated && location.pathname.startsWith("/instructor") && user?.role !== "instructor" && user?.role !== "admin" && user?.role !== "sub-admin") {
+  const isStaffPath = location.pathname.startsWith("/instructor") || location.pathname.startsWith("/admin");
+  const isStaffUser = user?.role === "instructor" || user?.role === "admin" || user?.role === "sub-admin";
+
+  if (authenticated && isStaffPath && !isStaffUser) {
     return <Navigate to="/home" replace />;
   }
 
