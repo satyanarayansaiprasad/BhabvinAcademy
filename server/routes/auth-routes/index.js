@@ -6,6 +6,7 @@ const {
   forgotPassword,
   resetPassword,
   updateUserProfile,
+  updatePassword,
   getAllSubAdmins,
   updateSubAdmin,
   deleteSubAdmin,
@@ -26,6 +27,7 @@ router.post("/reset-password", resetPassword);
 router.post("/google-login", googleLogin);
 router.post("/microsoft-login", microsoftLogin);
 router.put("/update-profile", authenticateMiddleware, updateUserProfile);
+router.put("/update-password", authenticateMiddleware, updatePassword);
 router.get("/check-auth", authenticateMiddleware, (req, res) => {
   const user = req.user;
 

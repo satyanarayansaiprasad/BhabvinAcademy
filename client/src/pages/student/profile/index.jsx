@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { AuthContext } from "@/context/auth-context";
 import { StudentContext } from "@/context/student-context";
-import { updateUserProfileService } from "@/services";
+import { updateUserProfileService, updatePasswordService } from "@/services";
 
 function StudentProfilePage() {
     const { auth, setAuth } = useContext(AuthContext);
@@ -817,15 +817,36 @@ function StudentProfilePage() {
                                     <div className="flex items-center justify-end gap-2.5 mt-[18px] pt-4 border-t border-[#f0f0f0]">
                                         <button className="bg-transparent text-[#6e6e73] border border-[#d2d2d7] p-[10px_20px] rounded-[980px] text-[13px] font-medium cursor-pointer hover:border-[#1d1d1f] hover:text-[#1d1d1f] transition-all">Cancel</button>
                                         <button 
-                                            onClick={() => {
+                                            onClick={async () => {
+                                                if (!currentPassword) {
+                                                    triggerToast("Please enter your current password.");
+                                                    return;
+                                                }
+                                                if (newPassword.length < 6) {
+                                                    triggerToast("New password must be at least 6 characters.");
+                                                    return;
+                                                }
                                                 if (newPassword !== confirmPassword) {
                                                     triggerToast("Passwords do not match!");
                                                     return;
                                                 }
-                                                triggerToast("Password updated successfully!");
-                                                setCurrentPassword("");
-                                                setNewPassword("");
-                                                setConfirmPassword("");
+                                                try {
+                                                    const res = await updatePasswordService({
+                                                        userId: auth?.user?._id,
+                                                        currentPassword,
+                                                        newPassword,
+                                                    });
+                                                    if (res?.success) {
+                                                        triggerToast("Password updated successfully!");
+                                                        setCurrentPassword("");
+                                                        setNewPassword("");
+                                                        setConfirmPassword("");
+                                                    } else {
+                                                        triggerToast(res?.message || "Failed to update password.");
+                                                    }
+                                                } catch (err) {
+                                                    triggerToast(err?.response?.data?.message || "Error updating password.");
+                                                }
                                             }}
                                             className="bg-[#0071e3] text-white border-none p-[10px_24px] rounded-[980px] text-[13px] font-semibold cursor-pointer hover:bg-[#0077ed] transition-colors"
                                         >

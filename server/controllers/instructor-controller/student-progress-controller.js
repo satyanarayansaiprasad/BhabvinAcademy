@@ -40,9 +40,10 @@ const getStudentProgress = async (req, res) => {
         const course = await Course.findById(courseInfo.courseId);
 
         let completionPercentage = 0;
+        const totalCurriculumCount = course?.curriculum?.length || (progress?.lecturesProgress?.length || 1);
         if (progress && progress.lecturesProgress && progress.lecturesProgress.length > 0) {
           const viewedLecturesCount = progress.lecturesProgress.filter((l) => l.viewed).length;
-          completionPercentage = Math.round((viewedLecturesCount * 100) / progress.lecturesProgress.length);
+          completionPercentage = Math.min(100, Math.round((viewedLecturesCount * 100) / totalCurriculumCount));
         }
 
         const paidAmt = matchingOrder?.courses?.find((c) => c.courseId === courseInfo.courseId)?.coursePricing ||
@@ -83,10 +84,12 @@ const getStudentProgress = async (req, res) => {
           courseId: cInfo.courseId,
         });
 
+        const progCourse = await Course.findById(cInfo.courseId);
         let completionPercentage = 0;
+        const totalCurriculumCount = progCourse?.curriculum?.length || (progress?.lecturesProgress?.length || 1);
         if (progress && progress.lecturesProgress && progress.lecturesProgress.length > 0) {
           const viewedLecturesCount = progress.lecturesProgress.filter((l) => l.viewed).length;
-          completionPercentage = Math.round((viewedLecturesCount * 100) / progress.lecturesProgress.length);
+          completionPercentage = Math.min(100, Math.round((viewedLecturesCount * 100) / totalCurriculumCount));
         }
 
         let performanceStatus = "Getting Started";
@@ -123,9 +126,10 @@ const getStudentProgress = async (req, res) => {
       const course = await Course.findById(prog.courseId);
 
       let completionPercentage = 0;
+      const totalCurriculumCount = course?.curriculum?.length || (prog?.lecturesProgress?.length || 1);
       if (prog.lecturesProgress && prog.lecturesProgress.length > 0) {
         const viewedLecturesCount = prog.lecturesProgress.filter((l) => l.viewed).length;
-        completionPercentage = Math.round((viewedLecturesCount * 100) / prog.lecturesProgress.length);
+        completionPercentage = Math.min(100, Math.round((viewedLecturesCount * 100) / totalCurriculumCount));
       }
 
       let performanceStatus = "Getting Started";

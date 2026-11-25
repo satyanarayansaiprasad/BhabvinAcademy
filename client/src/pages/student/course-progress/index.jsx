@@ -51,11 +51,18 @@ function StudentViewCourseProgressPage() {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [openResourcesDropdown, setOpenResourcesDropdown] = useState(null);
 
-    // Interactive state for Notes & Q&A
-    const [notes, setNotes] = useState([
-        { time: "08:15", text: "Key concept: Allocate largest subnets first when implementing VLSM address schemes." },
-        { time: "14:30", text: "RFC 3021 allows /31 subnets on point-to-point serial and WAN links." }
-    ]);
+    // Interactive state for Notes & Q&A with localStorage persistence (BUG-05)
+    const [notes, setNotes] = useState(() => {
+        try {
+            const saved = localStorage.getItem(`course_notes_${id}`);
+            return saved ? JSON.parse(saved) : [
+                { time: "08:15", text: "Key concept: Allocate largest subnets first when implementing VLSM address schemes." },
+                { time: "14:30", text: "RFC 3021 allows /31 subnets on point-to-point serial and WAN links." }
+            ];
+        } catch (e) {
+            return [];
+        }
+    });
     const [newNoteText, setNewNoteText] = useState("");
     
     const [qaList, setQaList] = useState([
@@ -135,10 +142,14 @@ function StudentViewCourseProgressPage() {
     const handleSaveNote = () => {
         if (!newNoteText.trim()) return;
         const note = {
-            time: "05:20",
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             text: newNoteText.trim()
         };
-        setNotes([note, ...notes]);
+        const updatedNotes = [note, ...notes];
+        setNotes(updatedNotes);
+        try {
+            localStorage.setItem(`course_notes_${id}`, JSON.stringify(updatedNotes));
+        } catch (e) {}
         setNewNoteText("");
     };
 

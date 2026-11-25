@@ -443,6 +443,69 @@ const microsoftLogin = async (req, res) => {
   }
 };
 
+const updatePassword = async (req, res) => {
+  try {
+    const { userId, currentPassword, newPassword } = req.body;
+
+    if (!userId || !currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID, current password, and new password are required.",
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "New password must be at least 6 characters long.",
+      });
+    }
+
+    // Verify requesting user is updating their own password
+    if (req.user && req.user._id !== userId && req.user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to update another user's password.",
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    // Verify current password
+    if (user.password) {
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+        return res.status(400).json({
+          success: false,
+          message: "Incorrect current password.",
+        });
+      }
+    }
+
+    // Hash and save new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Password updated successfully.",
+    });
+  } catch (error) {
+    console.error("Update Password Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while updating the password.",
+    });
+  }
+};
+
 module.exports = {
   registerUser,
   registerSubAdmin,
@@ -450,6 +513,7 @@ module.exports = {
   forgotPassword,
   resetPassword,
   updateUserProfile,
+  updatePassword,
   getAllSubAdmins,
   updateSubAdmin,
   deleteSubAdmin,

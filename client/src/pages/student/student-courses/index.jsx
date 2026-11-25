@@ -42,56 +42,62 @@ function StudentCoursesPage() {
   const fadeUp = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.6 } };
 
   return (
-    <div className="bg-[#f2f2f2] min-h-screen pt-20 xs:pt-24 md:pt-32 pb-16">
-      <div className="container mx-auto px-4 xs:px-6">
+    <div className="bg-[#fafbfc] min-h-screen pt-20 xs:pt-24 md:pt-32 pb-16 font-sans">
+      <div className="container mx-auto px-4 xs:px-6 max-w-7xl">
         {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-3xl xs:text-4xl md:text-5xl font-semibold tracking-tight text-black mb-2">My Courses</h1>
-          <p className="text-[#616161] font-normal text-sm xs:text-base">Continue your learning journey and track your progress.</p>
+        <div className="mb-10 text-left">
+          <span className="text-xs font-bold text-[#0071e3] uppercase tracking-wider">My Learning</span>
+          <h1 className="text-3xl xs:text-4xl md:text-5xl font-extrabold tracking-tight text-[#1d1d1f] mt-1 mb-2">My Courses</h1>
+          <p className="text-[#86868b] font-normal text-sm xs:text-base">Continue your learning journey and track your certification milestones.</p>
         </div>
 
         {/* Courses Grid */}
-        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 text-left">
           {studentBoughtCoursesList && studentBoughtCoursesList.length > 0 ? (
             studentBoughtCoursesList.map((course, index) => (
               <div
                 key={course.courseId}
                 onClick={() => navigate(`/course-progress/${course?.courseId}`)}
-                className="group cursor-pointer bg-white rounded-sm border border-[#e6e6e6] shadow-sm hover:border-[#0067b8]/40 transition-colors overflow-hidden"
+                className="group cursor-pointer bg-white rounded-2xl border border-[#e5e5e5] shadow-sm hover:shadow-xl hover:border-[#0071e3]/40 transition-all overflow-hidden flex flex-col justify-between"
               >
-                <div className="aspect-video relative overflow-hidden bg-[#f2f2f2]">
-                  <img
-                    src={getCourseImageUrl(course)}
-                    alt={course?.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                    <div className="w-10 h-10 rounded-sm bg-white text-black flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm">
-                      <PlayCircle className="h-5 w-5 fill-current" />
+                <div>
+                  <div className="aspect-video relative overflow-hidden bg-gray-100">
+                    <img
+                      src={getCourseImageUrl(course)}
+                      alt={course?.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-full bg-white/90 text-[#0071e3] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                        <PlayCircle className="h-6 w-6 fill-current" />
+                      </div>
                     </div>
+                  </div>
+
+                  <div className="p-5">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-[10px] font-bold text-[#0071e3] uppercase tracking-wider">
+                        {course?.instructorName || "Bhavin Patel"}
+                      </span>
+                    </div>
+                    <h3 className="text-base font-bold text-[#1d1d1f] leading-snug line-clamp-2 group-hover:text-[#0071e3] transition-colors">
+                      {course?.title}
+                    </h3>
                   </div>
                 </div>
 
-                <div className="p-5">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="px-2 py-0.5 rounded-sm bg-[#f2f2f2] text-[10px] font-semibold text-[#616161] uppercase tracking-wider">
-                      {course?.instructorName}
-                    </span>
-                  </div>
-                  <h3 className="text-base font-semibold text-black leading-tight mb-6 line-clamp-2 group-hover:text-[#0067b8] transition-colors">
-                    {course?.title}
-                  </h3>
-                  <div className="flex items-center justify-between pt-4 border-t border-[#f2f2f2]">
-                    <div className="flex items-center gap-2 text-[#616161] font-semibold text-[10px] uppercase tracking-wider">
+                <div className="p-5 pt-0">
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-1.5 text-[#0071e3] font-semibold text-xs">
                       <BookOpen className="h-3.5 w-3.5" />
-                      <span>Continue</span>
+                      <span>Resume Course</span>
                     </div>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setDeletingCourseId(course.courseId);
                       }}
-                      className="p-1.5 rounded-sm hover:bg-red-50 text-[#d2d2d2] hover:text-red-600 transition-colors"
+                      className="p-1.5 rounded-lg hover:bg-red-50 text-gray-300 hover:text-red-600 transition-colors"
                       title="Remove Course"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -102,16 +108,16 @@ function StudentCoursesPage() {
             ))
           ) : (
             <div className="col-span-full flex flex-col items-center justify-center py-20 text-center">
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm border border-[#e6e6e6]">
-                <GraduationCap className="h-8 w-8 text-[#d2d2d2]" />
+              <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm border border-[#e5e5e5]">
+                <GraduationCap className="h-10 w-10 text-gray-300" />
               </div>
-              <h2 className="text-xl font-semibold text-black mb-2">No courses found</h2>
-              <p className="text-sm text-[#616161] font-normal mb-8 max-w-sm">Ready to start your learning journey? Explore our catalog and find your perfect course.</p>
+              <h2 className="text-2xl font-bold text-[#1d1d1f] mb-2">No courses enrolled yet</h2>
+              <p className="text-sm text-[#86868b] font-normal mb-8 max-w-sm">Ready to start your learning journey? Explore our curriculum and build real enterprise skills.</p>
               <Button
                 onClick={() => navigate("/courses")}
-                className="bg-black text-white rounded-sm h-12 px-8 text-sm font-semibold transition-none"
+                className="bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full h-12 px-8 text-sm font-semibold transition-colors"
               >
-                Explore Catalog
+                Explore Courses
               </Button>
             </div>
           )}
