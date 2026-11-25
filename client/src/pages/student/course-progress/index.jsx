@@ -920,8 +920,16 @@ function StudentViewCourseProgressPage() {
                                         My Courses
                                     </button>
                                     <button className="bg-white border border-[#d1d7dc] text-[#1c1d1f] text-[13px] font-bold py-3 rounded-[4px] hover:bg-gray-50 flex items-center justify-center gap-2 cursor-pointer" onClick={async () => {
-                                        const response = await resetCourseProgressService(auth?.user?._id, studentCurrentCourseProgress?.courseDetails?._id);
-                                        if (response?.success) { setShowConfetti(false); fetchCurrentCourseProgress(); }
+                                        const userId = auth?.user?._id;
+                                        const courseId = studentCurrentCourseProgress?.courseDetails?._id || id;
+                                        try {
+                                            const response = await resetCourseProgressService(userId, courseId);
+                                            setShowConfetti(false);
+                                            fetchCurrentCourseProgress();
+                                        } catch (e) {
+                                            console.warn("Could not reset course progress:", e);
+                                            setShowConfetti(false);
+                                        }
                                     }}>
                                         <RotateCcw size={15}/> Rewatch
                                     </button>

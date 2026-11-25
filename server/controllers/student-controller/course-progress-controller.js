@@ -151,12 +151,19 @@ const resetCurrentCourseProgress = async (req, res) => {
   try {
     const { userId, courseId } = req.body;
 
+    if (!userId || !courseId) {
+      return res.status(200).json({
+        success: true,
+        message: "No progress found to reset",
+      });
+    }
+
     const progress = await CourseProgress.findOne({ userId, courseId });
 
     if (!progress) {
-      return res.status(404).json({
-        success: false,
-        message: "Progress not found!",
+      return res.status(200).json({
+        success: true,
+        message: "No progress found to reset",
       });
     }
 

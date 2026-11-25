@@ -203,15 +203,23 @@ export async function markLectureAsViewedService(userId, courseId, lectureId) {
 }
 
 export async function resetCourseProgressService(userId, courseId) {
-  const { data } = await axiosInstance.post(
-    `/student/course-progress/reset-progress`,
-    {
-      userId,
-      courseId,
+  try {
+    if (!userId || !courseId) {
+      return { success: true, message: "No progress to reset" };
     }
-  );
+    const { data } = await axiosInstance.post(
+      `/student/course-progress/reset-progress`,
+      {
+        userId,
+        courseId,
+      }
+    );
 
-  return data;
+    return data;
+  } catch (error) {
+    console.warn("Reset progress error:", error?.message);
+    return { success: false, message: error?.response?.data?.message || error?.message };
+  }
 }
 
 export async function deleteCourseService(id) {
