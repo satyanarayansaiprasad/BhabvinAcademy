@@ -48,7 +48,7 @@ function CartPage() {
                   className="bg-white rounded-sm border border-[#e6e6e6] p-4 flex flex-col xs:flex-row gap-6 shadow-sm group"
                 >
                   <div className="w-full xs:w-48 h-32 rounded-sm overflow-hidden shrink-0">
-                    <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src={item.image?.startsWith("http://") ? item.image.replace(/^http:\/\//i, "https://") : item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   </div>
                   <div className="flex-1 flex flex-col justify-between py-1">
                     <div>

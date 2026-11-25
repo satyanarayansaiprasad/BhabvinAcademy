@@ -20,15 +20,23 @@ export const categoryImages = {
   "default": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80"
 };
 
+export function enforceHttps(url) {
+  if (!url || typeof url !== "string") return url;
+  if (url.startsWith("http://")) {
+    return url.replace(/^http:\/\//i, "https://");
+  }
+  return url;
+}
+
 export function getCourseImageUrl(course) {
   if (!course) return categoryImages.default;
 
-  // 1. If the course specifically has a valid custom image URL, use it
+  // 1. If the course specifically has a valid custom image URL, use it (enforcing HTTPS)
   if (course.image && course.image.startsWith("http")) {
-    return course.image;
+    return enforceHttps(course.image);
   }
   if (course.courseImage && course.courseImage.startsWith("http")) {
-    return course.courseImage;
+    return enforceHttps(course.courseImage);
   }
 
   // 2. Check by course category (normalized)

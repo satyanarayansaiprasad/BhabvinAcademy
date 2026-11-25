@@ -64,11 +64,15 @@ function CourseCard({ course, onClick }) {
   const originalPrice = (priceValue * 1.634).toFixed(2);
 
   // Check if course image is a valid URL or image path
-  const hasImageUrl = course?.image && (
-    course.image.startsWith('http://') ||
-    course.image.startsWith('https://') ||
-    course.image.startsWith('/') ||
-    course.image.startsWith('data:')
+  const rawImage = course?.image || '';
+  const sanitizedImage = rawImage.startsWith('http://') ? rawImage.replace(/^http:\/\//i, 'https://') : rawImage;
+  const hasImageUrl = Boolean(
+    sanitizedImage && (
+      sanitizedImage.startsWith('http://') ||
+      sanitizedImage.startsWith('https://') ||
+      sanitizedImage.startsWith('/') ||
+      sanitizedImage.startsWith('data:')
+    )
   );
 
   return (
@@ -80,7 +84,7 @@ function CourseCard({ course, onClick }) {
       <div className="relative w-full h-[185px] rounded-[16px] overflow-hidden select-none bg-slate-900 flex items-center justify-center">
         {hasImageUrl ? (
           <img
-            src={course.image}
+            src={sanitizedImage}
             alt={course.title}
             className="w-full h-full object-cover rounded-[16px] group-hover:scale-105 transition-transform duration-500"
           />

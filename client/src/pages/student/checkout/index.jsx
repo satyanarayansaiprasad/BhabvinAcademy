@@ -160,7 +160,8 @@ function CheckoutPage() {
 
             <div className="space-y-4">
               {itemsToBuy.map((item, index) => {
-                const itemImg = item.courseImage || item.image;
+                const rawItemImg = item.courseImage || item.image;
+                const itemImg = rawItemImg?.startsWith("http://") ? rawItemImg.replace(/^http:\/\//i, "https://") : rawItemImg;
                 const isGradient = itemImg && (itemImg.includes("gradient") || itemImg.includes("|"));
                 let iconChar = "📚";
                 let bgGrad = "linear-gradient(135deg, #0071e3, #42a5f5)";

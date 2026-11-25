@@ -18,6 +18,7 @@ import {
     Smartphone,
     PlayCircle,
     FileText,
+    BookOpen,
     CheckCircle2,
     MoreVertical,
     Download,

@@ -12,8 +12,12 @@ const uploadMediaToCloudinary = async (filePath) => {
   try {
     const result = await cloudinary.uploader.upload(filePath, {
       resource_type: "auto",
+      secure: true,
     });
 
+    if (result && result.url && !result.secure_url) {
+      result.secure_url = result.url.replace(/^http:\/\//i, "https://");
+    }
     return result;
   } catch (error) {
     console.log(error);
@@ -26,12 +30,16 @@ const uploadMediaToCloudinaryFromBuffer = (fileBuffer) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
         resource_type: "auto",
+        secure: true,
       },
       (error, result) => {
         if (error) {
           console.log(error);
           reject(new Error("Error uploading to cloudinary from buffer"));
         } else {
+          if (result && result.url && !result.secure_url) {
+            result.secure_url = result.url.replace(/^http:\/\//i, "https://");
+          }
           resolve(result);
         }
       }
